@@ -11,8 +11,15 @@ export const http = axios.create({
 http.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("ella:token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const url = config.url || "";
+
+    // Não anexa token em endpoints públicos (login / register)
+    // A URL aqui será relativa, ex: "/auth/login" ou "/users"
+    const isPublicEndpoint = url.startsWith("/auth") || url.startsWith("/users");
+
+    if (token && !isPublicEndpoint) {
+      config.headers = config.headers || {};
+      (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -26,8 +33,23 @@ http.interceptors.response.use(
     const msg =
       error?.response?.data?.message ||
       error?.response?.data?.error ||
+      error?.message ||
       "Erro na conexão com o servidor";
 
-    return Promise.reject(new Error(msg));
+    // Se houver indício de token expirado ou 401, limpar token e redirecionar
+    const status = error?.response?.status;
+    if (status === 401 || /expired/i.test(String(msg))) {
+      try {
+        localStorage.removeItem("ella:token");
+        if (typeof window !== "undefined") {
+          // força retorno para a tela de login
+          window.location.href = "/login";
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    return Promise.reject(new Error(String(msg)));
   },
 );
