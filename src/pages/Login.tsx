@@ -19,32 +19,33 @@ export default function LoginPage() {
     try {
       await doLogin(email, password);
       navigate("/dashboard");
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      setError(err?.message || "Erro ao autenticar");
+      const errorMsg = err instanceof Error ? err.message : "Erro ao autenticar";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-[1.2fr,1fr] items-center">
+    <div className="grid items-center gap-8 md:grid-cols-[1.2fr,1fr]">
       {/* Lado esquerdo */}
       <section className="space-y-4">
-        <p className="text-sm uppercase tracking-[0.3em] text-ella-subtile">
+        <p className="text-ella-subtile text-sm tracking-[0.3em] uppercase">
           bem-vinda ao futuro das finanças
         </p>
 
-        <h1 className="text-3xl md:text-4xl font-semibold text-ella-navy">
+        <h1 className="text-ella-navy text-3xl font-semibold md:text-4xl">
           Organize sua vida financeira com clareza e inteligência.
         </h1>
 
-        <p className="text-sm md:text-base text-ella-subtile max-w-xl">
-          A ELLA conecta suas faturas, extratos e metas em um só lugar – e
-          ainda gera insights inteligentes.
+        <p className="text-ella-subtile max-w-xl text-sm md:text-base">
+          A ELLA conecta suas faturas, extratos e metas em um só lugar – e ainda gera insights
+          inteligentes.
         </p>
 
-        <ul className="mt-4 space-y-2 text-sm text-ella-subtile">
+        <ul className="text-ella-subtile mt-4 space-y-2 text-sm">
           <li>• Visão unificada de contas pessoais e empresas</li>
           <li>• Metas guiadas pela IA com valores sugeridos</li>
           <li>• Alertas de gastos fora do seu padrão</li>
@@ -52,38 +53,32 @@ export default function LoginPage() {
       </section>
 
       {/* Card de login */}
-      <section className="rounded-2xl border border-ella-muted bg-white/90 p-6 shadow-lg ella-glass">
-        <h2 className="text-lg font-medium text-ella-navy mb-1">
-          Acessar sua conta
-        </h2>
-        <p className="text-xs text-ella-subtile mb-6">
+      <section className="border-ella-muted ella-glass rounded-2xl border bg-white/90 p-6 shadow-lg">
+        <h2 className="text-ella-navy mb-1 text-lg font-medium">Acessar sua conta</h2>
+        <p className="text-ella-subtile mb-6 text-xs">
           Digite suas credenciais para continuar com a ELLA.
         </p>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-1">
-            <label className="text-xs font-medium uppercase text-ella-subtile">
-              E-mail
-            </label>
+            <label className="text-ella-subtile text-xs font-medium uppercase">E-mail</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="voce@exemplo.com"
-              className="w-full rounded-lg border border-ella-muted bg-white px-3 py-2 text-sm text-ella-text focus:border-ella-gold focus:ring-1 focus:ring-ella-gold"
+              className="border-ella-muted text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border bg-white px-3 py-2 text-sm focus:ring-1"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium uppercase text-ella-subtile">
-              Senha
-            </label>
+            <label className="text-ella-subtile text-xs font-medium uppercase">Senha</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-lg border border-ella-muted bg-white px-3 py-2 text-sm text-ella-text focus:border-ella-gold focus:ring-1 focus:ring-ella-gold"
+              className="border-ella-muted text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border bg-white px-3 py-2 text-sm focus:ring-1"
             />
           </div>
 
@@ -92,17 +87,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-ella-gold px-4 py-2 text-sm font-medium text-ella-navy hover:brightness-110 disabled:opacity-60"
+            className="bg-ella-gold text-ella-navy w-full rounded-lg px-4 py-2 text-sm font-medium hover:brightness-110 disabled:opacity-60"
           >
             {loading ? "Entrando..." : "Entrar na ELLA"}
           </button>
 
-          <p className="pt-3 text-center text-xs text-ella-subtile">
+          <p className="text-ella-subtile pt-3 text-center text-xs">
             Ainda não tem conta?{" "}
-            <a
-              href="/register"
-              className="text-ella-navy font-medium hover:text-ella-gold"
-            >
+            <a href="/register" className="text-ella-navy hover:text-ella-gold font-medium">
               Criar acesso
             </a>
           </p>

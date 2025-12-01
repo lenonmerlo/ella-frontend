@@ -30,92 +30,81 @@ export default function RegisterPage() {
       await register({ firstName, lastName, email, password });
       setSuccess("Conta criada! Redirecionando...");
       setTimeout(() => navigate("/login"), 1500);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      setError(err?.message || "Erro ao criar conta.");
+      const errorMsg = err instanceof Error ? err.message : "Erro ao criar conta.";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-[1.2fr,1fr] items-center p-6 min-h-screen">
+    <div className="grid min-h-screen items-center gap-8 p-6 md:grid-cols-[1.2fr,1fr]">
       <section className="space-y-4">
-        <p className="text-sm uppercase tracking-[0.3em] text-ella-subtile">
-          comece com a ella
-        </p>
+        <p className="text-ella-subtile text-sm tracking-[0.3em] uppercase">comece com a ella</p>
 
-        <h1 className="text-3xl md:text-4xl font-semibold text-ella-navy">
+        <h1 className="text-ella-navy text-3xl font-semibold md:text-4xl">
           Crie sua conta e conecte suas finanças.
         </h1>
 
-        <p className="text-sm md:text-base text-ella-subtile max-w-xl">
+        <p className="text-ella-subtile max-w-xl text-sm md:text-base">
           Tenha visão unificada de contas, IA financeira e alertas inteligentes.
         </p>
       </section>
 
       {/* Card */}
-      <section className="rounded-2xl border border-ella-muted bg-white/90 p-6 shadow-lg ella-glass">
-        <h2 className="text-lg font-medium text-ella-navy mb-1">
-          Criar sua conta ELLA
-        </h2>
+      <section className="border-ella-muted ella-glass rounded-2xl border bg-white/90 p-6 shadow-lg">
+        <h2 className="text-ella-navy mb-1 text-lg font-medium">Criar sua conta ELLA</h2>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div className="space-y-1">
-              <label className="text-xs font-medium uppercase text-ella-subtile">
-                Nome
-              </label>
+              <label className="text-ella-subtile text-xs font-medium uppercase">Nome</label>
               <input
                 type="text"
                 placeholder="Mariana"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full rounded-lg border border-ella-muted px-3 py-2 text-sm focus:border-ella-gold focus:ring-1 focus:ring-ella-gold"
+                className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium uppercase text-ella-subtile">
-                Sobrenome
-              </label>
+              <label className="text-ella-subtile text-xs font-medium uppercase">Sobrenome</label>
               <input
                 type="text"
                 placeholder="Silva"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full rounded-lg border border-ella-muted px-3 py-2 text-sm focus:border-ella-gold focus:ring-1 focus:ring-ella-gold"
+                className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium uppercase text-ella-subtile">
-              E-mail
-            </label>
+            <label className="text-ella-subtile text-xs font-medium uppercase">E-mail</label>
             <input
               type="email"
               placeholder="voce@exemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-ella-muted px-3 py-2 text-sm focus:border-ella-gold focus:ring-1 focus:ring-ella-gold"
+              className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium uppercase text-ella-subtile">
-              Senha
-            </label>
+            <label className="text-ella-subtile text-xs font-medium uppercase">Senha</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-lg border border-ella-muted px-3 py-2 text-sm focus:border-ella-gold focus:ring-1 focus:ring-ella-gold"
+              className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium uppercase text-ella-subtile">
+            <label className="text-ella-subtile text-xs font-medium uppercase">
               Confirmar senha
             </label>
             <input
@@ -123,27 +112,24 @@ export default function RegisterPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded-lg border border-ella-muted px-3 py-2 text-sm focus:border-ella-gold focus:ring-1 focus:ring-ella-gold"
+              className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          {success && <p className="text-emerald-600 text-sm">{success}</p>}
+          {error && <p className="text-sm text-red-500">{error}</p>}
+          {success && <p className="text-sm text-emerald-600">{success}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-ella-gold px-4 py-2 text-sm font-medium text-ella-navy hover:brightness-110 disabled:opacity-60"
+            className="bg-ella-gold text-ella-navy w-full rounded-lg px-4 py-2 text-sm font-medium hover:brightness-110 disabled:opacity-60"
           >
             {loading ? "Criando conta..." : "Criar conta na ELLA"}
           </button>
 
-          <p className="pt-3 text-center text-xs text-ella-subtile">
+          <p className="text-ella-subtile pt-3 text-center text-xs">
             Já tem conta?
-            <a
-              href="/login"
-              className="ml-1 font-medium text-ella-navy hover:text-ella-gold"
-            >
+            <a href="/login" className="text-ella-navy hover:text-ella-gold ml-1 font-medium">
               Entrar
             </a>
           </p>

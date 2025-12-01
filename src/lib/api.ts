@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/lib/api.ts
 
-export const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api";
+export const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api";
 
 // Wrapper genérico pra falar com o backend
 type ApiFetchOptions = RequestInit & {
@@ -22,7 +21,7 @@ export async function apiFetch<T = unknown>(
     ...(options.headers as Record<string, string> | undefined),
   };
 
-  let body: BodyInit | undefined = options.body;
+  let body: BodyInit | undefined = options.body ?? undefined;
 
   if (options.json !== undefined) {
     body = JSON.stringify(options.json);
@@ -46,9 +45,7 @@ export async function apiFetch<T = unknown>(
   }
 
   if (!res.ok) {
-    const msg =
-      (payload && (payload.message || payload.error)) ||
-      `Erro HTTP ${res.status}`;
+    const msg = (payload && (payload.message || payload.error)) || `Erro HTTP ${res.status}`;
     const err = new Error(msg);
     (err as any).status = res.status;
     (err as any).payload = payload;
