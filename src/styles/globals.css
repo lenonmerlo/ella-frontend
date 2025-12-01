@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+html,
+body {
+  @apply antialiased;
+  margin: 0;
+  padding: 0;
+}
+
+/* 🎨 Paleta da ELLA usando Tailwind v4 (@theme) */
+@theme {
+  --color-ella-navy: #0e1a2b;
+  --color-ella-gold: #c9a43b;
+  --color-ella-background: #f5f5f7;
+  --color-ella-card: #ffffff;
+  --color-ella-muted: #e1e1e6;
+  --color-ella-text: #111827;
+  --color-ella-subtile: #4b5563;
+}
+
+/* gradiente */
+.ella-gradient-bg {
+  background:
+    radial-gradient(circle at top left, #c9a43b33, transparent 55%),
+    radial-gradient(circle at bottom right, #0e1a2b33, transparent 55%);
+}
+
+/* glass */
+.ella-glass {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(18px);
+}
