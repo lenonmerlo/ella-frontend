@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import DashboardPage from "./pages/Dashboard";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
+import SettingsPage from "./pages/Settings";
 import "./styles/globals.css";
 
 function HeaderContent() {
@@ -41,6 +42,12 @@ function HeaderContent() {
               </div>
             </div>
             <button
+              onClick={() => navigate("/settings")}
+              className="border-ella-muted text-ella-subtile hover:border-ella-gold hover:text-ella-navy rounded-full border px-3 py-1 text-xs"
+            >
+              Config
+            </button>
+            <button
               onClick={handleLogout}
               className="border-ella-muted text-ella-subtile hover:border-ella-gold hover:text-ella-navy rounded-full border px-3 py-1 text-xs"
             >
@@ -69,6 +76,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Routes>
           </div>
         </main>

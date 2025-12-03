@@ -212,7 +212,7 @@ export default function DashboardPage() {
           </>
         );
       case "invoices":
-        return <InvoicesSection />;
+        return <InvoicesSection transactions={dashboardData.transactions} />;
       case "transactions":
         return <TransactionsSection transactions={dashboardData.transactions} />;
       case "charts":

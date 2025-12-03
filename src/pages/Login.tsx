@@ -38,7 +38,7 @@ export default function LoginPage() {
 
   return (
     <div
-      className="grid min-h-screen items-center gap-8 md:grid-cols-[1.2fr,1fr]"
+      className="grid min-h-screen items-center gap-8 p-6 md:grid-cols-[1.2fr,1fr]"
       style={{
         backgroundImage: "url(/background.png)",
         backgroundSize: "cover",
