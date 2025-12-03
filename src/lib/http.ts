@@ -17,7 +17,10 @@ http.interceptors.request.use(
     // Não anexa token em endpoints públicos (login / register POST)
     // A URL aqui será relativa, ex: "/auth/login" ou "/users"
     const method = (config.method || "get").toLowerCase();
-    const isPublicEndpoint = url.startsWith("/auth") || (url === "/users" && method === "post");
+    const isPublicEndpoint =
+      (url === "/auth/login" && method === "post") ||
+      (url === "/auth/refresh" && method === "post") ||
+      (url === "/users" && method === "post");
 
     if (token && !isPublicEndpoint) {
       config.headers = config.headers || {};
