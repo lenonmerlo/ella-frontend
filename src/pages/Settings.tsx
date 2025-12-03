@@ -72,9 +72,19 @@ export default function SettingsPage() {
 
       setSuccess("Perfil atualizado com sucesso!");
 
-      // Recarregar perfil
+      // Atualizar state local imediatamente
+      setName(name);
+      setEmail(email);
+      setPhone(phone);
+      setAddress(address);
+      setBirthDate(birthDate);
+
+      // Recarregar perfil após atualização (com tratamento de erro)
       setTimeout(() => {
-        loadProfile();
+        loadProfile().catch(() => {
+          // Se falhar ao recarregar, manter dados atualizados localmente
+          console.log("Perfil local atualizado, reload do servidor falhou");
+        });
       }, 500);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Erro ao atualizar perfil";
@@ -123,7 +133,15 @@ export default function SettingsPage() {
   return (
     <div className="bg-ella-background min-h-screen px-4 py-8">
       <div className="mx-auto max-w-2xl space-y-6">
-        <h1 className="text-ella-navy text-3xl font-semibold">Configurações</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-ella-navy text-3xl font-semibold">Configurações</h1>
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="text-ella-subtile hover:text-ella-navy text-sm font-medium"
+          >
+            ← Voltar
+          </button>
+        </div>
 
         {/* Avatar Section */}
         <section className="ella-glass border-ella-muted rounded-2xl border p-6">
