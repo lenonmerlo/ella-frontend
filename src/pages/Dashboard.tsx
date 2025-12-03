@@ -38,10 +38,17 @@ export interface DashboardInsight {
   priority: "HIGH" | "MEDIUM" | "LOW";
 }
 
+export interface MonthlyData {
+  month: string;
+  income: number;
+  expense: number;
+}
+
 export interface DashboardData {
   summary: DashboardSummary;
   transactions: DashboardTransaction[];
   insights: DashboardInsight[];
+  monthly?: MonthlyData[];
 }
 
 type SectionId = "overview" | "invoices" | "transactions" | "charts" | "goals" | "insights";
@@ -90,6 +97,30 @@ function mapBackendToDashboard(backendData: DashboardResponseDTO): DashboardData
     },
     transactions,
     insights,
+    monthly: (function () {
+      const evo = backendData.personalMonthlyEvolution;
+      if (!evo) return [];
+      if (Array.isArray(evo)) {
+        return evo.map((m) => ({ month: m.month, income: m.income, expense: m.expense }));
+      }
+      // If backend returned an object keyed by month or a single entry, try to normalize
+      if (typeof evo === "object") {
+        // If it's an object with month keys: { "Jan": { income:..., expense:... }, ... }
+        const entries: Array<{ month: string; income: number; expense: number }> = [];
+        for (const key of Object.keys(evo)) {
+          const val = (evo as any)[key];
+          if (val && typeof val === "object") {
+            entries.push({
+              month: key,
+              income: Number(val.income ?? 0),
+              expense: Number(val.expense ?? 0),
+            });
+          }
+        }
+        if (entries.length > 0) return entries;
+      }
+      return [];
+    })(),
   };
 }
 
