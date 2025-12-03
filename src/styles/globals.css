@@ -18,6 +18,14 @@ body {
   --color-ella-subtile: #4b5563;
 }
 
+/* 🌅 Background de imagem para Login, Registro e Dashboard */
+.ella-bg {
+  background-image: url("/background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 /* gradiente */
 .ella-gradient-bg {
   background:

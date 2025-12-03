@@ -1,10 +1,12 @@
 // src/pages/Login.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { login as doLogin } from "../lib/auth";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { loadProfile } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +20,12 @@ export default function LoginPage() {
 
     try {
       await doLogin(email, password);
+      // depois de logar, carregar perfil via contexto
+      try {
+        await loadProfile();
+      } catch (er) {
+        // ignore
+      }
       navigate("/dashboard");
     } catch (err) {
       console.error(err);
@@ -29,7 +37,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="grid items-center gap-8 md:grid-cols-[1.2fr,1fr]">
+    <div
+      className="grid min-h-screen items-center gap-8 md:grid-cols-[1.2fr,1fr]"
+      style={{
+        backgroundImage: "url(/background.png)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
       {/* Lado esquerdo */}
       <section className="space-y-4">
         <p className="text-ella-subtile text-sm tracking-[0.3em] uppercase">

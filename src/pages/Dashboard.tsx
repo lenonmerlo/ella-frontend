@@ -1,14 +1,18 @@
 // src/pages/Dashboard.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import { getToken } from "../lib/auth";
+import { fetchCurrentUserDashboard, type DashboardResponseDTO } from "../lib/dashboard";
 
-import { DashboardSidebar } from "../components/dashboard/DashboardSidebar";
-import { UploadState } from "../components/dashboard/UploadState";
-import { SummaryCards } from "../components/dashboard/SummaryCards";
-import { InsightsSection } from "../components/dashboard/InsightsSection";
 import { ChartsSection } from "../components/dashboard/ChartsSection";
+import { DashboardSidebar } from "../components/dashboard/DashboardSidebar";
+import { GoalsSection } from "../components/dashboard/GoalsSection";
+import { InsightsSection } from "../components/dashboard/InsightsSection";
+import { InvoicesSection } from "../components/dashboard/InvoicesSection";
+import { SummaryCards } from "../components/dashboard/SummaryCards";
 import { TransactionsSection } from "../components/dashboard/TransactionsSection";
+import { UploadState } from "../components/dashboard/UploadState";
 
 export interface DashboardSummary {
   balance: number;
@@ -40,8 +44,58 @@ export interface DashboardData {
   insights: DashboardInsight[];
 }
 
+type SectionId = "overview" | "invoices" | "transactions" | "charts" | "goals" | "insights";
+
+/**
+ * Mapeia DashboardResponseDTO (do backend) para DashboardData (formato local)
+ */
+function mapBackendToDashboard(backendData: DashboardResponseDTO): DashboardData {
+  // Extrair balance: totalIncome - totalExpense
+  const totalIncome = backendData.personalTotals?.totalIncome ?? 0;
+  const totalExpense = backendData.personalTotals?.totalExpense ?? 0;
+  const balance = backendData.personalTotals?.balance ?? totalIncome - totalExpense;
+  const savingsRate = totalIncome > 0 ? Math.round((balance / totalIncome) * 100) : 0;
+
+  // Transformar invoices em transactions
+  const transactions: DashboardTransaction[] = (backendData.personalInvoices ?? []).map(
+    (invoice, idx) => ({
+      id: idx + 1,
+      description: `Fatura #${invoice.id}`,
+      amount: invoice.amount,
+      category: "Faturas",
+      date: invoice.dueDate,
+      type: invoice.amount < 0 ? "EXPENSE" : "INCOME",
+    }),
+  );
+
+  // Criar insights baseados nos dados (opcional)
+  const insights: DashboardInsight[] = [];
+
+  if (savingsRate >= 30) {
+    insights.push({
+      id: 1,
+      title: "Ótima taxa de poupança! 🎉",
+      description: `Você está economizando ${savingsRate}% da sua renda mensal. Continue assim para atingir suas metas ainda mais rápido!`,
+      type: "TIP",
+      priority: "HIGH",
+    });
+  }
+
+  return {
+    summary: {
+      balance,
+      totalIncome,
+      totalExpenses: totalExpense,
+      savingsRate,
+    },
+    transactions,
+    insights,
+  };
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Auth básica: se não tiver token, volta pro login
   useEffect(() => {
@@ -52,9 +106,52 @@ export default function DashboardPage() {
   }, [navigate]);
 
   const [hasData, setHasData] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [selectedSection, setSelectedSection] = useState<SectionId>("overview");
+  const [error, setError] = useState<string | null>(null);
+
+  /**
+   * Carrega dados reais do dashboard ao montar o componente
+   */
+  useEffect(() => {
+    async function loadDashboardData() {
+      try {
+        setIsLoading(true);
+        setError(null);
+        // Pegar data atual para passar year e month
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1; // getMonth() retorna 0-11
+
+        const backendData = await fetchCurrentUserDashboard(year, month);
+
+        if (backendData) {
+          const mappedData = mapBackendToDashboard(backendData);
+          setDashboardData(mappedData);
+          setHasData(true);
+          setSelectedSection("overview");
+        } else {
+          throw new Error("Nenhum dado retornado do servidor");
+        }
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : "Erro ao carregar dashboard";
+        console.error("Erro ao buscar dados do dashboard:", err);
+        setError(errorMsg);
+        // Não chamar setHasData(true) para manter a tela de upload
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadDashboardData();
+  }, []);
+
+  function handleSelectSection(id: string) {
+    setSelectedSection(id as SectionId);
+  }
 
   async function simulateAIProcessing() {
     const steps = [20, 40, 60, 80, 100];
@@ -70,133 +167,30 @@ export default function DashboardPage() {
 
     setIsUploading(true);
     setUploadProgress(0);
+    setError(null);
 
     try {
       await simulateAIProcessing();
 
-      // 🔮 MOCK – depois trocamos pelo retorno real do backend
-      const mock: DashboardData = {
-        summary: {
-          balance: 15847.5,
-          totalIncome: 8500,
-          totalExpenses: 5234.8,
-          savingsRate: 38,
-        },
-        transactions: [
-          {
-            id: 1,
-            description: "Salário",
-            amount: 8500,
-            category: "Salário",
-            date: "2025-11-01",
-            type: "INCOME",
-          },
-          {
-            id: 2,
-            description: "Aluguel",
-            amount: -2000,
-            category: "Moradia",
-            date: "2025-11-05",
-            type: "EXPENSE",
-          },
-          {
-            id: 3,
-            description: "Supermercado",
-            amount: -456.8,
-            category: "Alimentação",
-            date: "2025-11-08",
-            type: "EXPENSE",
-          },
-          {
-            id: 4,
-            description: "Academia",
-            amount: -120,
-            category: "Saúde",
-            date: "2025-11-10",
-            type: "EXPENSE",
-          },
-          {
-            id: 5,
-            description: "Restaurante",
-            amount: -180,
-            category: "Alimentação",
-            date: "2025-11-12",
-            type: "EXPENSE",
-          },
-          {
-            id: 6,
-            description: "Uber",
-            amount: -78,
-            category: "Transporte",
-            date: "2025-11-15",
-            type: "EXPENSE",
-          },
-          {
-            id: 7,
-            description: "Freelance",
-            amount: 1200,
-            category: "Renda Extra",
-            date: "2025-11-18",
-            type: "INCOME",
-          },
-          {
-            id: 8,
-            description: "Netflix",
-            amount: -45,
-            category: "Entretenimento",
-            date: "2025-11-20",
-            type: "EXPENSE",
-          },
-          {
-            id: 9,
-            description: "Farmácia",
-            amount: -85,
-            category: "Saúde",
-            date: "2025-11-22",
-            type: "EXPENSE",
-          },
-          {
-            id: 10,
-            description: "Shopping",
-            amount: -320,
-            category: "Compras",
-            date: "2025-11-25",
-            type: "EXPENSE",
-          },
-        ],
-        insights: [
-          {
-            id: 1,
-            title: "Ótima taxa de poupança! 🎉",
-            description:
-              "Você está economizando 38% da sua renda mensal. Continue assim para atingir suas metas ainda mais rápido!",
-            type: "TIP",
-            priority: "HIGH",
-          },
-          {
-            id: 2,
-            title: "Gastos com alimentação aumentaram",
-            description:
-              "Seus gastos em restaurantes e delivery subiram 25% este mês. Que tal tentar cozinhar mais em casa?",
-            type: "ALERT",
-            priority: "MEDIUM",
-          },
-          {
-            id: 3,
-            title: "Oportunidade de investimento",
-            description:
-              "Com seu saldo atual, você pode começar a investir em renda fixa. Considere separar R$ 500/mês para construir sua reserva de emergência.",
-            type: "SUGGESTION",
-            priority: "HIGH",
-          },
-        ],
-      };
+      // Carregar dados reais do backend
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
 
-      setDashboardData(mock);
+      const backendData = await fetchCurrentUserDashboard(year, month);
+      if (!backendData) {
+        throw new Error("Nenhum dado retornado do servidor");
+      }
+
+      const mappedData = mapBackendToDashboard(backendData);
+      setDashboardData(mappedData);
       setHasData(true);
-    } catch (error) {
-      console.error("Upload error:", error);
-      alert("Erro ao processar arquivo. Tente novamente.");
+      setSelectedSection("overview");
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Erro ao processar arquivo";
+      console.error("Upload error:", err);
+      setError(errorMsg);
+      alert(`Erro ao carregar dashboard: ${errorMsg}`);
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -204,12 +198,48 @@ export default function DashboardPage() {
     }
   }
 
+  function renderSection() {
+    if (!dashboardData) return null;
+
+    switch (selectedSection) {
+      case "overview":
+        return (
+          <>
+            <SummaryCards summary={dashboardData.summary} insights={dashboardData.insights} />
+            <InsightsSection insights={dashboardData.insights} />
+            <ChartsSection data={dashboardData} />
+            <TransactionsSection transactions={dashboardData.transactions} />
+          </>
+        );
+      case "invoices":
+        return <InvoicesSection />;
+      case "transactions":
+        return <TransactionsSection transactions={dashboardData.transactions} />;
+      case "charts":
+        return <ChartsSection data={dashboardData} />;
+      case "goals":
+        return <GoalsSection />;
+      case "insights":
+        return <InsightsSection insights={dashboardData.insights} />;
+      default:
+        return null;
+    }
+  }
+
   // Estado inicial: aguardando upload da fatura
   if (!hasData) {
     return (
-      <div className="ella-gradient-bg min-h-screen">
+      <div
+        className="ella-gradient-bg min-h-screen"
+        style={{
+          backgroundImage: "url(/background.png)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
+        }}
+      >
         <main className="mx-auto flex max-w-7xl gap-6 px-6 py-8">
-          <DashboardSidebar selected="overview" />
+          <DashboardSidebar selected={selectedSection} onSelect={handleSelectSection} />
           <div className="flex-1">
             <UploadState
               isUploading={isUploading}
@@ -224,20 +254,31 @@ export default function DashboardPage() {
 
   if (!dashboardData) return null;
 
-  // Estado com dados: cards + insights + gráficos + transações
+  // Estado com dados: seção de acordo com o menu
   return (
-    <div className="ella-gradient-bg min-h-screen">
+    <div
+      className="ella-gradient-bg min-h-screen"
+      style={{
+        backgroundImage: "url(/background.png)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <main className="mx-auto flex max-w-7xl gap-6 px-6 py-8">
-        <DashboardSidebar selected="overview" />
+        <DashboardSidebar selected={selectedSection} onSelect={handleSelectSection} />
 
         <div className="flex-1 space-y-8">
-          <SummaryCards
-            summary={dashboardData.summary}
-            insights={dashboardData.insights}
-          />
-          <InsightsSection insights={dashboardData.insights} />
-          <ChartsSection data={dashboardData} />
-          <TransactionsSection transactions={dashboardData.transactions} />
+          {/* Greeting */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-ella-navy text-2xl font-semibold">
+                {`Bem-vinda${user?.name ? ", " + user.name : ""} 👋`}
+              </h2>
+              <p className="text-ella-subtile text-sm">Aqui está a visão geral das suas finanças</p>
+            </div>
+          </div>
+          {renderSection()}
         </div>
       </main>
     </div>

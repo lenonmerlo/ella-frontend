@@ -40,7 +40,15 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="grid min-h-screen items-center gap-8 p-6 md:grid-cols-[1.2fr,1fr]">
+    <div
+      className="grid min-h-screen items-center gap-8 p-6 md:grid-cols-[1.2fr,1fr]"
+      style={{
+        backgroundImage: "url(/background.png)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <section className="space-y-4">
         <p className="text-ella-subtile text-sm tracking-[0.3em] uppercase">comece com a ella</p>
 
