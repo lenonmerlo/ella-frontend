@@ -81,7 +81,7 @@ http.interceptors.response.use(
 // refresh handling
 let isRefreshing = false;
 let refreshQueue: Array<{
-  resolve: (token?: string) => void;
+  resolve: (token: string) => void;
   reject: (err?: any) => void;
 }> = [];
 
@@ -89,7 +89,7 @@ async function doRefresh(): Promise<string> {
   // usa axios direto para evitar loops com este interceptor
   const refreshUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`;
   const resp = await axios.post(refreshUrl, null, { withCredentials: true });
-  const newToken = resp?.data?.data?.token;
+  const newToken = resp?.data?.data?.token ?? resp?.data?.token;
   if (newToken) {
     localStorage.setItem("ella:token", newToken);
     return newToken;

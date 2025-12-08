@@ -2,46 +2,70 @@
 import { getToken, parseJwt } from "./auth";
 import { http } from "./http";
 
-// Tipos compatíveis com o backend
+// ✅ Tipos compatíveis com o backend (atualizados)
 export interface SummaryDTO {
-  totalBalance: number;
-  monthlyIncome: number;
-  monthlyExpense: number;
-  projectedBalance: number;
+  totalIncome: number;
+  totalExpenses: number;
+  balance: number;
 }
 
 export interface TotalsDTO {
-  totalIncome: number;
-  totalExpense: number;
-  balance: number;
+  monthIncome: number;
+  monthExpenses: number;
+  yearIncome: number;
+  yearExpenses: number;
 }
 
 export interface CategoryBreakdownDTO {
   category: string;
-  totalAmount: number;
+  total: number;
   percentage: number;
-  transactionCount: number;
+}
+
+export interface MonthlyPointDTO {
+  monthLabel: string;
+  income: number;
+  expenses: number;
 }
 
 export interface MonthlyEvolutionDTO {
-  month: string;
-  income: number;
-  expense: number;
-  balance: number;
+  points: MonthlyPointDTO[];
 }
 
 export interface GoalProgressDTO {
-  totalGoals: number;
-  completedGoals: number;
-  activeGoals: number;
-  completionPercentage: number;
+  goalId: string;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  percentage: number;
+  status: string;
 }
 
 export interface InvoiceSummaryDTO {
-  id: string;
-  amount: number;
+  creditCardId: string;
+  creditCardName: string;
+  creditCardBrand?: string;
+  creditCardLastFourDigits?: string;
+  personName?: string;
+  totalAmount: number;
   dueDate: string;
+  isOverdue: boolean;
+}
+
+export interface FinancialTransactionResponseDTO {
+  id: string;
+  personId: string;
+  personName: string;
+  description: string;
+  amount: number;
+  type: "INCOME" | "EXPENSE";
+  category: string;
+  transactionDate: string;
+  dueDate?: string;
+  paidDate?: string;
   status: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CompanyDashboardDTO {
@@ -54,19 +78,21 @@ export interface CompanyDashboardDTO {
 }
 
 export interface ConsolidatedTotalsDTO {
-  totalBalance: number;
+  balance: number;
   totalIncome: number;
-  totalExpense: number;
+  totalExpenses: number;
 }
 
+// ✅ CORRIGIDO: Adicionado personalTransactions
 export interface DashboardResponseDTO {
   personId: string;
   personalSummary?: SummaryDTO;
   personalTotals?: TotalsDTO;
   personalCategoryBreakdown?: CategoryBreakdownDTO[];
-  personalMonthlyEvolution?: MonthlyEvolutionDTO[];
+  personalMonthlyEvolution?: MonthlyEvolutionDTO;
   goalProgress?: GoalProgressDTO;
   personalInvoices?: InvoiceSummaryDTO[];
+  personalTransactions?: FinancialTransactionResponseDTO[]; // ✅ NOVO
   companies?: CompanyDashboardDTO[];
   consolidatedTotals?: ConsolidatedTotalsDTO;
 }
@@ -75,6 +101,37 @@ export interface DashboardRequestDTO {
   personId: string;
   year: number;
   month: number;
+}
+
+// Estrutura esperada pelo Dashboard local após upload
+export interface DashboardSummaryLocal {
+  balance: number;
+  totalIncome: number;
+  totalExpenses: number;
+  savingsRate: number;
+}
+
+export interface DashboardTransactionLocal {
+  id: number;
+  description: string;
+  amount: number;
+  category: string;
+  date: string;
+  type: "INCOME" | "EXPENSE";
+}
+
+export interface DashboardInsightLocal {
+  id: number;
+  title: string;
+  description: string;
+  type: string;
+  priority: "HIGH" | "MEDIUM" | "LOW";
+}
+
+export interface DashboardDataLocal {
+  summary: DashboardSummaryLocal;
+  transactions: DashboardTransactionLocal[];
+  insights: DashboardInsightLocal[];
 }
 
 /**
@@ -86,7 +143,10 @@ export function getPersonIdFromToken(): string | null {
   if (!token) return null;
 
   const payload = parseJwt(token);
-  return payload?.id ?? null;
+  // Aceita múltiplas chaves possíveis para o id
+  const possible = payload?.id || payload?.personId || payload?.userId || payload?.sub;
+  if (!possible) return null;
+  return String(possible);
 }
 
 /**
@@ -95,8 +155,23 @@ export function getPersonIdFromToken(): string | null {
  */
 export async function fetchQuickDashboard(personId: string): Promise<DashboardResponseDTO | null> {
   try {
-    const res = await http.get<{ data: DashboardResponseDTO }>(`/dashboard/quick/${personId}`);
-    return res.data?.data ?? null;
+    console.log("[API] GET /dashboard/quick/", personId);
+    const res = await http.get<any>(`/dashboard/quick/${personId}`);
+    console.log("[API] /dashboard/quick response:", res.status, res.data);
+    const payload = res.data?.data ?? res.data;
+    return payload ?? null;
+  } catch (error) {
+    console.error("Erro ao buscar quick dashboard:", error);
+    throw error;
+  }
+}
+
+export async function getInvoices(): Promise<DashboardResponseDTO | null> {
+  try {
+    const res = await http.get<any>("/invoices");
+    console.log("[API] /invoices response:", res.status, res.data);
+    const payload = res.data?.data ?? res.data;
+    return payload ?? null;
   } catch (error) {
     console.error("Erro ao buscar quick dashboard:", error);
     throw error;
@@ -113,12 +188,15 @@ export async function fetchDashboard(
   month: number,
 ): Promise<DashboardResponseDTO | null> {
   try {
-    const res = await http.post<{ data: DashboardResponseDTO }>("/dashboard", {
+    console.log("[API] POST /dashboard", { personId, year, month });
+    const res = await http.post<any>("/dashboard", {
       personId,
       year,
       month,
     });
-    return res.data?.data ?? null;
+    console.log("[API] /dashboard response:", res.status, res.data);
+    const payload = res.data?.data ?? res.data;
+    return payload ?? null;
   } catch (error) {
     console.error("Erro ao buscar dashboard:", error);
     throw error;
@@ -136,6 +214,93 @@ export async function fetchCurrentUserDashboard(
   if (!personId) {
     throw new Error("Não foi possível extrair personId do token");
   }
-
+  console.debug("[Auth] personId extraído do token:", personId);
+  // Preferir dashboard rápido centralizado no backend; fallback para completo
+  try {
+    const quick = await fetchQuickDashboard(personId);
+    if (quick) return quick;
+  } catch (e) {
+    console.warn("[API] Falha no quick dashboard, tentando completo:", e);
+  }
   return fetchDashboard(personId, year, month);
+}
+
+/**
+ * Fallback: busca transações persistidas para a pessoa no período.
+ * GET /api/transactions/person/{personId}/period?start=YYYY-MM-DD&end=YYYY-MM-DD
+ */
+export async function fetchCurrentUserTransactionsInPeriod(
+  start: string,
+  end: string,
+): Promise<DashboardTransactionLocal[]> {
+  const personId = getPersonIdFromToken();
+  if (!personId) throw new Error("PersonId ausente no token");
+
+  console.debug("[API] GET /transactions/person/period", { personId, start, end });
+  const res = await http.get<{ data: any[] }>(`/transactions/person/${personId}/period`, {
+    params: { start, end },
+  });
+  console.debug("[API] /transactions/person/period response:", res.status, res.data);
+
+  const list = Array.isArray(res.data?.data) ? res.data.data : [];
+  return list.map((t: any, idx: number) => ({
+    id: idx + 1,
+    description: String(t.description ?? ""),
+    amount: Number(t.amount ?? 0),
+    category: String(t.category ?? ""),
+    date: String(t.transactionDate ?? t.date ?? ""),
+    type: String(t.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE",
+  }));
+}
+
+/**
+ * Upload real de fatura (CSV prioritário; PDF futuramente)
+ * POST /api/invoices/upload
+ * multipart/form-data com campo "file"
+ * Retorno esperado: { summary, transactions, insights }
+ */
+export async function uploadInvoice(file: File): Promise<DashboardDataLocal> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  console.debug("[API] POST /invoices/upload (multipart)", { name: file.name, size: file.size });
+  const response = await http.post<any>("/invoices/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  console.log("[API] /invoices/upload response:", response.status, response.data);
+
+  const raw = response.data?.data ?? response.data;
+  if (!raw) throw new Error("Resposta vazia do upload de fatura");
+
+  const summary: DashboardSummaryLocal = {
+    balance: Number(raw.summary?.balance ?? 0),
+    totalIncome: Number(raw.summary?.totalIncome ?? 0),
+    totalExpenses: Number(raw.summary?.totalExpenses ?? 0),
+    savingsRate: Number(raw.summary?.savingsRate ?? 0),
+  };
+
+  const transactions: DashboardTransactionLocal[] = Array.isArray(raw.transactions)
+    ? raw.transactions.map((t: any, idx: number) => ({
+        id: idx + 1,
+        description: String(t.description ?? ""),
+        amount: Number(t.amount ?? 0),
+        category: String(t.category ?? ""),
+        date: String(t.date ?? ""),
+        type: String(t.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE",
+      }))
+    : [];
+
+  const insights: DashboardInsightLocal[] = Array.isArray(raw.insights)
+    ? raw.insights.map((i: any, idx: number) => ({
+        id: Number(i.id ?? idx + 1),
+        title: String(i.title ?? ""),
+        description: String(i.description ?? ""),
+        type: String(i.type ?? "TIP"),
+        priority: ["HIGH", "MEDIUM", "LOW"].includes(String(i.priority))
+          ? (i.priority as "HIGH" | "MEDIUM" | "LOW")
+          : "LOW",
+      }))
+    : [];
+
+  return { summary, transactions, insights };
 }
