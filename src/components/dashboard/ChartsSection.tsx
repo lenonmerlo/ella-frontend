@@ -12,129 +12,120 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { DashboardData } from "../../pages/Dashboard";
+import { ChartsDTO } from "../../services/api/chartsService";
 
 const PIE_COLORS = ["#0E1A2B", "#C9A43B", "#4B5563", "#E5D4A0", "#2E3A4D", "#D4AF65"];
 
 interface Props {
-  data: DashboardData;
+  data: ChartsDTO;
 }
 
 export function ChartsSection({ data }: Props) {
-  const expensesByCategory = data.transactions
-    .filter((t) => t.type === "EXPENSE")
-    .reduce<Record<string, number>>((acc, t) => {
-      acc[t.category] = (acc[t.category] || 0) + Math.abs(t.amount);
-      return acc;
-    }, {});
-
-  const categoryData = Object.entries(expensesByCategory).map(([name, value]) => ({
-    name,
-    value,
+  const categoryData = data.categoryBreakdown.map((item) => ({
+    name: item.category,
+    value: item.total,
   }));
 
-  // Prefer backend monthly evolution when available. Otherwise, derive monthly totals
-  // from the transactions list (group by month). Fall back to static mock only if
-  // no transaction data is available.
-  const monthlyData: Array<{ month: string; receitas: number; despesas: number }> =
-    data.monthly && data.monthly.length > 0
-      ? data.monthly.map((m) => ({ month: m.month, receitas: m.income, despesas: m.expense }))
-      : (() => {
-          if (!data.transactions || data.transactions.length === 0) {
-            return [
-              { month: "Jul", receitas: 7000, despesas: 4500 },
-              { month: "Ago", receitas: 7500, despesas: 4800 },
-              { month: "Set", receitas: 8000, despesas: 5100 },
-              { month: "Out", receitas: 8200, despesas: 5000 },
-              { month: "Nov", receitas: 8500, despesas: 5234.8 },
-            ];
-          }
-
-          // Group transactions by month (use locale short month names)
-          const monthMap = new Map<string, { receitas: number; despesas: number }>();
-
-          data.transactions.forEach((t) => {
-            const dt = new Date(t.date);
-            const monthName = dt.toLocaleString("pt-BR", { month: "short" });
-            const name = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-            const entry = monthMap.get(name) ?? { receitas: 0, despesas: 0 };
-            if (t.type === "INCOME") entry.receitas += Math.abs(t.amount);
-            else entry.despesas += Math.abs(t.amount);
-            monthMap.set(name, entry);
-          });
-
-          // Convert map to sorted array by month order
-          const monthOrder = [
-            "Jan",
-            "Fev",
-            "Mar",
-            "Abr",
-            "Mai",
-            "Jun",
-            "Jul",
-            "Ago",
-            "Set",
-            "Out",
-            "Nov",
-            "Dez",
-          ];
-
-          const result: Array<{ month: string; receitas: number; despesas: number }> = [];
-          monthOrder.forEach((m) => {
-            const v = monthMap.get(m);
-            if (v) result.push({ month: m, receitas: v.receitas, despesas: v.despesas });
-          });
-
-          // If no matching month names (locale mismatch), fallback to map iteration
-          if (result.length === 0) {
-            for (const [name, v] of monthMap.entries()) {
-              result.push({ month: name, receitas: v.receitas, despesas: v.despesas });
-            }
-          }
-
-          return result;
-        })();
+  const monthlyData = data.monthlyEvolution.points.map((m) => ({
+    month: m.monthLabel,
+    receitas: m.income,
+    despesas: m.expenses,
+  }));
 
   return (
     <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {/* Gráfico de Barras */}
       <div className="ella-glass p-6">
         <h3 className="text-ella-navy mb-6 text-sm font-semibold">Receitas vs Despesas</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={monthlyData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E1E1E6" />
-            <XAxis dataKey="month" stroke="#4B5563" />
-            <YAxis stroke="#4B5563" />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="receitas" fill="#10B981" name="Receitas" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="despesas" fill="#EF4444" name="Despesas" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        {monthlyData.length === 0 ? (
+          <div className="flex h-[300px] items-center justify-center">
+            <p className="text-sm text-gray-500">Sem dados para exibir</p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+              <XAxis
+                dataKey="month"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#6B7280", fontSize: 12 }}
+                dy={10}
+                interval={0} // Forçar exibição de todos os meses
+              />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 12 }} />
+              <Tooltip
+                cursor={{ fill: "#F3F4F6" }}
+                contentStyle={{
+                  borderRadius: "8px",
+                  border: "none",
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                }}
+              />
+              <Legend iconType="circle" wrapperStyle={{ paddingTop: "20px" }} />
+              <Bar
+                dataKey="receitas"
+                name="Receitas"
+                fill="#10B981"
+                radius={[4, 4, 0, 0]}
+                barSize={20}
+              />
+              <Bar
+                dataKey="despesas"
+                name="Despesas"
+                fill="#EF4444"
+                radius={[4, 4, 0, 0]}
+                barSize={20}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
+      {/* Gráfico de Pizza */}
       <div className="ella-glass p-6">
         <h3 className="text-ella-navy mb-6 text-sm font-semibold">Gastos por Categoria</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={categoryData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              outerRadius={90}
-              dataKey="value"
-              label={({ name, percent }) => {
-                const safePercent = percent ?? 0; // se vier undefined, vira 0
-                return `${name}: ${(safePercent * 100).toFixed(0)}%`;
-              }}
-            >
-              {categoryData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
+        {categoryData.length === 0 ? (
+          <div className="flex h-[300px] items-center justify-center">
+            <p className="text-sm text-gray-500">Sem dados para exibir</p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={categoryData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                innerRadius={0}
+                dataKey="value"
+                label={({ name, percent }) => {
+                  const safePercent = percent ?? 0;
+                  const safeName = name ?? "";
+                  return `${safeName.substring(0, 10)}: ${(safePercent * 100).toFixed(0)}%`;
+                }}
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "500",
+                }}
+              >
+                {categoryData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value: number) => `R$ ${value.toFixed(2)}`}
+                contentStyle={{
+                  backgroundColor: "rgba(255, 255, 255, 0.95)",
+                  border: "1px solid #E1E1E6",
+                  borderRadius: "8px",
+                  padding: "8px 12px",
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </section>
   );
