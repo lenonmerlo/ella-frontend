@@ -32,6 +32,14 @@ export function ChartsSection({ data }: Props) {
     despesas: m.expenses,
   }));
 
+  const formatMonth = (label: string) => {
+    // Espera "YYYY-MM"; se falhar, devolve original
+    const [y, m] = label.split("-").map(Number);
+    if (!y || !m) return label;
+    const d = new Date(y, m - 1, 1);
+    return d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" });
+  };
+
   return (
     <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       {/* Gráfico de Barras */}
@@ -49,9 +57,10 @@ export function ChartsSection({ data }: Props) {
                 dataKey="month"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#6B7280", fontSize: 12 }}
+                tick={{ fill: "#6B7280", fontSize: 11 }}
                 dy={10}
-                interval={0} // Forçar exibição de todos os meses
+                interval={1}
+                tickFormatter={formatMonth}
               />
               <YAxis axisLine={false} tickLine={false} tick={{ fill: "#6B7280", fontSize: 12 }} />
               <Tooltip

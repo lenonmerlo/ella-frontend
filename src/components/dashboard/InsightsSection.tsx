@@ -23,9 +23,9 @@ export function InsightsSection({ insights }: Props) {
       </div>
 
       <div className="space-y-4">
-        {insights.map((insight) => (
+        {insights.map((insight, index) => (
           <div
-            key={insight.id}
+            key={(insight as any).id || index}
             className="bg-ella-background rounded-xl p-6"
             style={{
               borderLeftWidth: 4,
