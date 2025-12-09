@@ -65,7 +65,7 @@ export function InvoicesSection({ invoices = [] }: InvoicesSectionProps) {
               <div className="flex justify-between text-sm">
                 <span className="text-ella-subtile">Vencimento</span>
                 <span className="text-ella-navy font-medium">
-                  {new Date(invoice.dueDate).toLocaleDateString("pt-BR")}
+                  {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString("pt-BR") : "--"}
                 </span>
               </div>
             </div>
@@ -75,7 +75,7 @@ export function InvoicesSection({ invoices = [] }: InvoicesSectionProps) {
                 <div>
                   <p className="text-ella-subtile text-xs">Valor Total</p>
                   <p className="text-ella-navy text-lg font-bold">
-                    R$ {invoice.amount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {(invoice.amount ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div className="bg-ella-background/5 text-ella-navy group-hover:bg-ella-gold rounded-full p-1.5 transition-colors group-hover:text-white">

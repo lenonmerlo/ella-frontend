@@ -13,6 +13,13 @@ http.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("ella:token");
     const url = config.url || "";
+    console.debug("[HTTP][request]", {
+      method: config.method,
+      url,
+      baseURL: config.baseURL,
+      params: config.params,
+      data: config.data,
+    });
 
     // Não anexa token em endpoints públicos (login / register POST)
     // A URL aqui será relativa, ex: "/auth/login" ou "/users"
@@ -33,8 +40,21 @@ http.interceptors.request.use(
 
 // Interceptor para tratar erros da API
 http.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.debug("[HTTP][response]", {
+      status: response.status,
+      url: response.config?.url,
+      data: response.data,
+    });
+    return response;
+  },
   (error) => {
+    console.error("[HTTP][error]", {
+      url: error?.config?.url,
+      status: error?.response?.status,
+      data: error?.response?.data,
+      message: error?.message,
+    });
     const msg =
       error?.response?.data?.message ||
       error?.response?.data?.error ||

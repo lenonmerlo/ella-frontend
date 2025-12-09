@@ -6,9 +6,12 @@ import {
 } from "../../lib/dashboard";
 import { http } from "../../lib/http";
 
-export async function uploadInvoice(file: File): Promise<DashboardDataLocal> {
+export async function uploadInvoice(file: File, password?: string): Promise<DashboardDataLocal> {
   const formData = new FormData();
   formData.append("file", file);
+  if (password) {
+    formData.append("password", password);
+  }
 
   const response = await http.post<any>("/invoices/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
@@ -30,7 +33,7 @@ export async function uploadInvoice(file: File): Promise<DashboardDataLocal> {
         description: String(t.description ?? ""),
         amount: Number(t.amount ?? 0),
         category: String(t.category ?? ""),
-        date: String(t.date ?? ""),
+        date: String(t.transactionDate ?? t.date ?? ""),
         type: String(t.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE",
       }))
     : [];
@@ -47,5 +50,8 @@ export async function uploadInvoice(file: File): Promise<DashboardDataLocal> {
       }))
     : [];
 
-  return { summary, transactions, insights, monthly: [] };
+  const startDate = raw.startDate ? String(raw.startDate) : undefined;
+  const endDate = raw.endDate ? String(raw.endDate) : undefined;
+
+  return { summary, transactions, insights, monthly: [], startDate, endDate };
 }

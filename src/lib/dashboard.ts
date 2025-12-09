@@ -132,6 +132,8 @@ export interface DashboardDataLocal {
   summary: DashboardSummaryLocal;
   transactions: DashboardTransactionLocal[];
   insights: DashboardInsightLocal[];
+  startDate?: string;
+  endDate?: string;
 }
 
 /**
@@ -259,9 +261,12 @@ export async function fetchCurrentUserTransactionsInPeriod(
  * multipart/form-data com campo "file"
  * Retorno esperado: { summary, transactions, insights }
  */
-export async function uploadInvoice(file: File): Promise<DashboardDataLocal> {
+export async function uploadInvoice(file: File, password?: string): Promise<DashboardDataLocal> {
   const formData = new FormData();
   formData.append("file", file);
+  if (password) {
+    formData.append("password", password);
+  }
 
   console.debug("[API] POST /invoices/upload (multipart)", { name: file.name, size: file.size });
   const response = await http.post<any>("/invoices/upload", formData, {
@@ -285,7 +290,7 @@ export async function uploadInvoice(file: File): Promise<DashboardDataLocal> {
         description: String(t.description ?? ""),
         amount: Number(t.amount ?? 0),
         category: String(t.category ?? ""),
-        date: String(t.date ?? ""),
+        date: String(t.transactionDate ?? t.date ?? ""),
         type: String(t.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE",
       }))
     : [];
@@ -302,5 +307,8 @@ export async function uploadInvoice(file: File): Promise<DashboardDataLocal> {
       }))
     : [];
 
-  return { summary, transactions, insights };
+  const startDate = raw.startDate ? String(raw.startDate) : undefined;
+  const endDate = raw.endDate ? String(raw.endDate) : undefined;
+
+  return { summary, transactions, insights, startDate, endDate };
 }

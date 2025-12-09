@@ -10,23 +10,27 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import type { DashboardDataLocal } from "../../lib/dashboard";
 import { uploadInvoice } from "../../services/api/uploadService";
 
 interface Props {
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (result?: DashboardDataLocal) => void;
 }
 
 export function UploadState({ onClose, onSuccess }: Props) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [password, setPassword] = useState("");
+  const [isPasswordRequired, setIsPasswordRequired] = useState(false);
+  const [fileToUpload, setFileToUpload] = useState<File | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  async function processUpload(file: File, pwd?: string) {
     setIsUploading(true);
+    setIsPasswordRequired(false);
     setUploadProgress(10);
+    setErrorMessage(null);
 
     try {
       // Simulate progress steps
@@ -37,20 +41,42 @@ export function UploadState({ onClose, onSuccess }: Props) {
         });
       }, 500);
 
-      await uploadInvoice(file);
+      const result = await uploadInvoice(file, pwd);
 
       clearInterval(interval);
       setUploadProgress(100);
 
       setTimeout(() => {
-        onSuccess();
+        onSuccess(result);
         onClose();
       }, 1000);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Erro ao fazer upload");
       setIsUploading(false);
       setUploadProgress(0);
+
+      const msg = error.response?.data?.message || error.message || "Erro ao fazer upload";
+
+      if (msg.toLowerCase().includes("senha") || msg.toLowerCase().includes("password")) {
+        setIsPasswordRequired(true);
+        setErrorMessage(msg);
+      } else {
+        alert(msg);
+      }
+    }
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFileToUpload(file);
+    processUpload(file);
+  }
+
+  async function handlePasswordSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (fileToUpload && password) {
+      processUpload(fileToUpload, password);
     }
   }
 
@@ -65,7 +91,35 @@ export function UploadState({ onClose, onSuccess }: Props) {
           <X size={24} />
         </button>
 
-        {isUploading ? (
+        {isPasswordRequired ? (
+          <div className="ella-glass p-12 text-center">
+            <div
+              className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full"
+              style={{ backgroundColor: "rgba(201, 164, 59, 0.1)" }}
+            >
+              <FileText size={48} style={{ color: "#C9A43B" }} />
+            </div>
+            <h2 className="text-ella-navy mb-4 text-2xl font-semibold">Arquivo Protegido</h2>
+            <p className="text-ella-subtile mx-auto mb-6 max-w-md text-sm">{errorMessage}</p>
+            <form onSubmit={handlePasswordSubmit} className="mx-auto max-w-xs space-y-4">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Digite a senha do PDF"
+                className="w-full rounded-lg border p-3 outline-none focus:border-[#C9A43B]"
+                autoFocus
+              />
+              <button
+                type="submit"
+                className="w-full rounded-xl px-8 py-4 text-sm font-medium shadow-lg transition-all hover:opacity-90"
+                style={{ backgroundColor: "#C9A43B", color: "#FFFFFF" }}
+              >
+                Tentar Novamente
+              </button>
+            </form>
+          </div>
+        ) : isUploading ? (
           <div className="ella-glass p-12 text-center">
             <div
               className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full"
