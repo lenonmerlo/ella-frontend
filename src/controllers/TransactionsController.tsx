@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { fetchTransactions, TransactionListDTO } from "../services/api/transactionsService";
+import {
+  fetchTransactions,
+  TransactionFilters,
+  TransactionListDTO,
+} from "../services/api/transactionsService";
 
 interface Props {
   personId: string;
-  year: number;
-  month: number;
-  limit?: number;
+  filters: TransactionFilters;
   children: (props: {
     data: TransactionListDTO | null;
     loading: boolean;
@@ -13,7 +15,7 @@ interface Props {
   }) => React.ReactNode;
 }
 
-export function TransactionsController({ personId, year, month, limit = 50, children }: Props) {
+export function TransactionsController({ personId, filters, children }: Props) {
   const [data, setData] = useState<TransactionListDTO | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +26,7 @@ export function TransactionsController({ personId, year, month, limit = 50, chil
     async function load() {
       setLoading(true);
       try {
-        const result = await fetchTransactions(personId, year, month, limit);
+        const result = await fetchTransactions(personId, filters);
         setData(result);
       } catch (err) {
         setError("Erro ao carregar transações");
@@ -34,7 +36,17 @@ export function TransactionsController({ personId, year, month, limit = 50, chil
       }
     }
     load();
-  }, [personId, year, month, limit]);
+    // Spread dependencies to evitar refetch em cada render com objeto novo
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    personId,
+    filters.year,
+    filters.month,
+    filters.start,
+    filters.end,
+    filters.page,
+    filters.size,
+  ]);
 
   return <>{children({ data, loading, error })}</>;
 }

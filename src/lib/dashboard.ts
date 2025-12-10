@@ -58,7 +58,8 @@ export interface FinancialTransactionResponseDTO {
   personName: string;
   description: string;
   amount: number;
-  type: "INCOME" | "EXPENSE";
+  type: "INCOME" | "EXPENSE" | "DEBIT" | "CREDIT" | "PIX" | "TRANSFER" | "CASH";
+  scope?: "PERSONAL" | "BUSINESS";
   category: string;
   transactionDate: string;
   dueDate?: string;

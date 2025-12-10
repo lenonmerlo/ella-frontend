@@ -12,7 +12,7 @@ export function mapBackendToDashboard(backendData: DashboardResponseDTO): Dashbo
   const savingsRate = monthIncome > 0 ? Math.round((balance / monthIncome) * 100) : 0;
 
   const transactions = (backendData.personalTransactions ?? []).map((tx: any, idx: number) => ({
-    id: idx + 1,
+    id: String(tx.id ?? idx + 1),
     description: tx.description ?? "",
     amount: Number(tx.amount ?? 0),
     category: tx.category ?? "",
@@ -20,6 +20,7 @@ export function mapBackendToDashboard(backendData: DashboardResponseDTO): Dashbo
     type: (String(tx.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE") as
       | "INCOME"
       | "EXPENSE",
+    scope: tx.scope ?? "PERSONAL",
   }));
 
   const insights = [] as DashboardData["insights"];

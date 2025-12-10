@@ -8,12 +8,13 @@ export interface DashboardSummary {
 }
 
 export interface DashboardTransaction {
-  id: number;
+  id: string;
   description: string;
   amount: number;
   category: string;
   date: string;
   type: "INCOME" | "EXPENSE";
+  scope?: "PERSONAL" | "BUSINESS";
 }
 
 export interface DashboardInsight {
