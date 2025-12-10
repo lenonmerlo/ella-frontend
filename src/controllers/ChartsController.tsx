@@ -4,6 +4,7 @@ import { ChartsDTO, fetchCharts } from "../services/api/chartsService";
 interface Props {
   personId: string;
   year: number;
+  month?: number;
   children: (props: {
     data: ChartsDTO | null;
     loading: boolean;
@@ -11,7 +12,7 @@ interface Props {
   }) => React.ReactNode;
 }
 
-export function ChartsController({ personId, year, children }: Props) {
+export function ChartsController({ personId, year, month, children }: Props) {
   const [data, setData] = useState<ChartsDTO | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +23,7 @@ export function ChartsController({ personId, year, children }: Props) {
     async function load() {
       setLoading(true);
       try {
-        const result = await fetchCharts(personId, year);
+        const result = await fetchCharts(personId, year, month);
         setData(result);
       } catch (err) {
         setError("Erro ao carregar gráficos");
@@ -32,7 +33,7 @@ export function ChartsController({ personId, year, children }: Props) {
       }
     }
     load();
-  }, [personId, year]);
+  }, [personId, year, month]);
 
   return <>{children({ data, loading, error })}</>;
 }

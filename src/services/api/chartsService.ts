@@ -6,9 +6,9 @@ export interface ChartsDTO {
   categoryBreakdown: CategoryBreakdownDTO[];
 }
 
-export async function fetchCharts(personId: string, year: number) {
+export async function fetchCharts(personId: string, year: number, month?: number) {
   const res = await http.get<{ data: ChartsDTO }>(`/dashboard/${personId}/charts`, {
-    params: { year },
+    params: { year, month },
   });
   return res.data.data;
 }
