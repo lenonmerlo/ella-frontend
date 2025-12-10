@@ -5,6 +5,7 @@ import { GoalsSection } from "../components/dashboard/GoalsSection";
 import { InsightsSection } from "../components/dashboard/InsightsSection";
 import { InvoicesSection } from "../components/dashboard/InvoicesSection";
 import { SummaryCards } from "../components/dashboard/SummaryCards";
+import { TransactionsBoard } from "../components/dashboard/TransactionsBoard";
 import { TransactionsSection } from "../components/dashboard/TransactionsSection";
 import { UploadState } from "../components/dashboard/UploadState";
 import { useAuth } from "../contexts/AuthContext";
@@ -39,16 +40,8 @@ export default function DashboardPage() {
   const month = selectedDate.getMonth() + 1;
 
   return (
-    <div
-      className="ella-gradient-bg min-h-screen"
-      style={{
-        backgroundImage: "url(/background.png)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      <main className="mx-auto flex max-w-7xl gap-6 px-6 py-8">
+    <div className="ella-gradient-bg min-h-screen">
+      <main className="mx-auto flex w-full max-w-7xl gap-6 px-4 py-8 md:px-6">
         <DashboardSidebar
           selected={selectedSection}
           onSelect={setSelectedSection}
@@ -89,7 +82,7 @@ export default function DashboardPage() {
                 }
               </InsightsController>
 
-              <ChartsController personId={personId} year={year}>
+              <ChartsController personId={personId} year={year} month={month}>
                 {({ data, loading }) =>
                   loading ? (
                     <div>Carregando gráficos...</div>
@@ -99,7 +92,7 @@ export default function DashboardPage() {
                 }
               </ChartsController>
 
-              <TransactionsController personId={personId} year={year} month={month} limit={5}>
+              <TransactionsController personId={personId} filters={{ year, month, size: 5 }}>
                 {({ data, loading }) =>
                   loading ? (
                     <div>Carregando transações...</div>
@@ -124,25 +117,11 @@ export default function DashboardPage() {
           )}
 
           {selectedSection === "transactions" && (
-            <TransactionsController
-              key={refreshKey}
-              personId={personId}
-              year={year}
-              month={month}
-              limit={50}
-            >
-              {({ data, loading }) =>
-                loading ? (
-                  <div>Carregando transações...</div>
-                ) : data ? (
-                  <TransactionsSection transactions={data.transactions} />
-                ) : null
-              }
-            </TransactionsController>
+            <TransactionsBoard personId={personId} referenceDate={selectedDate} />
           )}
 
           {selectedSection === "charts" && (
-            <ChartsController key={refreshKey} personId={personId} year={year}>
+            <ChartsController key={refreshKey} personId={personId} year={year} month={month}>
               {({ data, loading }) =>
                 loading ? (
                   <div>Carregando gráficos...</div>

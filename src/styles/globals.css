@@ -18,19 +18,12 @@ body {
   --color-ella-subtile: #4b5563;
 }
 
-/* 🌅 Background de imagem para Login, Registro e Dashboard */
-.ella-bg {
-  background-image: url("/background.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* gradiente */
 .ella-gradient-bg {
   background:
+    linear-gradient(135deg, #f7f7fa 0%, #eef1f7 40%, #f7f7fa 100%),
     radial-gradient(circle at top left, #c9a43b33, transparent 55%),
     radial-gradient(circle at bottom right, #0e1a2b33, transparent 55%);
+  background-color: #f5f5f7;
 }
 
 /* glass */

@@ -37,85 +37,79 @@ export default function LoginPage() {
   }
 
   return (
-    <div
-      className="grid min-h-screen items-center gap-8 p-6 md:grid-cols-[1.2fr,1fr]"
-      style={{
-        backgroundImage: "url(/background.png)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      {/* Lado esquerdo */}
-      <section className="space-y-4">
-        <p className="text-ella-subtile text-sm tracking-[0.3em] uppercase">
-          bem-vinda ao futuro das finanças
-        </p>
-
-        <h1 className="text-ella-navy text-3xl font-semibold md:text-4xl">
-          Organize sua vida financeira com clareza e inteligência.
-        </h1>
-
-        <p className="text-ella-subtile max-w-xl text-sm md:text-base">
-          A ELLA conecta suas faturas, extratos e metas em um só lugar – e ainda gera insights
-          inteligentes.
-        </p>
-
-        <ul className="text-ella-subtile mt-4 space-y-2 text-sm">
-          <li>• Visão unificada de contas pessoais e empresas</li>
-          <li>• Metas guiadas pela IA com valores sugeridos</li>
-          <li>• Alertas de gastos fora do seu padrão</li>
-        </ul>
-      </section>
-
-      {/* Card de login */}
-      <section className="border-ella-muted ella-glass rounded-2xl border bg-white/90 p-6 shadow-lg">
-        <h2 className="text-ella-navy mb-1 text-lg font-medium">Acessar sua conta</h2>
-        <p className="text-ella-subtile mb-6 text-xs">
-          Digite suas credenciais para continuar com a ELLA.
-        </p>
-
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-1">
-            <label className="text-ella-subtile text-xs font-medium uppercase">E-mail</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="voce@exemplo.com"
-              className="border-ella-muted text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border bg-white px-3 py-2 text-sm focus:ring-1"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-ella-subtile text-xs font-medium uppercase">Senha</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="border-ella-muted text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border bg-white px-3 py-2 text-sm focus:ring-1"
-            />
-          </div>
-
-          {error && <div className="text-sm text-red-500">{error}</div>}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-ella-gold text-ella-navy w-full rounded-lg px-4 py-2 text-sm font-medium hover:brightness-110 disabled:opacity-60"
-          >
-            {loading ? "Entrando..." : "Entrar na ELLA"}
-          </button>
-
-          <p className="text-ella-subtile pt-3 text-center text-xs">
-            Ainda não tem conta?{" "}
-            <a href="/register" className="text-ella-navy hover:text-ella-gold font-medium">
-              Criar acesso
-            </a>
+    <div className="ella-gradient-bg min-h-screen px-4 py-10">
+      <div className="mx-auto grid max-w-5xl items-center gap-6 rounded-2xl bg-white/60 p-6 shadow-sm backdrop-blur md:grid-cols-[1.1fr,0.9fr]">
+        {/* Lado esquerdo */}
+        <section className="space-y-4">
+          <p className="text-ella-subtile text-sm tracking-[0.3em] uppercase">
+            bem-vinda ao futuro das finanças
           </p>
-        </form>
-      </section>
+
+          <h1 className="text-ella-navy text-3xl font-semibold md:text-4xl">
+            Organize sua vida financeira com clareza e inteligência.
+          </h1>
+
+          <p className="text-ella-subtile max-w-xl text-sm md:text-base">
+            A ELLA conecta suas faturas, extratos e metas em um só lugar – e ainda gera insights
+            inteligentes.
+          </p>
+
+          <ul className="text-ella-subtile mt-4 space-y-2 text-sm">
+            <li>• Visão unificada de contas pessoais e empresas</li>
+            <li>• Metas guiadas pela IA com valores sugeridos</li>
+            <li>• Alertas de gastos fora do seu padrão</li>
+          </ul>
+        </section>
+
+        {/* Card de login */}
+        <section className="border-ella-muted ella-glass rounded-2xl border bg-white/90 p-6 shadow-lg">
+          <h2 className="text-ella-navy mb-1 text-lg font-medium">Acessar sua conta</h2>
+          <p className="text-ella-subtile mb-6 text-xs">
+            Digite suas credenciais para continuar com a ELLA.
+          </p>
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="space-y-1">
+              <label className="text-ella-subtile text-xs font-medium uppercase">E-mail</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="voce@exemplo.com"
+                className="border-ella-muted text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border bg-white px-3 py-2 text-sm focus:ring-1"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-ella-subtile text-xs font-medium uppercase">Senha</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="border-ella-muted text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border bg-white px-3 py-2 text-sm focus:ring-1"
+              />
+            </div>
+
+            {error && <div className="text-sm text-red-500">{error}</div>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-ella-gold text-ella-navy w-full rounded-lg px-4 py-2 text-sm font-medium hover:brightness-110 disabled:opacity-60"
+            >
+              {loading ? "Entrando..." : "Entrar na ELLA"}
+            </button>
+
+            <p className="text-ella-subtile pt-3 text-center text-xs">
+              Ainda não tem conta?{" "}
+              <a href="/register" className="text-ella-navy hover:text-ella-gold font-medium">
+                Criar acesso
+              </a>
+            </p>
+          </form>
+        </section>
+      </div>
     </div>
   );
 }
