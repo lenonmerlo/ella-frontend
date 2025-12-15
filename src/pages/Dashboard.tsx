@@ -1,4 +1,4 @@
-import { getConsentHistory } from "@/services/api/privacyService";
+import { getConsentStatus } from "@/services/api/privacyService";
 import type { DashboardInvoice } from "@/types/dashboard";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -40,10 +40,8 @@ export default function DashboardPage() {
   useEffect(() => {
     (async () => {
       try {
-        const history = await getConsentHistory();
-        if (!history || history.length === 0) {
-          navigate("/privacy", { replace: true });
-        }
+        const status = await getConsentStatus();
+        if (!status?.hasConsent) navigate("/privacy", { replace: true });
       } catch {
         navigate("/privacy", { replace: true });
       }

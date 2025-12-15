@@ -21,6 +21,11 @@ export type ConsentResponseDTO = {
   acceptedAt: string;
 };
 
+export type ConsentStatusDTO = {
+  hasConsent: boolean;
+  currentContractVersion: string;
+};
+
 function unwrap<T>(res: ApiEnvelope<T> | T): T {
   // DTO direto
   if (
@@ -41,6 +46,11 @@ function unwrap<T>(res: ApiEnvelope<T> | T): T {
 
 export async function getConsentHistory(): Promise<ConsentHistoryDTO[]> {
   const res = await apiFetch<ApiEnvelope<ConsentHistoryDTO[]>>("/privacy/consents");
+  return unwrap(res);
+}
+
+export async function getConsentStatus(): Promise<ConsentStatusDTO> {
+  const res = await apiFetch<ApiEnvelope<ConsentStatusDTO>>("/privacy/status");
   return unwrap(res);
 }
 
