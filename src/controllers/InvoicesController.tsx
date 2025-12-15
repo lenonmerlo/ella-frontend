@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchInvoices, InvoiceListDTO } from "../services/api/invoicesService";
+import { fetchInvoices } from "../services/api/invoicesService";
 import type { DashboardInvoice } from "../types/dashboard";
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
   year: number;
   month: number;
   children: (props: {
-    data: InvoiceListDTO | null;
+    data: { invoices: DashboardInvoice[] } | null;
     loading: boolean;
     error: string | null;
   }) => React.ReactNode;

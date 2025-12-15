@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { getConsentHistory } from "@/services/api/privacyService";
+import type { DashboardInvoice } from "@/types/dashboard";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChartsSection } from "../components/dashboard/ChartsSection";
 import { DashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { GoalsSection } from "../components/dashboard/GoalsSection";
@@ -18,6 +21,7 @@ import { TransactionsController } from "../controllers/TransactionsController";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedSection, setSelectedSection] = useState("overview");
   const [selectedDate, setSelectedDate] = useState(() => {
     const saved = sessionStorage.getItem("dashboard_date");
@@ -32,6 +36,19 @@ export default function DashboardPage() {
   };
 
   const personId = user?.id;
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const history = await getConsentHistory();
+        if (!history || history.length === 0) {
+          navigate("/privacy", { replace: true });
+        }
+      } catch {
+        navigate("/privacy", { replace: true });
+      }
+    })();
+  }, [navigate]);
 
   if (!personId)
     return <div className="flex h-screen items-center justify-center">Carregando usuário...</div>;
@@ -106,7 +123,13 @@ export default function DashboardPage() {
 
           {selectedSection === "invoices" && (
             <InvoicesController key={refreshKey} personId={personId} year={year} month={month}>
-              {({ data, loading }) =>
+              {({
+                data,
+                loading,
+              }: {
+                data: { invoices: DashboardInvoice[] } | null;
+                loading: boolean;
+              }) =>
                 loading ? (
                   <div>Carregando faturas...</div>
                 ) : data ? (

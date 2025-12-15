@@ -1,8 +1,9 @@
+import { JSX } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
+import PrivacyPage from "../pages/PrivacyPage";
 import { AuthRoutes } from "./AuthRoutes";
 import { DashboardRoutes } from "./DashboardRoutes";
-import { JSX } from "react";
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { user, loadingProfile: loading } = useAuth();
@@ -28,6 +29,14 @@ export function AppRoutes() {
           element={
             <PrivateRoute>
               <DashboardRoutes />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/privacy"
+          element={
+            <PrivateRoute>
+              <PrivacyPage />
             </PrivateRoute>
           }
         />

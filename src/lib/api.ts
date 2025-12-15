@@ -21,6 +21,14 @@ export async function apiFetch<T = unknown>(
     ...(options.headers as Record<string, string> | undefined),
   };
 
+  // Anexa JWT se existir para manter endpoints protegidos funcionais
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("ella:token");
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+  }
+
   let body: BodyInit | undefined = options.body ?? undefined;
 
   if (options.json !== undefined) {
@@ -30,6 +38,7 @@ export async function apiFetch<T = unknown>(
   const res = await fetch(url, {
     ...options,
     headers,
+    credentials: options.credentials ?? "include",
     body,
   });
 
@@ -49,9 +58,17 @@ export async function apiFetch<T = unknown>(
     const err = new Error(msg);
     (err as any).status = res.status;
     (err as any).payload = payload;
+
+    // Token expirado ou ausente: limpa client-side para forçar re-login
+    if (res.status === 401 || res.status === 403) {
+      try {
+        localStorage.removeItem("ella:token");
+      } catch (e) {
+        // ignore
+      }
+    }
     throw err;
   }
 
-  // se sua API tiver envelope { success, data, message }, aqui você pode adaptar:
   return payload as T;
 }
