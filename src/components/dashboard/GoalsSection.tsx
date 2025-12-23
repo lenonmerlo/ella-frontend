@@ -149,6 +149,7 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
         )}
 
         {goals.map((goal) => {
+          const goalId = (goal as any).id ?? (goal as any).goalId;
           const progress = Math.min(
             100,
             Math.round((goal.currentAmount / goal.targetAmount) * 100),
@@ -156,7 +157,7 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
 
           return (
             <div
-              key={goal.id}
+              key={goalId}
               className="group relative rounded-2xl bg-white/80 p-5 shadow-sm backdrop-blur-sm transition-all hover:shadow-md"
             >
               <div className="mb-3 flex items-start justify-between">
@@ -174,7 +175,7 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
                   </div>
                 </div>
                 <button
-                  onClick={() => handleDelete(goal.id)}
+                  onClick={() => handleDelete(String(goalId))}
                   className="opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-600"
                   title="Excluir meta"
                 >

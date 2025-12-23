@@ -1,6 +1,6 @@
 // src/components/dashboard/InsightsSection.tsx
+import type { DashboardInsight } from "@/types/dashboard";
 import { Sparkles } from "lucide-react";
-import { DashboardInsight } from "../../pages/Dashboard";
 
 interface Props {
   insights: DashboardInsight[];

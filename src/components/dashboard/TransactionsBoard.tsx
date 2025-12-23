@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { FinancialTransactionResponseDTO } from "../../lib/dashboard";
+import { fetchInvoices, updateInvoicePayment } from "../../services/api/invoicesService";
 import {
   FinancialTransactionRequest,
   createTransaction,
@@ -7,6 +8,7 @@ import {
   fetchTransactions,
   updateTransaction,
 } from "../../services/api/transactionsService";
+import type { DashboardInvoice } from "../../types/dashboard";
 
 interface Props {
   personId: string;
@@ -14,7 +16,6 @@ interface Props {
   onRefresh?: () => void;
 }
 
-const STATUS_OPTIONS = ["PENDING", "PAID", "OVERDUE", "CANCELLED"] as const;
 const TYPE_OPTIONS = ["INCOME", "EXPENSE", "DEBIT", "CREDIT", "PIX", "TRANSFER", "CASH"] as const;
 const SCOPE_OPTIONS = ["PERSONAL", "BUSINESS"] as const;
 const CATEGORY_OPTIONS = [
@@ -69,6 +70,9 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
+  const [invoices, setInvoices] = useState<DashboardInvoice[]>([]);
+  const [savingInvoiceId, setSavingInvoiceId] = useState<string | null>(null);
+
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<FinancialTransactionResponseDTO | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FinancialTransactionResponseDTO | null>(null);
@@ -87,6 +91,31 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
 
   const year = referenceDate.getFullYear();
   const month = referenceDate.getMonth() + 1;
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const result = await fetchInvoices(personId, year, month);
+        const mapped: DashboardInvoice[] = (result?.invoices ?? []).map((inv: any) => ({
+          id: String(inv.invoiceId ?? inv.id ?? inv.creditCardId),
+          cardId: String(inv.creditCardId ?? ""),
+          cardName: String(inv.creditCardName ?? "Cartão"),
+          brand: String(inv.creditCardBrand ?? ""),
+          lastFourDigits: String(inv.creditCardLastFourDigits ?? "****"),
+          personName: String(inv.personName ?? ""),
+          amount: Number(inv.totalAmount ?? 0),
+          dueDate: String(inv.dueDate ?? ""),
+          isOverdue: Boolean(inv.isOverdue),
+          isPaid: Boolean(inv.isPaid),
+          paidDate: inv.paidDate ? String(inv.paidDate) : undefined,
+        }));
+        setInvoices(mapped);
+      } catch {
+        // ignore: movimentação pode funcionar sem faturas
+        setInvoices([]);
+      }
+    })();
+  }, [personId, year, month]);
 
   useEffect(() => {
     async function load() {
@@ -167,10 +196,14 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
     e.preventDefault();
     setLoading(true);
     try {
+      const payload: FinancialTransactionRequest = {
+        ...form,
+        status: form.paidDate ? "PAID" : "PENDING",
+      };
       if (editing) {
-        await updateTransaction(editing.id, form);
+        await updateTransaction(editing.id, payload);
       } else {
-        await createTransaction(form);
+        await createTransaction(payload);
       }
       setShowForm(false);
       setEditing(null);
@@ -321,6 +354,110 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
         </div>
       </div>
 
+      {invoices.length > 0 && (
+        <div className="bg-ella-background/40 rounded-xl p-4">
+          <h4 className="text-ella-navy mb-3 text-sm font-semibold">Pagamento das faturas</h4>
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {invoices.map((inv) => (
+              <div key={inv.id} className="rounded-lg bg-white/70 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-ella-navy text-sm font-medium">{inv.cardName}</div>
+                    <div className="text-ella-subtile text-xs">
+                      Venc.:{" "}
+                      {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString("pt-BR") : "--"}
+                    </div>
+                  </div>
+                  {inv.isOverdue && !inv.isPaid && (
+                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                      Vencida
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-2 flex items-center justify-between text-sm">
+                  <span className="text-ella-subtile">Pago?</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(inv.isPaid)}
+                      disabled={savingInvoiceId === inv.id}
+                      onChange={async (e) => {
+                        const paid = e.target.checked;
+                        const dateToSend = paid
+                          ? inv.paidDate || new Date().toISOString().slice(0, 10)
+                          : undefined;
+                        try {
+                          setSavingInvoiceId(inv.id);
+                          await updateInvoicePayment(inv.id, paid, dateToSend);
+                          const refreshed = await fetchInvoices(personId, year, month);
+                          const mapped: DashboardInvoice[] = (refreshed?.invoices ?? []).map(
+                            (x: any) => ({
+                              id: String(x.invoiceId ?? x.id ?? x.creditCardId),
+                              cardId: String(x.creditCardId ?? ""),
+                              cardName: String(x.creditCardName ?? "Cartão"),
+                              brand: String(x.creditCardBrand ?? ""),
+                              lastFourDigits: String(x.creditCardLastFourDigits ?? "****"),
+                              personName: String(x.personName ?? ""),
+                              amount: Number(x.totalAmount ?? 0),
+                              dueDate: String(x.dueDate ?? ""),
+                              isOverdue: Boolean(x.isOverdue),
+                              isPaid: Boolean(x.isPaid),
+                              paidDate: x.paidDate ? String(x.paidDate) : undefined,
+                            }),
+                          );
+                          setInvoices(mapped);
+                          onRefresh?.();
+                        } finally {
+                          setSavingInvoiceId(null);
+                        }
+                      }}
+                      className="h-4 w-4"
+                    />
+
+                    {Boolean(inv.isPaid) && (
+                      <input
+                        type="date"
+                        value={inv.paidDate ? inv.paidDate.slice(0, 10) : ""}
+                        disabled={savingInvoiceId === inv.id}
+                        onChange={async (e) => {
+                          const paidDate = e.target.value;
+                          try {
+                            setSavingInvoiceId(inv.id);
+                            await updateInvoicePayment(inv.id, true, paidDate);
+                            const refreshed = await fetchInvoices(personId, year, month);
+                            const mapped: DashboardInvoice[] = (refreshed?.invoices ?? []).map(
+                              (x: any) => ({
+                                id: String(x.invoiceId ?? x.id ?? x.creditCardId),
+                                cardId: String(x.creditCardId ?? ""),
+                                cardName: String(x.creditCardName ?? "Cartão"),
+                                brand: String(x.creditCardBrand ?? ""),
+                                lastFourDigits: String(x.creditCardLastFourDigits ?? "****"),
+                                personName: String(x.personName ?? ""),
+                                amount: Number(x.totalAmount ?? 0),
+                                dueDate: String(x.dueDate ?? ""),
+                                isOverdue: Boolean(x.isOverdue),
+                                isPaid: Boolean(x.isPaid),
+                                paidDate: x.paidDate ? String(x.paidDate) : undefined,
+                              }),
+                            );
+                            setInvoices(mapped);
+                            onRefresh?.();
+                          } finally {
+                            setSavingInvoiceId(null);
+                          }
+                        }}
+                        className="rounded-lg border border-gray-200 px-2 py-1 text-xs"
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
@@ -331,7 +468,6 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
               <th className="px-4 py-3">Escopo</th>
               <th className="px-4 py-3">Tipo</th>
               <th className="px-4 py-3 text-right">Valor</th>
-              <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Ações</th>
             </tr>
           </thead>
@@ -366,7 +502,6 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
                     {isIncome ? "+" : "-"}
                     {formatCurrency(Number(tx.amount))}
                   </td>
-                  <td className="text-ella-subtile px-4 py-3">{tx.status}</td>
                   <td className="space-x-2 px-4 py-3">
                     <button
                       className="text-ella-navy text-xs font-semibold hover:underline"
@@ -386,7 +521,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
             })}
             {filtered.length === 0 && (
               <tr>
-                <td className="text-ella-subtile px-4 py-6 text-center text-sm" colSpan={8}>
+                <td className="text-ella-subtile px-4 py-6 text-center text-sm" colSpan={7}>
                   Nenhuma transação encontrada para os filtros selecionados.
                 </td>
               </tr>
@@ -546,20 +681,6 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
                   onChange={(e) => setForm({ ...form, paidDate: e.target.value })}
                   className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
                 />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-ella-subtile text-xs">Status</label>
-                <select
-                  value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value as any })}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                >
-                  {STATUS_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
               </div>
               <div className="flex items-center justify-end gap-2 pt-2 md:col-span-2">
                 <button

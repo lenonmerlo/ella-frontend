@@ -1,5 +1,5 @@
 // src/components/dashboard/TransactionsSection.tsx
-import { DashboardTransaction } from "../../pages/Dashboard";
+import type { DashboardTransaction } from "@/types/dashboard";
 
 interface Props {
   transactions: DashboardTransaction[];
@@ -11,7 +11,8 @@ export function TransactionsSection({ transactions }: Props) {
       <h3 className="text-ella-navy mb-6 text-sm font-semibold">Transações Recentes</h3>
       <div className="space-y-3">
         {transactions.slice(0, 8).map((transaction) => {
-          const date = transaction.date ? new Date(transaction.date) : null;
+          const dateStr = transaction.purchaseDate || transaction.date;
+          const date = dateStr ? new Date(dateStr) : null;
           const formattedDate =
             date && !Number.isNaN(date.getTime())
               ? date.toLocaleDateString("pt-BR")

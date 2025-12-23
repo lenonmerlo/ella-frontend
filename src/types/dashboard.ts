@@ -13,6 +13,7 @@ export interface DashboardTransaction {
   amount: number;
   category: string;
   date: string;
+  purchaseDate?: string;
   type: "INCOME" | "EXPENSE";
   scope?: "PERSONAL" | "BUSINESS";
 }
@@ -33,6 +34,7 @@ export interface MonthlyData {
 
 export interface DashboardInvoice {
   id: string;
+  cardId: string;
   cardName: string;
   brand: string;
   lastFourDigits: string;
@@ -40,6 +42,8 @@ export interface DashboardInvoice {
   amount: number;
   dueDate: string;
   isOverdue: boolean;
+  isPaid?: boolean;
+  paidDate?: string;
 }
 
 export interface DashboardData {

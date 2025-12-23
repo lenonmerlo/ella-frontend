@@ -1,6 +1,6 @@
 // src/components/dashboard/SummaryCards.tsx
-import { CreditCard, Activity, Wallet, Sparkles } from "lucide-react";
-import { DashboardSummary, DashboardInsight } from "../../pages/Dashboard";
+import type { DashboardInsight, DashboardSummary } from "@/types/dashboard";
+import { Activity, CreditCard, Sparkles, Wallet } from "lucide-react";
 
 interface Props {
   summary: DashboardSummary;
@@ -20,18 +20,14 @@ export function SummaryCards({ summary, insights }: Props) {
       {/* Saúde financeira */}
       <div className="ella-glass p-6">
         <div className="mb-4 flex items-center justify-between">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ella-background">
+          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
             <Activity size={24} className="text-ella-gold" />
           </div>
-          <span className="text-xs font-medium uppercase text-ella-subtile">
-            saúde financeira
-          </span>
+          <span className="text-ella-subtile text-xs font-medium uppercase">saúde financeira</span>
         </div>
-        <p className="mb-1 text-sm text-ella-subtile">Score ELLA</p>
-        <p className="text-3xl font-bold text-ella-navy">
-          {financialHealthScore}/100
-        </p>
-        <p className="mt-1 text-xs text-ella-subtile">
+        <p className="text-ella-subtile mb-1 text-sm">Score ELLA</p>
+        <p className="text-ella-navy text-3xl font-bold">{financialHealthScore}/100</p>
+        <p className="text-ella-subtile mt-1 text-xs">
           Baseado nas suas faturas e gastos recentes.
         </p>
       </div>
@@ -39,21 +35,19 @@ export function SummaryCards({ summary, insights }: Props) {
       {/* Fatura atual */}
       <div className="ella-glass p-6">
         <div className="mb-4 flex items-center justify-between">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ella-background">
+          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
             <CreditCard size={24} className="text-ella-gold" />
           </div>
-          <span className="text-xs font-medium uppercase text-ella-subtile">
-            cartão
-          </span>
+          <span className="text-ella-subtile text-xs font-medium uppercase">cartão</span>
         </div>
-        <p className="mb-1 text-sm text-ella-subtile">Fatura do mês</p>
-        <p className="text-3xl font-bold text-ella-navy">
+        <p className="text-ella-subtile mb-1 text-sm">Fatura do mês</p>
+        <p className="text-ella-navy text-3xl font-bold">
           R{"$ "}
           {faturaAtual.toLocaleString("pt-BR", {
             minimumFractionDigits: 2,
           })}
         </p>
-        <p className="mt-1 text-xs text-ella-subtile">
+        <p className="text-ella-subtile mt-1 text-xs">
           Valor consolidado a partir da última fatura enviada.
         </p>
       </div>
@@ -61,21 +55,19 @@ export function SummaryCards({ summary, insights }: Props) {
       {/* Gasto variável */}
       <div className="ella-glass p-6">
         <div className="mb-4 flex items-center justify-between">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ella-background">
+          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
             <Wallet size={24} className="text-ella-gold" />
           </div>
-          <span className="text-xs font-medium uppercase text-ella-subtile">
-            gastos
-          </span>
+          <span className="text-ella-subtile text-xs font-medium uppercase">gastos</span>
         </div>
-        <p className="mb-1 text-sm text-ella-subtile">Gasto variável do mês</p>
+        <p className="text-ella-subtile mb-1 text-sm">Gasto variável do mês</p>
         <p className="text-3xl font-bold text-red-600">
           R{"$ "}
           {gastoVariavel.toLocaleString("pt-BR", {
             minimumFractionDigits: 2,
           })}
         </p>
-        <p className="mt-1 text-xs text-ella-subtile">
+        <p className="text-ella-subtile mt-1 text-xs">
           Restaurantes, apps, compras, lazer e outros variáveis.
         </p>
       </div>
@@ -83,16 +75,14 @@ export function SummaryCards({ summary, insights }: Props) {
       {/* Alertas da IA */}
       <div className="ella-glass p-6">
         <div className="mb-4 flex items-center justify-between">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ella-background">
+          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
             <Sparkles size={24} className="text-ella-gold" />
           </div>
-          <span className="text-xs font-medium uppercase text-ella-subtile">
-            insights
-          </span>
+          <span className="text-ella-subtile text-xs font-medium uppercase">insights</span>
         </div>
-        <p className="mb-1 text-sm text-ella-subtile">Alertas da IA</p>
-        <p className="text-3xl font-bold text-ella-navy">{alertasIa}</p>
-        <p className="mt-1 text-xs text-ella-subtile">
+        <p className="text-ella-subtile mb-1 text-sm">Alertas da IA</p>
+        <p className="text-ella-navy text-3xl font-bold">{alertasIa}</p>
+        <p className="text-ella-subtile mt-1 text-xs">
           Recomendações e avisos importantes para o mês.
         </p>
       </div>

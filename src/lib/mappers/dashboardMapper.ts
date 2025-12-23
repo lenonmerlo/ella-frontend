@@ -17,6 +17,7 @@ export function mapBackendToDashboard(backendData: DashboardResponseDTO): Dashbo
     amount: Number(tx.amount ?? 0),
     category: tx.category ?? "",
     date: tx.transactionDate ?? tx.date ?? "",
+    purchaseDate: tx.purchaseDate ?? "",
     type: (String(tx.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE") as
       | "INCOME"
       | "EXPENSE",
@@ -56,7 +57,8 @@ export function mapBackendToDashboard(backendData: DashboardResponseDTO): Dashbo
   }
 
   const invoices = (backendData.personalInvoices ?? []).map((inv: any) => ({
-    id: inv.creditCardId,
+    id: String(inv.invoiceId ?? inv.id ?? inv.creditCardId),
+    cardId: String(inv.creditCardId ?? ""),
     cardName: inv.creditCardName ?? "Cartão",
     brand: inv.creditCardBrand ?? "",
     lastFourDigits: inv.creditCardLastFourDigits ?? "****",
@@ -64,6 +66,8 @@ export function mapBackendToDashboard(backendData: DashboardResponseDTO): Dashbo
     amount: Number(inv.totalAmount ?? 0),
     dueDate: inv.dueDate ?? "",
     isOverdue: Boolean(inv.isOverdue),
+    isPaid: Boolean(inv.isPaid ?? String(inv.status ?? "").toUpperCase() === "PAID"),
+    paidDate: inv.paidDate ? String(inv.paidDate) : undefined,
   }));
 
   return {

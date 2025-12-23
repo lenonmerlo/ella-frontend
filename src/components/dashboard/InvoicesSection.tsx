@@ -1,14 +1,17 @@
 // src/components/dashboard/InvoicesSection.tsx
 import { ChevronRight, CreditCard } from "lucide-react";
 import { useState } from "react";
+import { updateInvoicePayment } from "../../services/api/invoicesService";
 import { DashboardInvoice } from "../../types/dashboard";
 
 interface InvoicesSectionProps {
   invoices?: DashboardInvoice[];
+  onRefresh?: () => void;
 }
 
-export function InvoicesSection({ invoices = [] }: InvoicesSectionProps) {
+export function InvoicesSection({ invoices = [], onRefresh }: InvoicesSectionProps) {
   const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
+  const [saving, setSaving] = useState<string | null>(null);
 
   // Se não houver dados reais, mostrar mensagem
   if (invoices.length === 0) {
@@ -67,6 +70,54 @@ export function InvoicesSection({ invoices = [] }: InvoicesSectionProps) {
                 <span className="text-ella-navy font-medium">
                   {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString("pt-BR") : "--"}
                 </span>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <span className="text-ella-subtile">Pago?</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(invoice.isPaid)}
+                    disabled={saving === invoice.id}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={async (e) => {
+                      e.stopPropagation();
+                      const paid = e.target.checked;
+                      const dateToSend = paid
+                        ? invoice.paidDate || new Date().toISOString().slice(0, 10)
+                        : undefined;
+                      try {
+                        setSaving(invoice.id);
+                        await updateInvoicePayment(invoice.id, paid, dateToSend);
+                        onRefresh?.();
+                      } finally {
+                        setSaving(null);
+                      }
+                    }}
+                    className="h-4 w-4"
+                    aria-label="Marcar fatura como paga"
+                  />
+                  {Boolean(invoice.isPaid) && (
+                    <input
+                      type="date"
+                      value={invoice.paidDate ? invoice.paidDate.slice(0, 10) : ""}
+                      disabled={saving === invoice.id}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={async (e) => {
+                        e.stopPropagation();
+                        const paidDate = e.target.value;
+                        try {
+                          setSaving(invoice.id);
+                          await updateInvoicePayment(invoice.id, true, paidDate);
+                          onRefresh?.();
+                        } finally {
+                          setSaving(null);
+                        }
+                      }}
+                      className="rounded-lg border border-gray-200 px-2 py-1 text-xs"
+                    />
+                  )}
+                </div>
               </div>
             </div>
 

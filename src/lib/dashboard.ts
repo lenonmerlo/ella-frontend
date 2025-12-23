@@ -33,15 +33,18 @@ export interface MonthlyEvolutionDTO {
 }
 
 export interface GoalProgressDTO {
-  goalId: string;
+  id?: string;
+  goalId?: string;
   title: string;
   targetAmount: number;
   currentAmount: number;
   percentage: number;
   status: string;
+  deadline?: string;
 }
 
 export interface InvoiceSummaryDTO {
+  invoiceId?: string;
   creditCardId: string;
   creditCardName: string;
   creditCardBrand?: string;
@@ -50,6 +53,8 @@ export interface InvoiceSummaryDTO {
   totalAmount: number;
   dueDate: string;
   isOverdue: boolean;
+  isPaid?: boolean;
+  paidDate?: string;
 }
 
 export interface FinancialTransactionResponseDTO {
