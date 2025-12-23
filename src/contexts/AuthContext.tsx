@@ -15,6 +15,9 @@ export interface UserProfile {
   status?: string;
   email?: string;
   role?: string;
+
+  // Avatar (data URL: data:<mime>;base64,<...>)
+  avatarDataUrl?: string;
 }
 
 interface AuthContextValue {

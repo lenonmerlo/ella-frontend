@@ -30,6 +30,9 @@ export default function SettingsPage() {
     setPhone(user.phone || "");
     setAddress(user.address || "");
     setBirthDate(user.birthDate || "");
+
+    // Se houver avatar persistido, usa como preview inicial
+    setAvatarPreview(user.avatarDataUrl || null);
   }, [user, navigate]);
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -64,10 +67,10 @@ export default function SettingsPage() {
       if (avatarFile) {
         const formData = new FormData();
         formData.append("file", avatarFile);
-        // TODO: Implementar endpoint de upload de avatar
-        // await http.post(`/users/${user?.id}/avatar`, formData, {
-        //   headers: { "Content-Type": "multipart/form-data" },
-        // });
+
+        await http.post(`/users/${user?.id}/avatar`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       }
 
       setSuccess("Perfil atualizado com sucesso!");
