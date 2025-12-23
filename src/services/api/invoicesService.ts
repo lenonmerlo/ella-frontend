@@ -11,3 +11,11 @@ export async function fetchInvoices(personId: string, year: number, month: numbe
   });
   return res.data.data;
 }
+
+export async function updateInvoicePayment(invoiceId: string, paid: boolean, paidDate?: string) {
+  const res = await http.put<{ data: any }>(`/invoices/${invoiceId}/payment`, {
+    paid,
+    paidDate: paid ? (paidDate ?? null) : null,
+  });
+  return res.data.data;
+}
