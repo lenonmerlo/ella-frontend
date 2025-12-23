@@ -1,5 +1,10 @@
 import { getConsentStatus } from "@/services/api/privacyService";
-import type { DashboardInvoice } from "@/types/dashboard";
+import type {
+  DashboardInsight,
+  DashboardInvoice,
+  DashboardSummary,
+  DashboardTransaction,
+} from "@/types/dashboard";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChartsSection } from "../components/dashboard/ChartsSection";
@@ -54,6 +59,56 @@ export default function DashboardPage() {
   const year = selectedDate.getFullYear();
   const month = selectedDate.getMonth() + 1;
 
+  const mapInsights = (insights: any[]): DashboardInsight[] =>
+    (Array.isArray(insights) ? insights : []).map((i: any, idx: number) => {
+      const type = String(i?.type ?? "INFO");
+      const typeUpper = type.toUpperCase();
+      const priority: DashboardInsight["priority"] =
+        typeUpper.includes("ALERT") || typeUpper.includes("WARN") ? "HIGH" : "LOW";
+      return {
+        id: Number(i?.id ?? idx + 1),
+        title: String(i?.title ?? i?.category ?? "Insight"),
+        description: String(i?.description ?? i?.message ?? ""),
+        type,
+        priority,
+      };
+    });
+
+  const mapSummary = (data: any): DashboardSummary => {
+    const balance = Number(data?.balance ?? 0);
+    const totalIncome = Number(data?.totalIncome ?? 0);
+    const totalExpenses = Number(data?.totalExpenses ?? 0);
+    const savingsRate =
+      data?.savingsRate != null
+        ? Number(data.savingsRate)
+        : totalIncome > 0
+          ? Math.round((balance / totalIncome) * 100)
+          : 0;
+
+    return { balance, totalIncome, totalExpenses, savingsRate };
+  };
+
+  const mapTransactions = (transactions: any[]): DashboardTransaction[] =>
+    (Array.isArray(transactions) ? transactions : []).map((t: any, idx: number) => ({
+      id: String(t?.id ?? idx + 1),
+      description: String(t?.description ?? ""),
+      amount: Number(t?.amount ?? 0),
+      category: String(t?.category ?? ""),
+      date: String(t?.transactionDate ?? t?.date ?? ""),
+      purchaseDate: t?.purchaseDate ? String(t.purchaseDate) : undefined,
+      type: String(t?.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE",
+      scope:
+        String(t?.scope ?? "")
+          .toUpperCase()
+          .trim() === "BUSINESS"
+          ? "BUSINESS"
+          : String(t?.scope ?? "")
+                .toUpperCase()
+                .trim() === "PERSONAL"
+            ? "PERSONAL"
+            : undefined,
+    }));
+
   return (
     <div className="ella-gradient-bg min-h-screen">
       <main className="mx-auto flex w-full max-w-7xl gap-6 px-4 py-8 md:px-6">
@@ -80,7 +135,10 @@ export default function DashboardPage() {
                       loading || insightsLoading ? (
                         <div>Carregando resumo...</div>
                       ) : data && insightsData ? (
-                        <SummaryCards summary={data} insights={insightsData.insights} />
+                        <SummaryCards
+                          summary={mapSummary(data)}
+                          insights={mapInsights(insightsData.insights)}
+                        />
                       ) : null
                     }
                   </InsightsController>
@@ -92,7 +150,7 @@ export default function DashboardPage() {
                   loading ? (
                     <div>Carregando insights...</div>
                   ) : data ? (
-                    <InsightsSection insights={data.insights} />
+                    <InsightsSection insights={mapInsights(data.insights)} />
                   ) : null
                 }
               </InsightsController>
@@ -112,7 +170,7 @@ export default function DashboardPage() {
                   loading ? (
                     <div>Carregando transações...</div>
                   ) : data ? (
-                    <TransactionsSection transactions={data.transactions} />
+                    <TransactionsSection transactions={mapTransactions(data.transactions)} />
                   ) : null
                 }
               </TransactionsController>
@@ -124,14 +182,16 @@ export default function DashboardPage() {
               {({
                 data,
                 loading,
+                refresh,
               }: {
                 data: { invoices: DashboardInvoice[] } | null;
                 loading: boolean;
+                refresh: () => void;
               }) =>
                 loading ? (
                   <div>Carregando faturas...</div>
                 ) : data ? (
-                  <InvoicesSection invoices={data.invoices} />
+                  <InvoicesSection invoices={data.invoices} onRefresh={refresh} />
                 ) : null
               }
             </InvoicesController>
@@ -171,7 +231,7 @@ export default function DashboardPage() {
                 loading ? (
                   <div>Carregando insights...</div>
                 ) : data ? (
-                  <InsightsSection insights={data.insights} />
+                  <InsightsSection insights={mapInsights(data.insights)} />
                 ) : null
               }
             </InsightsController>

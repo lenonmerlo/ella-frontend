@@ -1,19 +1,34 @@
+import {
+  ConsentHistoryDTO,
+  ConsentStatusDTO,
+  getConsentHistory,
+  getConsentStatus,
+  registerConsent,
+} from "@/services/api/privacyService";
 import { useEffect, useMemo, useState } from "react";
-import { getConsentHistory, registerConsent, ConsentHistoryDTO } from "@/services/api/privacyService";
 
 export function usePrivacyController() {
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState<ConsentHistoryDTO[]>([]);
+  const [status, setStatus] = useState<ConsentStatusDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const hasConsent = useMemo(() => history.length > 0, [history]);
+  const hasConsent = useMemo(() => status?.hasConsent ?? history.length > 0, [status, history]);
 
   async function load() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getConsentHistory();
-      setHistory(data);
+      const statusRes = await getConsentStatus();
+      setStatus(statusRes);
+
+      // Só busca histórico se já houve consentimento
+      if (statusRes.hasConsent) {
+        const data = await getConsentHistory();
+        setHistory(data);
+      } else {
+        setHistory([]);
+      }
     } catch (e: any) {
       setError(e?.message ?? "Falha ao carregar consentimento");
     } finally {
@@ -37,5 +52,5 @@ export function usePrivacyController() {
     load();
   }, []);
 
-  return { loading, history, hasConsent, error, reload: load, accept };
+  return { loading, history, status, hasConsent, error, reload: load, accept };
 }

@@ -20,6 +20,7 @@ export interface UserProfile {
 interface AuthContextValue {
   user: UserProfile | null;
   setUser: (u: UserProfile | null) => void;
+  loadingProfile: boolean;
   loadProfile: () => Promise<UserProfile | null>;
   logout: () => Promise<void>;
 }
@@ -28,6 +29,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState<boolean>(true);
 
   async function loadProfile(): Promise<UserProfile | null> {
     const token = getToken();
@@ -60,14 +62,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Tenta carregar perfil se houver token
     (async () => {
-      if (getToken()) {
-        await loadProfile();
+      const token = getToken();
+      if (!token) {
+        setLoadingProfile(false);
+        return;
       }
+
+      setLoadingProfile(true);
+      await loadProfile();
+      setLoadingProfile(false);
     })();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loadProfile, logout }}>
+    <AuthContext.Provider value={{ user, setUser, loadingProfile, loadProfile, logout }}>
       {children}
     </AuthContext.Provider>
   );
