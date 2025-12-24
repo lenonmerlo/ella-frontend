@@ -20,24 +20,28 @@ const TYPE_OPTIONS = ["INCOME", "EXPENSE", "DEBIT", "CREDIT", "PIX", "TRANSFER",
 const SCOPE_OPTIONS = ["PERSONAL", "BUSINESS"] as const;
 const CATEGORY_OPTIONS = [
   "Alimentação",
+  "iFood",
   "Transporte",
+  "Viagem",
+  "E-commerce",
+  "Vestuário",
+  "Academia/Saúde",
+  "Beleza",
+  "Assinaturas",
   "Internet",
   "Celular",
   "TV",
-  "Streaming",
-  "Mercado",
   "Saúde",
-  "Médico",
-  "Farmácia",
   "Educação",
   "Lazer",
+  "Pet",
   "Moradia",
   "Água",
   "Luz",
   "Gás",
   "Aluguel",
   "Impostos",
-  "Taxas",
+  "Taxas e Juros",
   "Serviços",
   "Outros",
 ];
@@ -62,6 +66,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
   const [endDate, setEndDate] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("ALL");
   const [scopeFilter, setScopeFilter] = useState<string>("ALL");
+  const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [loading, setLoading] = useState(false);
@@ -127,6 +132,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
           month: startDate || endDate ? undefined : month,
           start: startDate || undefined,
           end: endDate || undefined,
+          category: categoryFilter === "ALL" ? undefined : categoryFilter,
           page,
           size,
         });
@@ -141,15 +147,25 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
       }
     }
     load();
-  }, [personId, year, month, startDate, endDate, page, size]);
+  }, [personId, year, month, startDate, endDate, categoryFilter, page, size]);
 
   const filtered = useMemo(() => {
     return data.filter((tx) => {
       const matchType = typeFilter === "ALL" || tx.type === typeFilter;
       const matchScope = scopeFilter === "ALL" || tx.scope === scopeFilter;
-      return matchType && matchScope;
+      const matchCategory = categoryFilter === "ALL" || tx.category === categoryFilter;
+      return matchType && matchScope && matchCategory;
     });
-  }, [data, typeFilter, scopeFilter]);
+  }, [data, typeFilter, scopeFilter, categoryFilter]);
+
+  const filterCategoryOptions = useMemo(() => {
+    const fromData = Array.from(
+      new Set(data.map((tx) => String(tx.category || "")).filter(Boolean)),
+    );
+    const merged = Array.from(new Set([...fromData, ...CATEGORY_OPTIONS]));
+    merged.sort((a, b) => a.localeCompare(b, "pt-BR"));
+    return merged;
+  }, [data]);
 
   const categoryOptions = useMemo(() => {
     if (form.category && !CATEGORY_OPTIONS.includes(form.category)) {
@@ -214,6 +230,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
         month: startDate || endDate ? undefined : month,
         start: startDate || undefined,
         end: endDate || undefined,
+        category: categoryFilter === "ALL" ? undefined : categoryFilter,
         page: 0,
         size,
       });
@@ -239,6 +256,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
         month: startDate || endDate ? undefined : month,
         start: startDate || undefined,
         end: endDate || undefined,
+        category: categoryFilter === "ALL" ? undefined : categoryFilter,
         page,
         size,
       });
@@ -258,6 +276,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
     setEndDate("");
     setTypeFilter("ALL");
     setScopeFilter("ALL");
+    setCategoryFilter("ALL");
     setPage(0);
   }
 
@@ -277,7 +296,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
         </div>
       </div>
 
-      <div className="bg-ella-background/60 grid grid-cols-1 gap-3 rounded-xl p-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="bg-ella-background/60 grid grid-cols-1 gap-3 rounded-xl p-4 md:grid-cols-2 lg:grid-cols-5">
         <div className="flex flex-col gap-1">
           <label className="text-ella-subtile text-xs">Início</label>
           <input
@@ -332,6 +351,24 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
           >
             <option value="ALL">Todos</option>
             {SCOPE_OPTIONS.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-ella-subtile text-xs">Categoria</label>
+          <select
+            value={categoryFilter}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setPage(0);
+            }}
+            className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          >
+            <option value="ALL">Todos</option>
+            {filterCategoryOptions.map((opt) => (
               <option key={opt} value={opt}>
                 {opt}
               </option>

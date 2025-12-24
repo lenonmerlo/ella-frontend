@@ -14,14 +14,15 @@ export interface TransactionFilters {
   month?: number;
   start?: string;
   end?: string;
+  category?: string;
   page?: number;
   size?: number;
 }
 
 export async function fetchTransactions(personId: string, filters: TransactionFilters) {
-  const { year, month, start, end, page = 0, size = 50 } = filters;
+  const { year, month, start, end, category, page = 0, size = 50 } = filters;
   const res = await http.get<{ data: TransactionListDTO }>(`/dashboard/${personId}/transactions`, {
-    params: { year, month, start, end, page, size },
+    params: { year, month, start, end, category, page, size },
   });
   return res.data.data;
 }
