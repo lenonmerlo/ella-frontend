@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import type { DashboardDataLocal } from "../../lib/dashboard";
+import { applyTrip } from "../../services/api/tripService";
 import { uploadInvoice } from "../../services/api/uploadService";
 
 interface Props {
@@ -27,6 +28,8 @@ export function UploadState({ onClose, onSuccess }: Props) {
   const [isDueDateRequired, setIsDueDateRequired] = useState(false);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [resultToReturn, setResultToReturn] = useState<DashboardDataLocal | null>(null);
+  const [tripIsApplying, setTripIsApplying] = useState(false);
 
   async function processUpload(file: File, pwd?: string, dueDateOverride?: string) {
     setIsUploading(true);
@@ -34,6 +37,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
     setIsDueDateRequired(false);
     setUploadProgress(10);
     setErrorMessage(null);
+    setResultToReturn(null);
 
     try {
       // Simulate progress steps
@@ -50,6 +54,11 @@ export function UploadState({ onClose, onSuccess }: Props) {
       setUploadProgress(100);
 
       setTimeout(() => {
+        if (result.tripSuggestion) {
+          setIsUploading(false);
+          setResultToReturn(result);
+          return;
+        }
         onSuccess(result);
         onClose();
       }, 1000);
@@ -73,6 +82,30 @@ export function UploadState({ onClose, onSuccess }: Props) {
         alert(msg);
       }
     }
+  }
+
+  async function handleApplyTrip() {
+    if (!resultToReturn?.tripSuggestion) return;
+    try {
+      setTripIsApplying(true);
+      await applyTrip(
+        resultToReturn.tripSuggestion.tripId,
+        resultToReturn.tripSuggestion.transactionIds,
+      );
+      onSuccess(resultToReturn);
+      onClose();
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || e?.message || "Erro ao aplicar sugestão de viagem";
+      alert(msg);
+    } finally {
+      setTripIsApplying(false);
+    }
+  }
+
+  function handleIgnoreTrip() {
+    if (!resultToReturn) return;
+    onSuccess(resultToReturn);
+    onClose();
   }
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -103,7 +136,41 @@ export function UploadState({ onClose, onSuccess }: Props) {
           <X size={24} />
         </button>
 
-        {isPasswordRequired || isDueDateRequired ? (
+        {resultToReturn?.tripSuggestion ? (
+          <div className="ella-glass p-12 text-center">
+            <div
+              className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full"
+              style={{ backgroundColor: "rgba(201, 164, 59, 0.1)" }}
+            >
+              <Sparkles size={48} style={{ color: "#C9A43B" }} />
+            </div>
+            <h2 className="text-ella-navy mb-4 text-2xl font-semibold">
+              Possível viagem detectada
+            </h2>
+            <p className="text-ella-subtile mx-auto mb-8 max-w-2xl text-sm">
+              {resultToReturn.tripSuggestion.message ||
+                "Identificamos um conjunto de transações que parece uma viagem. Quer agrupar como 'Viagem' preservando a categoria original como subcategoria?"}
+            </p>
+
+            <div className="mx-auto flex max-w-md flex-col gap-3">
+              <button
+                onClick={handleApplyTrip}
+                disabled={tripIsApplying}
+                className="w-full rounded-xl px-8 py-4 text-sm font-medium shadow-lg transition-all hover:opacity-90 disabled:opacity-60"
+                style={{ backgroundColor: "#C9A43B", color: "#FFFFFF" }}
+              >
+                {tripIsApplying ? "Aplicando..." : "Sim, agrupar como Viagem"}
+              </button>
+              <button
+                onClick={handleIgnoreTrip}
+                disabled={tripIsApplying}
+                className="w-full rounded-xl border px-8 py-4 text-sm font-medium transition-all hover:opacity-90 disabled:opacity-60"
+              >
+                Não, ignorar
+              </button>
+            </div>
+          </div>
+        ) : isPasswordRequired || isDueDateRequired ? (
           <div className="ella-glass p-12 text-center">
             <div
               className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full"

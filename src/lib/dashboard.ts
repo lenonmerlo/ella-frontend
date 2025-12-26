@@ -66,6 +66,8 @@ export interface FinancialTransactionResponseDTO {
   type: "INCOME" | "EXPENSE" | "DEBIT" | "CREDIT" | "PIX" | "TRANSFER" | "CASH";
   scope?: "PERSONAL" | "BUSINESS";
   category: string;
+  tripId?: string;
+  tripSubcategory?: string;
   transactionDate: string;
   dueDate?: string;
   paidDate?: string;
@@ -140,6 +142,15 @@ export interface DashboardDataLocal {
   insights: DashboardInsightLocal[];
   startDate?: string;
   endDate?: string;
+  tripSuggestion?: TripSuggestionLocal;
+}
+
+export interface TripSuggestionLocal {
+  tripId: string;
+  startDate: string;
+  endDate: string;
+  transactionIds: string[];
+  message?: string;
 }
 
 /**

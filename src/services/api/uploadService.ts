@@ -3,6 +3,7 @@ import {
   DashboardInsightLocal,
   DashboardSummaryLocal,
   DashboardTransactionLocal,
+  TripSuggestionLocal,
 } from "../../lib/dashboard";
 import { http } from "../../lib/http";
 
@@ -60,5 +61,17 @@ export async function uploadInvoice(
   const startDate = raw.startDate ? String(raw.startDate) : undefined;
   const endDate = raw.endDate ? String(raw.endDate) : undefined;
 
-  return { summary, transactions, insights, startDate, endDate };
+  const tripSuggestion: TripSuggestionLocal | undefined = raw.tripSuggestion
+    ? {
+        tripId: String(raw.tripSuggestion.tripId),
+        startDate: String(raw.tripSuggestion.startDate),
+        endDate: String(raw.tripSuggestion.endDate),
+        transactionIds: Array.isArray(raw.tripSuggestion.transactionIds)
+          ? raw.tripSuggestion.transactionIds.map((x: any) => String(x))
+          : [],
+        message: raw.tripSuggestion.message ? String(raw.tripSuggestion.message) : undefined,
+      }
+    : undefined;
+
+  return { summary, transactions, insights, startDate, endDate, tripSuggestion };
 }
