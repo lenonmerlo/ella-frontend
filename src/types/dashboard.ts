@@ -34,6 +34,7 @@ export interface MonthlyData {
 
 export interface DashboardInvoice {
   id: string;
+  invoiceId?: string;
   cardId: string;
   cardName: string;
   brand: string;

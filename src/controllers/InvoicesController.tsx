@@ -25,7 +25,10 @@ export function InvoicesController({ personId, year, month, children }: Props) {
     try {
       const result = await fetchInvoices(personId, year, month);
       const mapped: DashboardInvoice[] = (result?.invoices ?? []).map((inv) => ({
-        id: inv.invoiceId ?? inv.creditCardId ?? inv.creditCardName ?? "invoice",
+        id:
+          inv.invoiceId ??
+          `${inv.creditCardId ?? "card"}-${inv.dueDate ?? ""}-${inv.totalAmount ?? 0}`,
+        invoiceId: inv.invoiceId ?? undefined,
         cardId: inv.creditCardId ?? "",
         cardName: inv.creditCardName ?? "Cartão",
         brand: inv.creditCardBrand ?? "",
