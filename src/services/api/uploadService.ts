@@ -6,11 +6,18 @@ import {
 } from "../../lib/dashboard";
 import { http } from "../../lib/http";
 
-export async function uploadInvoice(file: File, password?: string): Promise<DashboardDataLocal> {
+export async function uploadInvoice(
+  file: File,
+  password?: string,
+  dueDate?: string,
+): Promise<DashboardDataLocal> {
   const formData = new FormData();
   formData.append("file", file);
   if (password) {
     formData.append("password", password);
+  }
+  if (dueDate) {
+    formData.append("dueDate", dueDate);
   }
 
   const response = await http.post<any>("/invoices/upload", formData, {
