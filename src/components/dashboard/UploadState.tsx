@@ -23,18 +23,15 @@ export function UploadState({ onClose, onSuccess }: Props) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [password, setPassword] = useState("");
-  const [dueDate, setDueDate] = useState("");
   const [isPasswordRequired, setIsPasswordRequired] = useState(false);
-  const [isDueDateRequired, setIsDueDateRequired] = useState(false);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [resultToReturn, setResultToReturn] = useState<DashboardDataLocal | null>(null);
   const [tripIsApplying, setTripIsApplying] = useState(false);
 
-  async function processUpload(file: File, pwd?: string, dueDateOverride?: string) {
+  async function processUpload(file: File, pwd?: string) {
     setIsUploading(true);
     setIsPasswordRequired(false);
-    setIsDueDateRequired(false);
     setUploadProgress(10);
     setErrorMessage(null);
     setResultToReturn(null);
@@ -48,7 +45,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
         });
       }, 500);
 
-      const result = await uploadInvoice(file, pwd, dueDateOverride);
+      const result = await uploadInvoice(file, pwd);
 
       clearInterval(interval);
       setUploadProgress(100);
@@ -71,12 +68,6 @@ export function UploadState({ onClose, onSuccess }: Props) {
 
       if (msg.toLowerCase().includes("senha") || msg.toLowerCase().includes("password")) {
         setIsPasswordRequired(true);
-        setErrorMessage(msg);
-      } else if (
-        msg.toLowerCase().includes("vencimento") ||
-        msg.toLowerCase().includes("duedate")
-      ) {
-        setIsDueDateRequired(true);
         setErrorMessage(msg);
       } else {
         alert(msg);
@@ -120,9 +111,8 @@ export function UploadState({ onClose, onSuccess }: Props) {
     if (!fileToUpload) return;
 
     if (isPasswordRequired && !password) return;
-    if (isDueDateRequired && !dueDate) return;
 
-    processUpload(fileToUpload, password || undefined, dueDate || undefined);
+    processUpload(fileToUpload, password || undefined);
   }
 
   return (
@@ -170,7 +160,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
               </button>
             </div>
           </div>
-        ) : isPasswordRequired || isDueDateRequired ? (
+        ) : isPasswordRequired ? (
           <div className="ella-glass p-12 text-center">
             <div
               className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full"
@@ -178,28 +168,16 @@ export function UploadState({ onClose, onSuccess }: Props) {
             >
               <FileText size={48} style={{ color: "#C9A43B" }} />
             </div>
-            <h2 className="text-ella-navy mb-4 text-2xl font-semibold">
-              {isPasswordRequired ? "Arquivo Protegido" : "Precisamos de uma informação"}
-            </h2>
+            <h2 className="text-ella-navy mb-4 text-2xl font-semibold">Arquivo Protegido</h2>
             <p className="text-ella-subtile mx-auto mb-6 max-w-md text-sm">{errorMessage}</p>
             <form onSubmit={handlePasswordSubmit} className="mx-auto max-w-xs space-y-4">
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={
-                  isPasswordRequired ? "Digite a senha do PDF" : "Senha do PDF (se houver)"
-                }
+                placeholder="Digite a senha do PDF"
                 className="w-full rounded-lg border p-3 outline-none focus:border-[#C9A43B]"
-                autoFocus={isPasswordRequired}
-              />
-
-              <input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="w-full rounded-lg border p-3 outline-none focus:border-[#C9A43B]"
-                required={isDueDateRequired}
+                autoFocus
               />
               <button
                 type="submit"

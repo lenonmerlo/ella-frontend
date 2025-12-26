@@ -278,18 +278,11 @@ export async function fetchCurrentUserTransactionsInPeriod(
  * multipart/form-data com campo "file"
  * Retorno esperado: { summary, transactions, insights }
  */
-export async function uploadInvoice(
-  file: File,
-  password?: string,
-  dueDate?: string,
-): Promise<DashboardDataLocal> {
+export async function uploadInvoice(file: File, password?: string): Promise<DashboardDataLocal> {
   const formData = new FormData();
   formData.append("file", file);
   if (password) {
     formData.append("password", password);
-  }
-  if (dueDate) {
-    formData.append("dueDate", dueDate);
   }
 
   console.debug("[API] POST /invoices/upload (multipart)", { name: file.name, size: file.size });
