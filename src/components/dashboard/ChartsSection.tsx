@@ -3,18 +3,14 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Legend,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 import { ChartsDTO } from "../../services/api/chartsService";
-
-const PIE_COLORS = ["#0E1A2B", "#C9A43B", "#4B5563", "#E5D4A0", "#2E3A4D", "#D4AF65"];
+import { SmartCategoryChart } from "./SmartCategoryChart";
 
 interface Props {
   data: ChartsDTO;
@@ -92,50 +88,16 @@ export function ChartsSection({ data }: Props) {
       </div>
 
       {/* Gráfico de Pizza */}
-      <div className="ella-glass p-6">
-        <h3 className="text-ella-navy mb-6 text-sm font-semibold">Gastos por Categoria</h3>
-        {categoryData.length === 0 ? (
+      {categoryData.length === 0 ? (
+        <div className="ella-glass p-6">
+          <h3 className="text-ella-navy mb-6 text-sm font-semibold">Gastos por Categoria</h3>
           <div className="flex h-[300px] items-center justify-center">
             <p className="text-sm text-gray-500">Sem dados para exibir</p>
           </div>
-        ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={categoryData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={80}
-                innerRadius={0}
-                dataKey="value"
-                label={({ name, percent }) => {
-                  const safePercent = percent ?? 0;
-                  const safeName = name ?? "";
-                  return `${safeName.substring(0, 10)}: ${(safePercent * 100).toFixed(0)}%`;
-                }}
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "500",
-                }}
-              >
-                {categoryData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip
-                formatter={(value: number) => `R$ ${value.toFixed(2)}`}
-                contentStyle={{
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  border: "1px solid #E1E1E6",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        )}
-      </div>
+        </div>
+      ) : (
+        <SmartCategoryChart data={categoryData} title="Gastos por Categoria" currency="R$" />
+      )}
     </section>
   );
 }
