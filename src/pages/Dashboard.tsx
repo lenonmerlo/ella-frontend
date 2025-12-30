@@ -8,6 +8,7 @@ import type {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChartsSection } from "../components/dashboard/ChartsSection";
+import { CriticalTransactionAlert } from "../components/dashboard/CriticalTransactionAlert";
 import { DashboardSidebar } from "../components/dashboard/DashboardSidebar";
 import { GoalsSection } from "../components/dashboard/GoalsSection";
 import { InsightsSection } from "../components/dashboard/InsightsSection";
@@ -23,6 +24,7 @@ import { InsightsController } from "../controllers/InsightsController";
 import { InvoicesController } from "../controllers/InvoicesController";
 import { SummaryController } from "../controllers/SummaryController";
 import { TransactionsController } from "../controllers/TransactionsController";
+import { updateTransaction } from "../services/api/transactionsService";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -170,7 +172,31 @@ export default function DashboardPage() {
                   loading ? (
                     <div>Carregando transações...</div>
                   ) : data ? (
-                    <TransactionsSection transactions={mapTransactions(data.transactions)} />
+                    <>
+                      <CriticalTransactionAlert
+                        transactions={mapTransactions(data.transactions)}
+                        onCategoryUpdated={() => setRefreshKey((k) => k + 1)}
+                        onConfirmCategory={async (tx, category) => {
+                          const safeDate =
+                            tx.date && tx.date.trim()
+                              ? tx.date
+                              : new Date().toISOString().slice(0, 10);
+                          await updateTransaction(tx.id, {
+                            personId,
+                            description: tx.description,
+                            amount: Number(tx.amount ?? 0),
+                            type: tx.type,
+                            scope: tx.scope,
+                            category,
+                            transactionDate: safeDate,
+                            dueDate: null,
+                            paidDate: null,
+                            status: "PENDING",
+                          });
+                        }}
+                      />
+                      <TransactionsSection transactions={mapTransactions(data.transactions)} />
+                    </>
                   ) : null
                 }
               </TransactionsController>
