@@ -1,9 +1,14 @@
+import {
+  fetchCriticalTransactions,
+  markCriticalTransactionReviewed,
+  type CriticalReason,
+} from "@/services/api/criticalTransactionsService";
 import type { DashboardTransaction } from "@/types/dashboard";
 import { AlertTriangle, DollarSign, Eye, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ManualCategoryModal } from "./ManualCategoryModal";
 
-const DEFAULT_THRESHOLD = 2000;
+const DEFAULT_THRESHOLD = 5000;
 
 const DEFAULT_CATEGORIES = [
   "Alimentação",
@@ -23,6 +28,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 interface Props {
+  personId: string;
   transactions: DashboardTransaction[];
   highValueThreshold?: number;
   currency?: string;
@@ -31,6 +37,7 @@ interface Props {
 }
 
 export function CriticalTransactionAlert({
+  personId,
   transactions,
   highValueThreshold = DEFAULT_THRESHOLD,
   currency = "R$",
@@ -40,27 +47,99 @@ export function CriticalTransactionAlert({
   const [dismissed, setDismissed] = useState(false);
   const [selected, setSelected] = useState<DashboardTransaction | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [backendList, setBackendList] = useState<
+    Array<DashboardTransaction & { criticalReason?: CriticalReason | null }>
+  >([]);
+  const [backendOk, setBackendOk] = useState(false);
 
-  const highValue = useMemo(() => {
-    const list = (transactions ?? [])
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const list = await fetchCriticalTransactions(personId);
+        if (cancelled) return;
+
+        const mapped = (Array.isArray(list) ? list : []).map((t) => {
+          const type: DashboardTransaction["type"] =
+            String(t.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE";
+
+          const scopeStr = String(t.scope ?? "")
+            .toUpperCase()
+            .trim();
+          const scope: DashboardTransaction["scope"] =
+            scopeStr === "BUSINESS" ? "BUSINESS" : scopeStr === "PERSONAL" ? "PERSONAL" : undefined;
+
+          return {
+            id: String(t.id),
+            description: String(t.description ?? ""),
+            amount: Number(t.amount ?? 0),
+            category: String(t.category ?? ""),
+            date: String(t.transactionDate ?? ""),
+            purchaseDate: t.purchaseDate ? String(t.purchaseDate) : undefined,
+            type,
+            scope,
+            criticalReason: t.criticalReason ?? null,
+          };
+        });
+
+        setBackendList(mapped);
+        setBackendOk(true);
+      } catch {
+        if (cancelled) return;
+        setBackendOk(false);
+        setBackendList([]);
+      }
+    }
+
+    if (!personId || dismissed) return;
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [dismissed, personId]);
+
+  const view = useMemo(() => {
+    const source = backendOk ? backendList : (transactions ?? []);
+    const list = (source ?? [])
       .filter((t) => {
         const abs = Math.abs(t.amount ?? 0);
         const isExpense = t.type === "EXPENSE";
-        return isExpense && abs >= highValueThreshold;
+        if (!isExpense) return false;
+        // quando o backend está disponível, ele já trouxe somente críticas pendentes
+        if (backendOk) return true;
+        return abs >= highValueThreshold;
       })
       .sort((a, b) => Math.abs(b.amount ?? 0) - Math.abs(a.amount ?? 0));
 
     const total = list.reduce((sum, t) => sum + Math.abs(t.amount ?? 0), 0);
     return { list, total };
-  }, [highValueThreshold, transactions]);
+  }, [backendList, backendOk, highValueThreshold, transactions]);
 
-  if (dismissed || highValue.list.length === 0) return null;
+  if (dismissed) return null;
 
-  const count = highValue.list.length;
+  const count = view.list.length;
 
   function openReview(tx: DashboardTransaction) {
     setSelected(tx);
     setModalOpen(true);
+  }
+
+  if (view.list.length === 0) {
+    return (
+      <div className="ella-glass text-ella-subtile border border-amber-200 p-6 text-center text-sm">
+        <div className="mb-2 flex items-center justify-center gap-2">
+          <AlertTriangle size={20} className="text-amber-500" />
+          <span>
+            Nenhuma transação {backendOk ? "crítica" : "de alto valor"} encontrada
+            <span className="text-ella-navy ml-1 font-semibold">(≥ R$ 5.000)</span>.
+          </span>
+        </div>
+        <div className="text-xs text-gray-500">
+          Cadastre ou atualize uma transação de valor igual ou superior a R$ 5.000 para testar o
+          alerta.
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -71,13 +150,26 @@ export function CriticalTransactionAlert({
             <AlertTriangle size={20} />
           </div>
           <div>
-            <h3 className="text-ella-navy text-sm font-semibold">
-              Transações de alto valor que precisam de atenção
+            <h3 className="text-ella-navy flex items-center gap-2 text-base font-bold">
+              <AlertTriangle size={18} className="text-amber-500" />
+              {backendOk
+                ? "Transações críticas que precisam de atenção"
+                : "Transações de alto valor que precisam de atenção"}
             </h3>
-            <p className="text-ella-subtile mt-1 text-xs">
-              {count} transação(ões) ≥ {currency} {highValueThreshold.toLocaleString("pt-BR")} ·
-              Total: {currency}{" "}
-              {highValue.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            <p className="text-ella-subtile mt-1 flex items-center gap-2 text-xs">
+              <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                {backendOk ? "Crítica" : "Alto valor"}
+              </span>
+              <span className="text-ella-navy font-semibold">≥ R$ 5.000</span>
+              <span className="mx-1">·</span>
+              <span>{count} transação(ões)</span>
+              <span className="mx-1">·</span>
+              <span>
+                Total:{" "}
+                <span className="font-semibold">
+                  {currency} {view.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </span>
+              </span>
             </p>
           </div>
         </div>
@@ -102,7 +194,7 @@ export function CriticalTransactionAlert({
           type="button"
           className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700"
           onClick={() => {
-            const first = highValue.list[0];
+            const first = view.list[0];
             if (first) openReview(first);
           }}
         >
@@ -112,7 +204,7 @@ export function CriticalTransactionAlert({
       </div>
 
       <div className="space-y-2">
-        {highValue.list.slice(0, 5).map((t) => (
+        {view.list.slice(0, 5).map((t) => (
           <div
             key={t.id}
             className="flex items-center justify-between gap-4 rounded-lg bg-white/70 p-4"
@@ -120,7 +212,9 @@ export function CriticalTransactionAlert({
             <div className="min-w-0">
               <div className="text-ella-navy truncate text-sm font-medium">{t.description}</div>
               <div className="text-ella-subtile mt-1 flex flex-wrap items-center gap-2 text-xs">
-                <span className="rounded bg-amber-100 px-2 py-0.5 text-amber-800">Alto valor</span>
+                <span className="rounded bg-amber-100 px-2 py-0.5 text-amber-800">
+                  {backendOk ? "Crítica" : "Alto valor"}
+                </span>
                 <span className="rounded bg-white px-2 py-0.5">{t.category}</span>
               </div>
             </div>
@@ -141,10 +235,8 @@ export function CriticalTransactionAlert({
           </div>
         ))}
 
-        {highValue.list.length > 5 && (
-          <div className="text-ella-subtile text-xs">
-            +{highValue.list.length - 5} transação(ões)
-          </div>
+        {view.list.length > 5 && (
+          <div className="text-ella-subtile text-xs">+{view.list.length - 5} transação(ões)</div>
         )}
       </div>
 
@@ -155,6 +247,13 @@ export function CriticalTransactionAlert({
         categories={DEFAULT_CATEGORIES}
         onConfirm={async (tx, category) => {
           await onConfirmCategory(tx, category);
+          if (backendOk) {
+            try {
+              await markCriticalTransactionReviewed(tx.id);
+            } catch {
+              // se falhar, não bloqueia o fluxo do usuário
+            }
+          }
           onCategoryUpdated?.();
         }}
       />

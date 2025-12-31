@@ -174,6 +174,7 @@ export default function DashboardPage() {
                   ) : data ? (
                     <>
                       <CriticalTransactionAlert
+                        personId={personId}
                         transactions={mapTransactions(data.transactions)}
                         onCategoryUpdated={() => setRefreshKey((k) => k + 1)}
                         onConfirmCategory={async (tx, category) => {

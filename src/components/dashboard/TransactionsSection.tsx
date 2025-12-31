@@ -5,7 +5,7 @@ interface Props {
   transactions: DashboardTransaction[];
 }
 
-const HIGH_VALUE_THRESHOLD = 2000;
+const HIGH_VALUE_THRESHOLD = 5000;
 
 export function TransactionsSection({ transactions }: Props) {
   return (
@@ -41,7 +41,8 @@ export function TransactionsSection({ transactions }: Props) {
                   </span>
                   {isHighValue && (
                     <span className="rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
-                      Alto valor
+                      Alto valor&nbsp;
+                      <span className="text-ella-navy font-semibold">≥ R$ 5.000</span>
                     </span>
                   )}
                   <span className={`${scopeClass} rounded px-2 py-1 text-xs font-semibold`}>
