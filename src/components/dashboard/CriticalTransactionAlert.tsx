@@ -134,10 +134,7 @@ export function CriticalTransactionAlert({
             <span className="text-ella-navy ml-1 font-semibold">(≥ R$ 5.000)</span>.
           </span>
         </div>
-        <div className="text-xs text-gray-500">
-          Cadastre ou atualize uma transação de valor igual ou superior a R$ 5.000 para testar o
-          alerta.
-        </div>
+        
       </div>
     );
   }

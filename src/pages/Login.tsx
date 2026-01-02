@@ -42,7 +42,7 @@ export default function LoginPage() {
         {/* Lado esquerdo */}
         <section className="space-y-4">
           <p className="text-ella-subtile text-sm tracking-[0.3em] uppercase">
-            bem-vinda ao futuro das finanças
+            Você chegou ao futuro das finanças
           </p>
 
           <h1 className="text-ella-navy text-3xl font-semibold md:text-4xl">

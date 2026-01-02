@@ -124,7 +124,7 @@ export default function DashboardPage() {
 
         <div className="flex-1 space-y-6">
           <div className="mb-8">
-            <h1 className="text-ella-navy text-2xl font-bold">Bem-vinda, {user.name} 👋</h1>
+            <h1 className="text-ella-navy text-2xl font-bold">Olá, {user.name} 👋</h1>
             <p className="text-ella-subtile">Aqui está a visão geral das suas finanças</p>
           </div>
 
