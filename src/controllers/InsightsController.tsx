@@ -20,10 +20,13 @@ export function InsightsController({ personId, year, month, children }: Props) {
   useEffect(() => {
     if (!personId) return;
 
+    console.log("[InsightsController] Loading insights", { personId, year, month });
+
     async function load() {
       setLoading(true);
       try {
         const result = await fetchInsights(personId, year, month);
+        console.log("[InsightsController] Insights response:", result);
         setData(result);
       } catch (err) {
         setError("Erro ao carregar insights");

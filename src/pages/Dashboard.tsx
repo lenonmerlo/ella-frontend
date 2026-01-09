@@ -61,6 +61,8 @@ export default function DashboardPage() {
   const year = selectedDate.getFullYear();
   const month = selectedDate.getMonth() + 1;
 
+  console.log("[Dashboard] Data selecionada:", selectedDate, { year, month });
+
   const mapInsights = (insights: any[]): DashboardInsight[] =>
     (Array.isArray(insights) ? insights : []).map((i: any, idx: number) => {
       const type = String(i?.type ?? "INFO");
