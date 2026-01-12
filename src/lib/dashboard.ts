@@ -74,6 +74,12 @@ export interface FinancialTransactionResponseDTO {
   status: string;
   createdAt: string;
   updatedAt: string;
+
+  // Optional credit card metadata (present for invoice-uploaded transactions)
+  creditCardId?: string | null;
+  creditCardName?: string | null;
+  creditCardLastFourDigits?: string | null;
+  creditCardCardholderName?: string | null;
 }
 
 export interface CompanyDashboardDTO {
