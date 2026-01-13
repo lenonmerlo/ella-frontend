@@ -69,6 +69,7 @@ export interface FinancialTransactionResponseDTO {
   tripId?: string;
   tripSubcategory?: string;
   transactionDate: string;
+  purchaseDate?: string;
   dueDate?: string;
   paidDate?: string;
   status: string;
@@ -273,7 +274,7 @@ export async function fetchCurrentUserTransactionsInPeriod(
     description: String(t.description ?? ""),
     amount: Number(t.amount ?? 0),
     category: String(t.category ?? ""),
-    date: String(t.transactionDate ?? t.date ?? ""),
+    date: String(t.purchaseDate ?? t.transactionDate ?? t.date ?? ""),
     type: String(t.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE",
   }));
 }
@@ -313,7 +314,7 @@ export async function uploadInvoice(file: File, password?: string): Promise<Dash
         description: String(t.description ?? ""),
         amount: Number(t.amount ?? 0),
         category: String(t.category ?? ""),
-        date: String(t.transactionDate ?? t.date ?? ""),
+        date: String(t.purchaseDate ?? t.transactionDate ?? t.date ?? ""),
         type: String(t.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE",
       }))
     : [];

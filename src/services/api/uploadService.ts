@@ -34,7 +34,7 @@ export async function uploadInvoice(file: File, password?: string): Promise<Dash
         description: String(t.description ?? ""),
         amount: Number(t.amount ?? 0),
         category: String(t.category ?? ""),
-        date: String(t.transactionDate ?? t.date ?? ""),
+        date: String(t.purchaseDate ?? t.transactionDate ?? t.date ?? ""),
         type: String(t.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE",
       }))
     : [];

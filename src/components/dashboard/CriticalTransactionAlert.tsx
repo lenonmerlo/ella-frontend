@@ -74,7 +74,7 @@ export function CriticalTransactionAlert({
             description: String(t.description ?? ""),
             amount: Number(t.amount ?? 0),
             category: String(t.category ?? ""),
-            date: String(t.transactionDate ?? ""),
+            date: String(t.purchaseDate ?? t.transactionDate ?? ""),
             purchaseDate: t.purchaseDate ? String(t.purchaseDate) : undefined,
             type,
             scope,
@@ -134,7 +134,6 @@ export function CriticalTransactionAlert({
             <span className="text-ella-navy ml-1 font-semibold">(≥ R$ 5.000)</span>.
           </span>
         </div>
-        
       </div>
     );
   }

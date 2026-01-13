@@ -217,8 +217,8 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
 
     for (const g of arr) {
       g.transactions.sort((a, b) => {
-        const da = new Date(a.transactionDate).getTime();
-        const db = new Date(b.transactionDate).getTime();
+        const da = new Date(a.purchaseDate ?? a.transactionDate).getTime();
+        const db = new Date(b.purchaseDate ?? b.transactionDate).getTime();
         return db - da;
       });
     }
@@ -597,7 +597,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
                   <tr key={tx.id} className="hover:bg-ella-background/40">
                     <td className="text-ella-navy px-4 py-3 font-medium">{tx.description}</td>
                     <td className="text-ella-subtile px-4 py-3">
-                      {formatDate(tx.transactionDate)}
+                      {formatDate(tx.purchaseDate ?? tx.transactionDate)}
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-ella-subtile rounded bg-white px-2 py-1 text-xs">
@@ -673,7 +673,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
                               {tx.description}
                             </td>
                             <td className="text-ella-subtile px-4 py-3">
-                              {formatDate(tx.transactionDate)}
+                              {formatDate(tx.purchaseDate ?? tx.transactionDate)}
                             </td>
                             <td className="px-4 py-3">
                               <span className="text-ella-subtile rounded bg-white px-2 py-1 text-xs">

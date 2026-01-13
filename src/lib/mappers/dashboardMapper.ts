@@ -16,7 +16,7 @@ export function mapBackendToDashboard(backendData: DashboardResponseDTO): Dashbo
     description: tx.description ?? "",
     amount: Number(tx.amount ?? 0),
     category: tx.category ?? "",
-    date: tx.transactionDate ?? tx.date ?? "",
+    date: tx.purchaseDate ?? tx.transactionDate ?? tx.date ?? "",
     purchaseDate: tx.purchaseDate ?? "",
     type: (String(tx.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE") as
       | "INCOME"
