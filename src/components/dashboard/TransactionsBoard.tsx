@@ -61,6 +61,12 @@ function formatDate(value?: string | null) {
   return d.toLocaleDateString("pt-BR");
 }
 
+function signedForInvoiceTotal(type: FinancialTransactionResponseDTO["type"], amount: number) {
+  // Match backend invoice total logic: expenses add, everything else subtract.
+  // (Invoice uploads typically use EXPENSE + INCOME.)
+  return type === "EXPENSE" ? amount : -amount;
+}
+
 export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props) {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -157,6 +163,72 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
       return matchType && matchScope && matchCategory;
     });
   }, [data, typeFilter, scopeFilter, categoryFilter]);
+
+  const groupedByCard = useMemo(() => {
+    const groups = new Map<
+      string,
+      {
+        key: string;
+        cardName: string;
+        lastFour: string;
+        cardholderName: string;
+        transactions: FinancialTransactionResponseDTO[];
+        subtotal: number;
+      }
+    >();
+
+    for (const tx of filtered) {
+      const key = String(tx.creditCardId ?? "");
+      const isCard = Boolean(tx.creditCardId);
+      const groupKey = isCard ? key : "__NO_CARD__";
+
+      const cardName = String(tx.creditCardName ?? "Cartão");
+      const lastFour = String(tx.creditCardLastFourDigits ?? "");
+      const cardholderName = String(tx.creditCardCardholderName ?? "");
+
+      const existing = groups.get(groupKey);
+      const amount = Number(tx.amount ?? 0);
+      const signed = signedForInvoiceTotal(tx.type, amount);
+
+      if (existing) {
+        existing.transactions.push(tx);
+        existing.subtotal += signed;
+      } else {
+        groups.set(groupKey, {
+          key: groupKey,
+          cardName: isCard ? cardName : "Sem cartão",
+          lastFour: isCard ? lastFour : "",
+          cardholderName: isCard ? cardholderName : "",
+          transactions: [tx],
+          subtotal: signed,
+        });
+      }
+    }
+
+    const arr = Array.from(groups.values());
+    // Stable ordering: cards first, then "Sem cartão".
+    arr.sort((a, b) => {
+      if (a.key === "__NO_CARD__" && b.key !== "__NO_CARD__") return 1;
+      if (b.key === "__NO_CARD__" && a.key !== "__NO_CARD__") return -1;
+      const aLabel = `${a.cardName} ${a.lastFour}`.trim();
+      const bLabel = `${b.cardName} ${b.lastFour}`.trim();
+      return aLabel.localeCompare(bLabel, "pt-BR");
+    });
+
+    for (const g of arr) {
+      g.transactions.sort((a, b) => {
+        const da = new Date(a.purchaseDate ?? a.transactionDate).getTime();
+        const db = new Date(b.purchaseDate ?? b.transactionDate).getTime();
+        return db - da;
+      });
+    }
+
+    const distinctCardGroups = arr.filter((g) => g.key !== "__NO_CARD__").length;
+    const shouldGroup = distinctCardGroups >= 2;
+    const grandTotal = arr.reduce((acc, g) => acc + g.subtotal, 0);
+
+    return { shouldGroup, groups: arr, grandTotal };
+  }, [filtered]);
 
   const filterCategoryOptions = useMemo(() => {
     const fromData = Array.from(
@@ -496,6 +568,14 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
       )}
 
       <div className="overflow-x-auto">
+        {groupedByCard.shouldGroup && (
+          <div className="mb-3 flex items-center justify-between rounded-xl border border-gray-200 bg-white/70 px-4 py-3">
+            <div className="text-ella-navy text-sm font-semibold">Total geral (fatura)</div>
+            <div className="text-ella-navy text-sm font-bold">
+              {formatCurrency(Math.abs(groupedByCard.grandTotal))}
+            </div>
+          </div>
+        )}
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr className="bg-ella-background/60 text-ella-subtile text-left text-xs tracking-wide uppercase">
@@ -509,53 +589,137 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 text-sm">
-            {filtered.map((tx) => {
-              const isIncome = tx.type === "INCOME";
-              const isBusiness = tx.scope === "BUSINESS";
-              return (
-                <tr key={tx.id} className="hover:bg-ella-background/40">
-                  <td className="text-ella-navy px-4 py-3 font-medium">{tx.description}</td>
-                  <td className="text-ella-subtile px-4 py-3">{formatDate(tx.transactionDate)}</td>
-                  <td className="px-4 py-3">
-                    <span className="text-ella-subtile rounded bg-white px-2 py-1 text-xs">
-                      {tx.category}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded px-2 py-1 text-xs font-semibold ${
-                        isBusiness ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"
+            {!groupedByCard.shouldGroup &&
+              filtered.map((tx) => {
+                const isIncome = tx.type === "INCOME";
+                const isBusiness = tx.scope === "BUSINESS";
+                return (
+                  <tr key={tx.id} className="hover:bg-ella-background/40">
+                    <td className="text-ella-navy px-4 py-3 font-medium">{tx.description}</td>
+                    <td className="text-ella-subtile px-4 py-3">
+                      {formatDate(tx.purchaseDate ?? tx.transactionDate)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-ella-subtile rounded bg-white px-2 py-1 text-xs">
+                        {tx.category}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded px-2 py-1 text-xs font-semibold ${
+                          isBusiness
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-emerald-100 text-emerald-700"
+                        }`}
+                      >
+                        {isBusiness ? "Empresa" : "Pessoal"}
+                      </span>
+                    </td>
+                    <td className="text-ella-subtile px-4 py-3">{tx.type}</td>
+                    <td
+                      className={`px-4 py-3 text-right font-semibold ${
+                        isIncome ? "text-emerald-600" : "text-red-600"
                       }`}
                     >
-                      {isBusiness ? "Empresa" : "Pessoal"}
-                    </span>
-                  </td>
-                  <td className="text-ella-subtile px-4 py-3">{tx.type}</td>
-                  <td
-                    className={`px-4 py-3 text-right font-semibold ${
-                      isIncome ? "text-emerald-600" : "text-red-600"
-                    }`}
-                  >
-                    {isIncome ? "+" : "-"}
-                    {formatCurrency(Number(tx.amount))}
-                  </td>
-                  <td className="space-x-2 px-4 py-3">
-                    <button
-                      className="text-ella-navy text-xs font-semibold hover:underline"
-                      onClick={() => openEdit(tx)}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="text-xs font-semibold text-red-600 hover:underline"
-                      onClick={() => setDeleteTarget(tx)}
-                    >
-                      Excluir
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+                      {isIncome ? "+" : "-"}
+                      {formatCurrency(Number(tx.amount))}
+                    </td>
+                    <td className="space-x-2 px-4 py-3">
+                      <button
+                        className="text-ella-navy text-xs font-semibold hover:underline"
+                        onClick={() => openEdit(tx)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="text-xs font-semibold text-red-600 hover:underline"
+                        onClick={() => setDeleteTarget(tx)}
+                      >
+                        Excluir
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+
+            {groupedByCard.shouldGroup &&
+              groupedByCard.groups
+                .filter((g) => g.key !== "__NO_CARD__")
+                .map((g) => {
+                  const titleParts = [
+                    g.cardName,
+                    g.lastFour ? `• final ${g.lastFour}` : "",
+                    g.cardholderName ? `• ${g.cardholderName}` : "",
+                  ].filter(Boolean);
+                  const title = titleParts.join(" ");
+                  return (
+                    <>
+                      <tr key={`${g.key}__header`} className="bg-ella-background/40">
+                        <td className="px-4 py-3" colSpan={7}>
+                          <div className="flex items-center justify-between">
+                            <div className="text-ella-navy text-sm font-semibold">{title}</div>
+                            <div className="text-ella-navy text-sm font-bold">
+                              Subtotal: {formatCurrency(Math.abs(g.subtotal))}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      {g.transactions.map((tx) => {
+                        const isIncome = tx.type === "INCOME";
+                        const isBusiness = tx.scope === "BUSINESS";
+                        return (
+                          <tr key={tx.id} className="hover:bg-ella-background/40">
+                            <td className="text-ella-navy px-4 py-3 font-medium">
+                              {tx.description}
+                            </td>
+                            <td className="text-ella-subtile px-4 py-3">
+                              {formatDate(tx.purchaseDate ?? tx.transactionDate)}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="text-ella-subtile rounded bg-white px-2 py-1 text-xs">
+                                {tx.category}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span
+                                className={`rounded px-2 py-1 text-xs font-semibold ${
+                                  isBusiness
+                                    ? "bg-blue-100 text-blue-700"
+                                    : "bg-emerald-100 text-emerald-700"
+                                }`}
+                              >
+                                {isBusiness ? "Empresa" : "Pessoal"}
+                              </span>
+                            </td>
+                            <td className="text-ella-subtile px-4 py-3">{tx.type}</td>
+                            <td
+                              className={`px-4 py-3 text-right font-semibold ${
+                                isIncome ? "text-emerald-600" : "text-red-600"
+                              }`}
+                            >
+                              {isIncome ? "+" : "-"}
+                              {formatCurrency(Number(tx.amount))}
+                            </td>
+                            <td className="space-x-2 px-4 py-3">
+                              <button
+                                className="text-ella-navy text-xs font-semibold hover:underline"
+                                onClick={() => openEdit(tx)}
+                              >
+                                Editar
+                              </button>
+                              <button
+                                className="text-xs font-semibold text-red-600 hover:underline"
+                                onClick={() => setDeleteTarget(tx)}
+                              >
+                                Excluir
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </>
+                  );
+                })}
             {filtered.length === 0 && (
               <tr>
                 <td className="text-ella-subtile px-4 py-6 text-center text-sm" colSpan={7}>

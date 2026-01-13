@@ -1,17 +1,18 @@
 // src/components/dashboard/SummaryCards.tsx
-import type { DashboardInsight, DashboardSummary } from "@/types/dashboard";
+import type { DashboardInsight, DashboardInvoice, DashboardSummary } from "@/types/dashboard";
 import { Activity, CreditCard, Sparkles, Wallet } from "lucide-react";
 
 interface Props {
   summary: DashboardSummary;
   insights: DashboardInsight[];
+  invoices?: DashboardInvoice[];
 }
 
-export function SummaryCards({ summary, insights }: Props) {
+export function SummaryCards({ summary, insights, invoices }: Props) {
   // mock de score de saúde financeira – depois podemos calcular de verdade
   const financialHealthScore = 82;
 
-  const faturaAtual = summary.totalExpenses; // interpretando como fatura do mês
+  const faturaAtual = (invoices ?? []).reduce((sum, inv) => sum + Number(inv.amount ?? 0), 0);
   const gastoVariavel = summary.totalExpenses; // pode mudar depois
   const alertasIa = insights.length;
 
@@ -48,7 +49,7 @@ export function SummaryCards({ summary, insights }: Props) {
           })}
         </p>
         <p className="text-ella-subtile mt-1 text-xs">
-          Valor consolidado a partir da última fatura enviada.
+          Soma das faturas do mês (aba “Faturas de cartão”).
         </p>
       </div>
 

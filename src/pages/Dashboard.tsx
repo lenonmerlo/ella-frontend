@@ -98,7 +98,7 @@ export default function DashboardPage() {
       description: String(t?.description ?? ""),
       amount: Number(t?.amount ?? 0),
       category: String(t?.category ?? ""),
-      date: String(t?.transactionDate ?? t?.date ?? ""),
+      date: String(t?.purchaseDate ?? t?.transactionDate ?? t?.date ?? ""),
       purchaseDate: t?.purchaseDate ? String(t.purchaseDate) : undefined,
       type: String(t?.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE",
       scope:
@@ -135,16 +135,21 @@ export default function DashboardPage() {
               <SummaryController personId={personId} year={year} month={month}>
                 {({ data, loading }) => (
                   <InsightsController personId={personId} year={year} month={month}>
-                    {({ data: insightsData, loading: insightsLoading }) =>
-                      loading || insightsLoading ? (
-                        <div>Carregando resumo...</div>
-                      ) : data && insightsData ? (
-                        <SummaryCards
-                          summary={mapSummary(data)}
-                          insights={mapInsights(insightsData.insights)}
-                        />
-                      ) : null
-                    }
+                    {({ data: insightsData, loading: insightsLoading }) => (
+                      <InvoicesController personId={personId} year={year} month={month}>
+                        {({ data: invoicesData, loading: invoicesLoading }) =>
+                          loading || insightsLoading || invoicesLoading ? (
+                            <div>Carregando resumo...</div>
+                          ) : data && insightsData ? (
+                            <SummaryCards
+                              summary={mapSummary(data)}
+                              insights={mapInsights(insightsData.insights)}
+                              invoices={invoicesData?.invoices ?? []}
+                            />
+                          ) : null
+                        }
+                      </InvoicesController>
+                    )}
                   </InsightsController>
                 )}
               </SummaryController>
