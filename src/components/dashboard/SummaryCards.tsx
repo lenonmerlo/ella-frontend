@@ -13,7 +13,6 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
   const financialHealthScore = 82;
 
   const faturaAtual = (invoices ?? []).reduce((sum, inv) => sum + Number(inv.amount ?? 0), 0);
-  const gastoVariavel = summary.totalExpenses; // pode mudar depois
   const alertasIa = insights.length;
 
   return (
@@ -42,7 +41,7 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
           <span className="text-ella-subtile text-xs font-medium uppercase">cartão</span>
         </div>
         <p className="text-ella-subtile mb-1 text-sm">Fatura do mês</p>
-        <p className="text-ella-navy text-3xl font-bold">
+        <p className="text-3xl font-bold text-red-600">
           R{"$ "}
           {faturaAtual.toLocaleString("pt-BR", {
             minimumFractionDigits: 2,
@@ -53,23 +52,18 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
         </p>
       </div>
 
-      {/* Gasto variável */}
-      <div className="ella-glass p-6">
+      {/* Recebimentos (standby por enquanto) */}
+      <div className="ella-glass p-6 opacity-70">
         <div className="mb-4 flex items-center justify-between">
           <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
-            <Wallet size={24} className="text-ella-gold" />
+            <Wallet size={24} className="text-green-600" />
           </div>
-          <span className="text-ella-subtile text-xs font-medium uppercase">gastos</span>
+          <span className="text-ella-subtile text-xs font-medium uppercase">recebimentos</span>
         </div>
-        <p className="text-ella-subtile mb-1 text-sm">Gasto variável do mês</p>
-        <p className="text-3xl font-bold text-red-600">
-          R{"$ "}
-          {gastoVariavel.toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-          })}
-        </p>
+        <p className="text-ella-subtile mb-1 text-sm">Recebimentos do mês</p>
+        <p className="text-2xl font-bold text-green-600">Em breve</p>
         <p className="text-ella-subtile mt-1 text-xs">
-          Restaurantes, apps, compras, lazer e outros variáveis.
+          Em standby — será alimentado por extratos bancários.
         </p>
       </div>
 
