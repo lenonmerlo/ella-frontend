@@ -55,4 +55,11 @@ export interface DashboardData {
   invoices?: DashboardInvoice[];
 }
 
-export type SectionId = "overview" | "invoices" | "transactions" | "charts" | "goals" | "insights";
+export type SectionId =
+  | "overview"
+  | "invoices"
+  | "transactions"
+  | "bank-statements"
+  | "charts"
+  | "goals"
+  | "insights";

@@ -22,10 +22,11 @@ interface Props {
 const ITEMS = [
   { id: "overview", label: "Saúde financeira", icon: Activity },
   { id: "invoices", label: "Faturas de cartão", icon: CreditCard },
-  { id: "transactions", label: "Movimentação", icon: ListTree },
+  { id: "transactions", label: "Lançamentos Cartão", icon: ListTree },
+  { id: "bank-statements", label: "Movimentação C/C", icon: ListTree },
   { id: "charts", label: "Gráficos", icon: BarChart3 },
   { id: "goals", label: "Metas", icon: Target },
-  { id: "insights", label: "Insights da IA", icon: Sparkles },
+  { id: "insights", label: "Insights da Ella", icon: Sparkles },
 ];
 
 export function DashboardSidebar({

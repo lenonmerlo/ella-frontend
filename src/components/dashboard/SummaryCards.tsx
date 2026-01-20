@@ -12,6 +12,7 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
   // mock de score de saúde financeira – depois podemos calcular de verdade
   const financialHealthScore = 82;
 
+  const saldoTotal = summary.totalIncome - summary.totalExpenses;
   const faturaAtual = (invoices ?? []).reduce((sum, inv) => sum + Number(inv.amount ?? 0), 0);
   const alertasIa = insights.length;
 
@@ -30,6 +31,24 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
         <p className="text-ella-subtile mt-1 text-xs">
           Baseado nas suas faturas e gastos recentes.
         </p>
+      </div>
+
+      {/* Saldo Total */}
+      <div className="ella-glass p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
+            <Wallet size={24} className="text-blue-600" />
+          </div>
+          <span className="text-ella-subtile text-xs font-medium uppercase">saldo</span>
+        </div>
+        <p className="text-ella-subtile mb-1 text-sm">Saldo Total</p>
+        <p className={`text-3xl font-bold ${saldoTotal >= 0 ? "text-green-600" : "text-red-600"}`}>
+          R{"$ "}
+          {Math.abs(saldoTotal).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+          })}
+        </p>
+        <p className="text-ella-subtile mt-1 text-xs">Recebimentos menos despesas do mês.</p>
       </div>
 
       {/* Fatura atual */}
@@ -52,6 +71,21 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
         </p>
       </div>
 
+      {/* Alertas da Ella */}
+      <div className="ella-glass p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
+            <Sparkles size={24} className="text-ella-gold" />
+          </div>
+          <span className="text-ella-subtile text-xs font-medium uppercase">insights</span>
+        </div>
+        <p className="text-ella-subtile mb-1 text-sm">Alertas da Ella</p>
+        <p className="text-ella-navy text-3xl font-bold">{alertasIa}</p>
+        <p className="text-ella-subtile mt-1 text-xs">
+          Recomendações e avisos importantes para o mês.
+        </p>
+      </div>
+
       {/* Recebimentos (standby por enquanto) */}
       <div className="ella-glass p-6 opacity-70">
         <div className="mb-4 flex items-center justify-between">
@@ -64,21 +98,6 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
         <p className="text-2xl font-bold text-green-600">Em breve</p>
         <p className="text-ella-subtile mt-1 text-xs">
           Em standby — será alimentado por extratos bancários.
-        </p>
-      </div>
-
-      {/* Alertas da IA */}
-      <div className="ella-glass p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
-            <Sparkles size={24} className="text-ella-gold" />
-          </div>
-          <span className="text-ella-subtile text-xs font-medium uppercase">insights</span>
-        </div>
-        <p className="text-ella-subtile mb-1 text-sm">Alertas da IA</p>
-        <p className="text-ella-navy text-3xl font-bold">{alertasIa}</p>
-        <p className="text-ella-subtile mt-1 text-xs">
-          Recomendações e avisos importantes para o mês.
         </p>
       </div>
     </section>

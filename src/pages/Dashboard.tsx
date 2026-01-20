@@ -235,6 +235,17 @@ export default function DashboardPage() {
             <TransactionsBoard personId={personId} referenceDate={selectedDate} />
           )}
 
+          {selectedSection === "bank-statements" && (
+            <div className="space-y-6">
+              <div className="rounded-lg bg-white p-6 shadow-sm">
+                <h2 className="text-ella-navy mb-4 text-lg font-semibold">Movimentação C/C</h2>
+                <p className="text-ella-subtile">
+                  Em breve — será alimentado por extratos bancários.
+                </p>
+              </div>
+            </div>
+          )}
+
           {selectedSection === "charts" && (
             <ChartsController key={refreshKey} personId={personId} year={year} month={month}>
               {({ data, loading }) =>
