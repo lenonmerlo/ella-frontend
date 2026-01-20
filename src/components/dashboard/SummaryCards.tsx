@@ -1,14 +1,15 @@
 // src/components/dashboard/SummaryCards.tsx
 import type { DashboardInsight, DashboardInvoice, DashboardSummary } from "@/types/dashboard";
-import { Activity, CreditCard, Sparkles, Wallet } from "lucide-react";
+import { Activity, CreditCard, Sparkles, Target, Wallet } from "lucide-react";
 
 interface Props {
   summary: DashboardSummary;
   insights: DashboardInsight[];
+  goalsCount?: number;
   invoices?: DashboardInvoice[];
 }
 
-export function SummaryCards({ summary, insights, invoices }: Props) {
+export function SummaryCards({ summary, insights, goalsCount = 0, invoices }: Props) {
   // mock de score de saúde financeira – depois podemos calcular de verdade
   const financialHealthScore = 82;
 
@@ -43,7 +44,7 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
         </div>
         <p className="text-ella-subtile mb-1 text-sm">Saldo Total</p>
         <p
-          className={`whitespace-nowrap text-2xl font-bold lg:text-3xl ${saldoTotal >= 0 ? "text-green-600" : "text-red-600"}`}
+          className={`text-2xl font-bold whitespace-nowrap lg:text-3xl ${saldoTotal >= 0 ? "text-green-600" : "text-red-600"}`}
         >
           {"R$\u00A0"}
           {Math.abs(saldoTotal).toLocaleString("pt-BR", {
@@ -62,7 +63,7 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
           <span className="text-ella-subtile text-xs font-medium uppercase">cartão</span>
         </div>
         <p className="text-ella-subtile mb-1 text-sm">Fatura do mês</p>
-        <p className="whitespace-nowrap text-2xl font-bold text-red-600 lg:text-3xl">
+        <p className="text-2xl font-bold whitespace-nowrap text-red-600 lg:text-3xl">
           {"R$\u00A0"}
           {faturaAtual.toLocaleString("pt-BR", {
             minimumFractionDigits: 2,
@@ -70,6 +71,21 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
         </p>
         <p className="text-ella-subtile mt-1 text-xs">
           Soma das faturas do mês (aba “Faturas de cartão”).
+        </p>
+      </div>
+
+      {/* Recebimentos (standby por enquanto) */}
+      <div className="ella-glass p-6 opacity-70">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
+            <Wallet size={24} className="text-green-600" />
+          </div>
+          <span className="text-ella-subtile text-xs font-medium uppercase">recebimentos</span>
+        </div>
+        <p className="text-ella-subtile mb-1 text-sm">Recebimentos do mês</p>
+        <p className="text-2xl font-bold text-green-600">Em breve</p>
+        <p className="text-ella-subtile mt-1 text-xs">
+          Em standby — será alimentado por extratos bancários.
         </p>
       </div>
 
@@ -88,19 +104,17 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
         </p>
       </div>
 
-      {/* Recebimentos (standby por enquanto) */}
-      <div className="ella-glass p-6 opacity-70">
+      {/* Metas */}
+      <div className="ella-glass p-6">
         <div className="mb-4 flex items-center justify-between">
           <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
-            <Wallet size={24} className="text-green-600" />
+            <Target size={24} className="text-ella-gold" />
           </div>
-          <span className="text-ella-subtile text-xs font-medium uppercase">recebimentos</span>
+          <span className="text-ella-subtile text-xs font-medium uppercase">metas</span>
         </div>
-        <p className="text-ella-subtile mb-1 text-sm">Recebimentos do mês</p>
-        <p className="text-2xl font-bold text-green-600">Em breve</p>
-        <p className="text-ella-subtile mt-1 text-xs">
-          Em standby — será alimentado por extratos bancários.
-        </p>
+        <p className="text-ella-subtile mb-1 text-sm">Metas</p>
+        <p className="text-ella-navy text-3xl font-bold">{goalsCount}</p>
+        <p className="text-ella-subtile mt-1 text-xs">Quantidade de metas cadastradas.</p>
       </div>
     </section>
   );

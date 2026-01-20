@@ -25,6 +25,11 @@ export async function createGoal(data: CreateGoalDTO) {
   return res.data?.data;
 }
 
+export async function updateGoal(id: string, data: CreateGoalDTO) {
+  const res = await http.put<{ data: GoalProgressDTO }>(`/goals/${id}`, data);
+  return res.data?.data;
+}
+
 export async function deleteGoal(id: string) {
   await http.delete(`/goals/${id}`);
 }

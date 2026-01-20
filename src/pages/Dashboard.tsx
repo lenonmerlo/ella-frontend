@@ -137,17 +137,22 @@ export default function DashboardPage() {
                   <InsightsController personId={personId} year={year} month={month}>
                     {({ data: insightsData, loading: insightsLoading }) => (
                       <InvoicesController personId={personId} year={year} month={month}>
-                        {({ data: invoicesData, loading: invoicesLoading }) =>
-                          loading || insightsLoading || invoicesLoading ? (
-                            <div>Carregando resumo...</div>
-                          ) : data && insightsData ? (
-                            <SummaryCards
-                              summary={mapSummary(data)}
-                              insights={mapInsights(insightsData.insights)}
-                              invoices={invoicesData?.invoices ?? []}
-                            />
-                          ) : null
-                        }
+                        {({ data: invoicesData, loading: invoicesLoading }) => (
+                          <GoalsController personId={personId}>
+                            {({ data: goalsData, loading: goalsLoading }) =>
+                              loading || insightsLoading || invoicesLoading || goalsLoading ? (
+                                <div>Carregando resumo...</div>
+                              ) : data && insightsData ? (
+                                <SummaryCards
+                                  summary={mapSummary(data)}
+                                  insights={mapInsights(insightsData.insights)}
+                                  goalsCount={goalsData?.goals?.length ?? 0}
+                                  invoices={invoicesData?.invoices ?? []}
+                                />
+                              ) : null
+                            }
+                          </GoalsController>
+                        )}
                       </InvoicesController>
                     )}
                   </InsightsController>

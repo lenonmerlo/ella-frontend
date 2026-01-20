@@ -1,9 +1,9 @@
 // src/components/dashboard/GoalsSection.tsx
-import { Plus, Target, Trash2 } from "lucide-react";
+import { Pencil, Plus, Target, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { GoalProgressDTO } from "../../lib/dashboard";
-import { createGoal, deleteGoal } from "../../services/api/goalsService";
+import { createGoal, deleteGoal, updateGoal } from "../../services/api/goalsService";
 
 interface GoalsSectionProps {
   goals: GoalProgressDTO[];
@@ -13,12 +13,51 @@ interface GoalsSectionProps {
 export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
   const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
+  const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState({
     title: "",
     targetAmount: "",
     currentAmount: "",
     deadline: "",
   });
+
+  const [editGoal, setEditGoal] = useState({
+    title: "",
+    targetAmount: "",
+    currentAmount: "",
+    deadline: "",
+  });
+
+  function formatBRL(value: number) {
+    return value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function calculateMonthlySaving(goal: GoalProgressDTO): {
+    monthly: number;
+    remaining: number;
+    monthsLeft: number;
+  } | null {
+    if (!goal.deadline) return null;
+
+    const deadline = new Date(goal.deadline);
+    if (Number.isNaN(deadline.getTime())) return null;
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const end = new Date(deadline.getFullYear(), deadline.getMonth(), deadline.getDate());
+
+    const remaining = Math.max(0, (goal.targetAmount ?? 0) - (goal.currentAmount ?? 0));
+    const msDiff = end.getTime() - today.getTime();
+    if (msDiff <= 0) {
+      return { monthly: remaining, remaining, monthsLeft: 0 };
+    }
+
+    // Aproximação determinística: meses restantes = teto(dias/30.44)
+    const days = msDiff / (1000 * 60 * 60 * 24);
+    const monthsLeft = Math.max(1, Math.ceil(days / 30.44));
+    const monthly = remaining / monthsLeft;
+    return { monthly, remaining, monthsLeft };
+  }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -38,6 +77,40 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
     } catch (error) {
       console.error("Erro ao criar meta:", error);
       alert("Erro ao criar meta");
+    }
+  }
+
+  async function handleEditOpen(goal: GoalProgressDTO) {
+    const goalId = String((goal as any).id ?? (goal as any).goalId);
+    setEditingGoalId(goalId);
+
+    const deadlineISO = goal.deadline ? new Date(goal.deadline).toISOString().slice(0, 10) : "";
+
+    setEditGoal({
+      title: goal.title ?? "",
+      targetAmount: String(goal.targetAmount ?? ""),
+      currentAmount: String(goal.currentAmount ?? ""),
+      deadline: deadlineISO,
+    });
+  }
+
+  async function handleEditSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!user?.id || !editingGoalId) return;
+    try {
+      await updateGoal(editingGoalId, {
+        ownerId: user.id,
+        title: editGoal.title,
+        targetAmount: Number(editGoal.targetAmount),
+        currentAmount: Number(editGoal.currentAmount || 0),
+        deadline: editGoal.deadline ? new Date(editGoal.deadline).toISOString() : undefined,
+        status: "ACTIVE",
+      });
+      setEditingGoalId(null);
+      onRefresh();
+    } catch (error) {
+      console.error("Erro ao atualizar meta:", error);
+      alert("Erro ao atualizar meta");
     }
   }
 
@@ -155,6 +228,8 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
             Math.round((goal.currentAmount / goal.targetAmount) * 100),
           );
 
+          const saving = calculateMonthlySaving(goal);
+
           return (
             <div
               key={goalId}
@@ -174,23 +249,129 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
                     )}
                   </div>
                 </div>
-                <button
-                  onClick={() => handleDelete(String(goalId))}
-                  className="opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-600"
-                  title="Excluir meta"
-                >
-                  <Trash2 size={16} />
-                </button>
+                <div className="flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button
+                    onClick={() => handleEditOpen(goal)}
+                    className="hover:text-ella-navy"
+                    title="Editar meta"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(String(goalId))}
+                    className="hover:text-red-600"
+                    title="Excluir meta"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
+
+              {editingGoalId === String(goalId) && (
+                <form
+                  onSubmit={handleEditSave}
+                  className="mt-3 space-y-4 rounded-xl border border-gray-100 bg-white p-4"
+                >
+                  <div>
+                    <label className="text-ella-subtile mb-1 block text-xs font-medium">
+                      Título
+                    </label>
+                    <input
+                      required
+                      type="text"
+                      className="border-ella-muted focus:border-ella-gold w-full rounded-lg border p-2 text-sm outline-none"
+                      value={editGoal.title}
+                      onChange={(e) => setEditGoal({ ...editGoal, title: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="text-ella-subtile mb-1 block text-xs font-medium">
+                        Valor Alvo (R$)
+                      </label>
+                      <input
+                        required
+                        inputMode="decimal"
+                        type="number"
+                        step="0.01"
+                        className="border-ella-muted focus:border-ella-gold w-full rounded-lg border p-2 text-sm outline-none"
+                        value={editGoal.targetAmount}
+                        onChange={(e) => setEditGoal({ ...editGoal, targetAmount: e.target.value })}
+                        placeholder="0,00"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-ella-subtile mb-1 block text-xs font-medium">
+                        Valor Atual (R$)
+                      </label>
+                      <input
+                        inputMode="decimal"
+                        type="number"
+                        step="0.01"
+                        className="border-ella-muted focus:border-ella-gold w-full rounded-lg border p-2 text-sm outline-none"
+                        value={editGoal.currentAmount}
+                        onChange={(e) =>
+                          setEditGoal({ ...editGoal, currentAmount: e.target.value })
+                        }
+                        placeholder="0,00"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="max-w-[220px]">
+                    <label className="text-ella-subtile mb-1 block text-xs font-medium">
+                      Prazo
+                    </label>
+                    <input
+                      type="date"
+                      className="border-ella-muted focus:border-ella-gold w-full rounded-lg border p-2 text-sm outline-none"
+                      value={editGoal.deadline}
+                      onChange={(e) => setEditGoal({ ...editGoal, deadline: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setEditingGoalId(null)}
+                      className="text-ella-subtile hover:text-ella-navy rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-ella-gold hover:bg-ella-gold/90 rounded-lg px-4 py-2 text-sm font-medium text-white"
+                    >
+                      Salvar
+                    </button>
+                  </div>
+                </form>
+              )}
 
               <div className="mt-4">
                 <div className="text-ella-subtile mb-2 flex items-center justify-between text-xs">
                   <span>
-                    R$ {goal.currentAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} de{" "}
-                    {goal.targetAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {formatBRL(goal.currentAmount)} de {formatBRL(goal.targetAmount)}
                   </span>
                   <span className="text-ella-navy font-medium">{progress}%</span>
                 </div>
+
+                {saving && saving.remaining > 0 && goal.deadline && (
+                  <div className="text-ella-subtile mb-2 text-xs">
+                    {saving.monthsLeft > 0 ? (
+                      <span>
+                        Para atingir até {new Date(goal.deadline).toLocaleDateString("pt-BR")},
+                        poupe ~ R$ {formatBRL(saving.monthly)}/mês
+                      </span>
+                    ) : (
+                      <span>
+                        Prazo expirado: faltam R$ {formatBRL(saving.remaining)} para concluir
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 <div className="bg-ella-background/20 h-2 w-full overflow-hidden rounded-full">
                   <div
