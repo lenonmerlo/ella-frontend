@@ -42,8 +42,10 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
           <span className="text-ella-subtile text-xs font-medium uppercase">saldo</span>
         </div>
         <p className="text-ella-subtile mb-1 text-sm">Saldo Total</p>
-        <p className={`text-3xl font-bold ${saldoTotal >= 0 ? "text-green-600" : "text-red-600"}`}>
-          R{"$ "}
+        <p
+          className={`whitespace-nowrap text-2xl font-bold lg:text-3xl ${saldoTotal >= 0 ? "text-green-600" : "text-red-600"}`}
+        >
+          {"R$\u00A0"}
           {Math.abs(saldoTotal).toLocaleString("pt-BR", {
             minimumFractionDigits: 2,
           })}
@@ -60,8 +62,8 @@ export function SummaryCards({ summary, insights, invoices }: Props) {
           <span className="text-ella-subtile text-xs font-medium uppercase">cartão</span>
         </div>
         <p className="text-ella-subtile mb-1 text-sm">Fatura do mês</p>
-        <p className="text-3xl font-bold text-red-600">
-          R{"$ "}
+        <p className="whitespace-nowrap text-2xl font-bold text-red-600 lg:text-3xl">
+          {"R$\u00A0"}
           {faturaAtual.toLocaleString("pt-BR", {
             minimumFractionDigits: 2,
           })}
