@@ -9,6 +9,7 @@ import {
   Sparkles,
   Target,
   Upload,
+  Wallet,
 } from "lucide-react";
 
 interface Props {
@@ -21,6 +22,7 @@ interface Props {
 
 const ITEMS = [
   { id: "overview", label: "Saúde financeira", icon: Activity },
+  { id: "budget", label: "Orçamento", icon: Wallet },
   { id: "invoices", label: "Faturas de cartão", icon: CreditCard },
   { id: "transactions", label: "Lançamentos Cartão", icon: ListTree },
   { id: "bank-statements", label: "Movimentação C/C", icon: ListTree },

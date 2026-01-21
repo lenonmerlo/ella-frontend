@@ -25,6 +25,7 @@ import { InvoicesController } from "../controllers/InvoicesController";
 import { SummaryController } from "../controllers/SummaryController";
 import { TransactionsController } from "../controllers/TransactionsController";
 import { updateTransaction } from "../services/api/transactionsService";
+import BudgetPage from "./BudgetPage";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -286,6 +287,8 @@ export default function DashboardPage() {
               }
             </InsightsController>
           )}
+
+          {selectedSection === "budget" && <BudgetPage />}
         </div>
       </main>
       {showUpload && (
