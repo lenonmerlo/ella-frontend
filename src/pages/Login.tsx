@@ -1,6 +1,6 @@
 // src/pages/Login.tsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { login as doLogin } from "../lib/auth";
 
@@ -103,9 +103,17 @@ export default function LoginPage() {
 
             <p className="text-ella-subtile pt-3 text-center text-xs">
               Ainda não tem conta?{" "}
-              <a href="/register" className="text-ella-navy hover:text-ella-gold font-medium">
+              <Link className="text-ella-navy hover:text-ella-gold font-medium" to="/auth/register">
                 Criar acesso
-              </a>
+              </Link>
+            </p>
+            <p className="mt-2 text-sm">
+              <Link
+                className="text-ella-navy hover:text-ella-gold font-medium"
+                to="/auth/forgot-password"
+              >
+                Esqueci minha senha
+              </Link>
             </p>
           </form>
         </section>

@@ -20,7 +20,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (!user) {
-      navigate("/login");
+      navigate("/auth/login");
       return;
     }
 
@@ -110,7 +110,7 @@ export default function SettingsPage() {
       setSuccess("Conta deletada com sucesso. Redirecionando...");
       setTimeout(() => {
         logout();
-        navigate("/login");
+        navigate("/auth/login");
       }, 1000);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Erro ao deletar conta";

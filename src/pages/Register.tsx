@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { register } from "../lib/auth";
+import { Link, useNavigate } from "react-router-dom";
+import { login as doLogin } from "../lib/auth";
+import { http } from "../lib/http";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -20,6 +21,11 @@ export default function RegisterPage() {
     setError(null);
     setSuccess(null);
 
+    if (password.length < 8) {
+      setError("A senha deve ter pelo menos 8 caracteres.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("As senhas não coincidem.");
       return;
@@ -27,9 +33,11 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      await register({ firstName, lastName, email, password });
-      setSuccess("Conta criada! Redirecionando...");
-      setTimeout(() => navigate("/login"), 1500);
+      const name = `${firstName} ${lastName}`.trim();
+      await http.post("/auth/register", null, { params: { name, email, password } });
+
+      await doLogin(email, password);
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
       const errorMsg = err instanceof Error ? err.message : "Erro ao criar conta.";
@@ -61,59 +69,95 @@ export default function RegisterPage() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div className="space-y-1">
-                <label className="text-ella-subtile text-xs font-medium uppercase">Nome</label>
+                <label
+                  className="text-ella-subtile text-xs font-medium uppercase"
+                  htmlFor="register-first-name"
+                >
+                  Nome
+                </label>
                 <input
+                  id="register-first-name"
                   type="text"
                   placeholder="Mariana"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
+                  required
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-ella-subtile text-xs font-medium uppercase">Sobrenome</label>
+                <label
+                  className="text-ella-subtile text-xs font-medium uppercase"
+                  htmlFor="register-last-name"
+                >
+                  Sobrenome
+                </label>
                 <input
+                  id="register-last-name"
                   type="text"
                   placeholder="Silva"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
+                  required
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-ella-subtile text-xs font-medium uppercase">E-mail</label>
+              <label
+                className="text-ella-subtile text-xs font-medium uppercase"
+                htmlFor="register-email"
+              >
+                E-mail
+              </label>
               <input
+                id="register-email"
                 type="email"
                 placeholder="voce@exemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
+                required
+                autoComplete="email"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-ella-subtile text-xs font-medium uppercase">Senha</label>
+              <label
+                className="text-ella-subtile text-xs font-medium uppercase"
+                htmlFor="register-password"
+              >
+                Senha
+              </label>
               <input
+                id="register-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
+                required
+                autoComplete="new-password"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-ella-subtile text-xs font-medium uppercase">
+              <label
+                className="text-ella-subtile text-xs font-medium uppercase"
+                htmlFor="register-confirm-password"
+              >
                 Confirmar senha
               </label>
               <input
+                id="register-confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
+                required
+                autoComplete="new-password"
               />
             </div>
 
@@ -130,9 +174,12 @@ export default function RegisterPage() {
 
             <p className="text-ella-subtile pt-3 text-center text-xs">
               Já tem conta?
-              <a href="/login" className="text-ella-navy hover:text-ella-gold ml-1 font-medium">
+              <Link
+                className="text-ella-navy hover:text-ella-gold ml-1 font-medium"
+                to="/auth/login"
+              >
                 Entrar
-              </a>
+              </Link>
             </p>
           </form>
         </section>

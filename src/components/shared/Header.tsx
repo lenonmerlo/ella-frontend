@@ -8,7 +8,7 @@ export function Header() {
 
   function handleLogout() {
     logout();
-    navigate("/login");
+    navigate("/auth/login");
   }
 
   const initials = user?.name
@@ -51,7 +51,7 @@ export function Header() {
         ) : (
           <div className="flex gap-4">
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/auth/login")}
               className="text-ella-subtile hover:text-ella-navy text-sm font-medium"
             >
               Entrar
