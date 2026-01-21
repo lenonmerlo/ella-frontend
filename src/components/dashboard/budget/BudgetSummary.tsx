@@ -60,7 +60,7 @@ export function BudgetSummary({ budget }: BudgetSummaryProps) {
             <span className="font-medium">{formatCurrency(budget.investment)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-700">Compra Programada</span>
+            <span className="text-gray-700">Compra Planejada</span>
             <span className="font-medium">{formatCurrency(budget.plannedPurchase)}</span>
           </div>
           <div className="flex justify-between">

@@ -42,7 +42,7 @@ const FIELDS: Field[] = [
     label: "Investimento",
     hint: "Poupança, investimentos, reserva de emergência",
   },
-  { key: "plannedPurchase", label: "Compra Programada", hint: "Consórcio" },
+  { key: "plannedPurchase", label: "Compra Planejada", hint: "Consórcio" },
   { key: "protection", label: "Proteção", hint: "Seguros de vida e patrimonial" },
 ];
 

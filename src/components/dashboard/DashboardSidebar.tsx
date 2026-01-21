@@ -24,6 +24,7 @@ interface Props {
 
 const ITEMS = [
   { id: "overview", label: "Saúde financeira", icon: Activity },
+  { id: "score", label: "Score ELLA", icon: Activity },
   { id: "budget", label: "Orçamento", icon: Wallet },
   { id: "investments", label: "Investimentos", icon: TrendingUp },
   { id: "invoices", label: "Faturas de cartão", icon: CreditCard },

@@ -4,8 +4,9 @@ import { fetchInvestmentsSummary } from "@/services/api/investmentService";
 import type { BudgetResponse } from "@/types/budget";
 import type { DashboardInsight, DashboardInvoice, DashboardSummary } from "@/types/dashboard";
 import type { InvestmentSummaryResponse } from "@/types/investment";
-import { Activity, CreditCard, PieChart, Sparkles, Target, TrendingUp, Wallet } from "lucide-react";
+import { CreditCard, PieChart, Sparkles, Target, TrendingUp, Wallet } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { ScoreCard } from "./ScoreCard";
 
 interface Props {
   personId: string;
@@ -15,6 +16,7 @@ interface Props {
   invoices?: DashboardInvoice[];
   onOpenInvestments?: () => void;
   onOpenBudget?: () => void;
+  onOpenScore?: () => void;
 }
 
 export function SummaryCards({
@@ -25,10 +27,8 @@ export function SummaryCards({
   invoices,
   onOpenInvestments,
   onOpenBudget,
+  onOpenScore,
 }: Props) {
-  // mock de score de saúde financeira – depois podemos calcular de verdade
-  const financialHealthScore = 82;
-
   const [investmentSummary, setInvestmentSummary] = useState<InvestmentSummaryResponse | null>(
     null,
   );
@@ -106,20 +106,7 @@ export function SummaryCards({
 
   return (
     <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-      {/* Saúde financeira */}
-      <div className="ella-glass p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
-            <Activity size={24} className="text-ella-gold" />
-          </div>
-          <span className="text-ella-subtile text-xs font-medium uppercase">saúde financeira</span>
-        </div>
-        <p className="text-ella-subtile mb-1 text-sm">Score ELLA</p>
-        <p className="text-ella-navy text-3xl font-bold">{financialHealthScore}/100</p>
-        <p className="text-ella-subtile mt-1 text-xs">
-          Baseado nas suas faturas e gastos recentes.
-        </p>
-      </div>
+      <ScoreCard personId={personId} onViewDetails={onOpenScore} />
 
       {/* Saldo Total */}
       <div className="ella-glass p-6">

@@ -28,6 +28,7 @@ import { TransactionsController } from "../controllers/TransactionsController";
 import { updateTransaction } from "../services/api/transactionsService";
 import BudgetPage from "./BudgetPage";
 import InvestmentPage from "./InvestmentPage";
+import ScorePage from "./ScorePage";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -225,6 +226,7 @@ export default function DashboardPage() {
                                   invoices={invoicesData?.invoices ?? []}
                                   onOpenInvestments={() => setSelectedSection("investments")}
                                   onOpenBudget={() => setSelectedSection("budget")}
+                                  onOpenScore={() => setSelectedSection("score")}
                                 />
                               ) : null
                             }
@@ -363,6 +365,8 @@ export default function DashboardPage() {
               }
             </InsightsController>
           )}
+
+          {selectedSection === "score" && <ScorePage />}
 
           {selectedSection === "budget" && <BudgetPage />}
 
