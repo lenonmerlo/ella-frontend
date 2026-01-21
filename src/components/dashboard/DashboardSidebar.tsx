@@ -8,6 +8,7 @@ import {
   ListTree,
   Sparkles,
   Target,
+  TrendingUp,
   Upload,
   Wallet,
 } from "lucide-react";
@@ -18,11 +19,13 @@ interface Props {
   onNewUpload?: () => void;
   selectedDate?: Date;
   onDateChange?: (date: Date) => void;
+  mode?: "desktop" | "drawer";
 }
 
 const ITEMS = [
   { id: "overview", label: "Saúde financeira", icon: Activity },
   { id: "budget", label: "Orçamento", icon: Wallet },
+  { id: "investments", label: "Investimentos", icon: TrendingUp },
   { id: "invoices", label: "Faturas de cartão", icon: CreditCard },
   { id: "transactions", label: "Lançamentos Cartão", icon: ListTree },
   { id: "bank-statements", label: "Movimentação C/C", icon: ListTree },
@@ -37,6 +40,7 @@ export function DashboardSidebar({
   onNewUpload,
   selectedDate,
   onDateChange,
+  mode = "desktop",
 }: Props) {
   const currentDate = selectedDate || new Date();
   const monthLabel = currentDate.toLocaleString("pt-BR", { month: "long", year: "numeric" });
@@ -53,8 +57,13 @@ export function DashboardSidebar({
     onDateChange?.(newDate);
   }
 
+  const asideClassName =
+    mode === "drawer"
+      ? "flex w-72 shrink-0 flex-col gap-2 rounded-2xl bg-white/95 p-4 shadow-sm"
+      : "hidden w-56 shrink-0 flex-col gap-2 rounded-2xl bg-white/90 p-4 shadow-sm lg:flex";
+
   return (
-    <aside className="hidden w-56 shrink-0 flex-col gap-2 rounded-2xl bg-white/90 p-4 shadow-sm lg:flex">
+    <aside className={asideClassName}>
       {onDateChange && (
         <div className="bg-ella-background/50 mb-4 flex items-center justify-between rounded-xl p-2">
           <button

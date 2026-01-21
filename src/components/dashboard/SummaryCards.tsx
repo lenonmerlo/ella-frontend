@@ -1,21 +1,108 @@
 // src/components/dashboard/SummaryCards.tsx
+import { fetchBudget } from "@/services/api/budgetService";
+import { fetchInvestmentsSummary } from "@/services/api/investmentService";
+import type { BudgetResponse } from "@/types/budget";
 import type { DashboardInsight, DashboardInvoice, DashboardSummary } from "@/types/dashboard";
-import { Activity, CreditCard, Sparkles, Target, Wallet } from "lucide-react";
+import type { InvestmentSummaryResponse } from "@/types/investment";
+import { Activity, CreditCard, PieChart, Sparkles, Target, TrendingUp, Wallet } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 interface Props {
+  personId: string;
   summary: DashboardSummary;
   insights: DashboardInsight[];
   goalsCount?: number;
   invoices?: DashboardInvoice[];
+  onOpenInvestments?: () => void;
+  onOpenBudget?: () => void;
 }
 
-export function SummaryCards({ summary, insights, goalsCount = 0, invoices }: Props) {
+export function SummaryCards({
+  personId,
+  summary,
+  insights,
+  goalsCount = 0,
+  invoices,
+  onOpenInvestments,
+  onOpenBudget,
+}: Props) {
   // mock de score de saúde financeira – depois podemos calcular de verdade
   const financialHealthScore = 82;
+
+  const [investmentSummary, setInvestmentSummary] = useState<InvestmentSummaryResponse | null>(
+    null,
+  );
+  const [investmentLoading, setInvestmentLoading] = useState(false);
+
+  const [budget, setBudget] = useState<BudgetResponse | null>(null);
+  const [budgetLoading, setBudgetLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!personId) return;
+      setInvestmentLoading(true);
+      try {
+        const data = await fetchInvestmentsSummary(personId);
+        if (!cancelled) setInvestmentSummary(data);
+      } catch {
+        if (!cancelled) setInvestmentSummary(null);
+      } finally {
+        if (!cancelled) setInvestmentLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [personId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!personId) return;
+      setBudgetLoading(true);
+      try {
+        const data = await fetchBudget(personId);
+        if (!cancelled) setBudget(data);
+      } catch {
+        if (!cancelled) setBudget(null);
+      } finally {
+        if (!cancelled) setBudgetLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [personId]);
 
   const saldoTotal = summary.totalIncome - summary.totalExpenses;
   const faturaAtual = (invoices ?? []).reduce((sum, inv) => sum + Number(inv.amount ?? 0), 0);
   const alertasIa = insights.length;
+
+  const investmentsValue = investmentSummary?.totalCurrent ?? 0;
+  const investmentsProfitability = investmentSummary?.totalProfitability ?? 0;
+
+  const investmentsProfitLabel = useMemo(() => {
+    const sign = investmentsProfitability >= 0 ? "+" : "-";
+    return `${sign}${Math.abs(investmentsProfitability).toFixed(2)}%`;
+  }, [investmentsProfitability]);
+
+  const investmentsProfitColor = investmentsProfitability >= 0 ? "text-green-600" : "text-red-600";
+
+  const budgetStatusText = budgetLoading
+    ? "Carregando..."
+    : budget
+      ? budget.isHealthy
+        ? "Saudável"
+        : "Atenção"
+      : "Não configurado";
+  const budgetStatusColor = budget?.isHealthy
+    ? "text-green-600"
+    : budget
+      ? "text-red-600"
+      : "text-ella-subtile";
 
   return (
     <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -87,6 +174,70 @@ export function SummaryCards({ summary, insights, goalsCount = 0, invoices }: Pr
         <p className="text-ella-subtile mt-1 text-xs">
           Em standby — será alimentado por extratos bancários.
         </p>
+      </div>
+
+      {/* Investimentos */}
+      <div className="ella-glass p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
+            <TrendingUp size={24} className="text-green-600" />
+          </div>
+          <span className="text-ella-subtile text-xs font-medium uppercase">investimentos</span>
+        </div>
+        <p className="text-ella-subtile mb-1 text-sm">Patrimônio investido</p>
+        <p className="text-ella-navy text-2xl font-bold whitespace-nowrap lg:text-3xl">
+          {investmentLoading ? (
+            "Carregando..."
+          ) : (
+            <>
+              {"R$\u00A0"}
+              {investmentsValue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </>
+          )}
+        </p>
+        <p className="text-ella-subtile mt-1 text-xs">
+          Rentabilidade total:{" "}
+          <span className={`font-semibold ${investmentsProfitColor}`}>
+            {investmentsProfitLabel}
+          </span>
+        </p>
+        {onOpenInvestments && (
+          <button
+            type="button"
+            className="text-ella-navy mt-3 text-xs font-semibold hover:underline"
+            onClick={onOpenInvestments}
+          >
+            Ver detalhes
+          </button>
+        )}
+      </div>
+
+      {/* Orçamento */}
+      <div className="ella-glass p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
+            <PieChart size={24} className="text-ella-gold" />
+          </div>
+          <span className="text-ella-subtile text-xs font-medium uppercase">orçamento</span>
+        </div>
+        <p className="text-ella-subtile mb-1 text-sm">Regra 50/30/20</p>
+        <p className={`text-2xl font-bold whitespace-nowrap lg:text-3xl ${budgetStatusColor}`}>
+          {budgetStatusText}
+        </p>
+        <p className="text-ella-subtile mt-1 line-clamp-2 text-xs">
+          {budget?.recommendation
+            ? budget.recommendation
+            : "Defina seu orçamento e acompanhe seus percentuais."}
+        </p>
+        {onOpenBudget && (
+          <button
+            type="button"
+            className="text-ella-navy mt-3 text-xs font-semibold hover:underline"
+            onClick={onOpenBudget}
+          >
+            Ver detalhes
+          </button>
+        )}
       </div>
 
       {/* Alertas da Ella */}

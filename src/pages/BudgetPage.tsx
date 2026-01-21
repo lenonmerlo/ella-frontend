@@ -60,8 +60,8 @@ export default function BudgetPage() {
       <div className="rounded-2xl bg-white/80 p-6 shadow-sm backdrop-blur-sm">
         <h2 className="text-ella-navy text-lg font-semibold">Orçamento</h2>
         <p className="text-ella-subtile mt-1 text-sm">
-          Planeje seu mês com mais clareza: defina seu orçamento e acompanhe a regra 50/30/20 (50% necessidades, 30% desejos, 20%
-          investimentos).
+          Planeje seu mês com mais clareza: defina seu orçamento e acompanhe a regra 50/30/20 (50%
+          necessidades, 30% desejos, 20% investimentos).
         </p>
       </div>
 

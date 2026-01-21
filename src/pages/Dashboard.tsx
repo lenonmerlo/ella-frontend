@@ -5,6 +5,7 @@ import type {
   DashboardSummary,
   DashboardTransaction,
 } from "@/types/dashboard";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChartsSection } from "../components/dashboard/ChartsSection";
@@ -26,11 +27,13 @@ import { SummaryController } from "../controllers/SummaryController";
 import { TransactionsController } from "../controllers/TransactionsController";
 import { updateTransaction } from "../services/api/transactionsService";
 import BudgetPage from "./BudgetPage";
+import InvestmentPage from "./InvestmentPage";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedSection, setSelectedSection] = useState("overview");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() => {
     const saved = sessionStorage.getItem("dashboard_date");
     return saved ? new Date(saved) : new Date();
@@ -55,6 +58,15 @@ export default function DashboardPage() {
       }
     })();
   }, [navigate]);
+
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileNavOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileNavOpen]);
 
   if (!personId)
     return <div className="flex h-screen items-center justify-center">Carregando usuário...</div>;
@@ -116,6 +128,67 @@ export default function DashboardPage() {
 
   return (
     <div className="ella-gradient-bg min-h-screen">
+      {/* Mobile header */}
+      <div className="sticky top-0 z-40 border-b border-white/40 bg-white/70 backdrop-blur lg:hidden">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 md:px-6">
+          <button
+            type="button"
+            className="text-ella-navy inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white/80 px-3 py-2 text-sm font-semibold"
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Abrir menu"
+            aria-expanded={mobileNavOpen}
+          >
+            <Menu size={18} />
+            Menu
+          </button>
+          <div className="text-right">
+            <p className="text-ella-navy text-sm font-semibold">Dashboard</p>
+            <p className="text-ella-subtile text-xs">Visão geral das finanças</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile drawer */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/30"
+            aria-label="Fechar menu"
+            onClick={() => setMobileNavOpen(false)}
+          />
+          <div className="relative h-full w-full max-w-sm p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-ella-navy text-sm font-semibold">Navegação</p>
+              <button
+                type="button"
+                className="text-ella-navy rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold"
+                onClick={() => setMobileNavOpen(false)}
+                aria-label="Fechar"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <DashboardSidebar
+              mode="drawer"
+              selected={selectedSection}
+              onSelect={(id) => {
+                setSelectedSection(id);
+                setMobileNavOpen(false);
+              }}
+              onNewUpload={() => {
+                setShowUpload(true);
+                setMobileNavOpen(false);
+              }}
+              selectedDate={selectedDate}
+              onDateChange={(date) => {
+                handleDateChange(date);
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       <main className="mx-auto flex w-full max-w-7xl gap-6 px-4 py-8 md:px-6">
         <DashboardSidebar
           selected={selectedSection}
@@ -145,10 +218,13 @@ export default function DashboardPage() {
                                 <div>Carregando resumo...</div>
                               ) : data && insightsData ? (
                                 <SummaryCards
+                                  personId={personId}
                                   summary={mapSummary(data)}
                                   insights={mapInsights(insightsData.insights)}
                                   goalsCount={goalsData?.goals?.length ?? 0}
                                   invoices={invoicesData?.invoices ?? []}
+                                  onOpenInvestments={() => setSelectedSection("investments")}
+                                  onOpenBudget={() => setSelectedSection("budget")}
                                 />
                               ) : null
                             }
@@ -289,6 +365,8 @@ export default function DashboardPage() {
           )}
 
           {selectedSection === "budget" && <BudgetPage />}
+
+          {selectedSection === "investments" && <InvestmentPage />}
         </div>
       </main>
       {showUpload && (
