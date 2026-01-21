@@ -29,7 +29,7 @@ export function useDashboard(navigate?: (path: string) => void) {
   // Redirect to login if no token
   useEffect(() => {
     const token = getToken();
-    if (!token && navigate) navigate("/login");
+    if (!token && navigate) navigate("/auth/login");
   }, [navigate]);
 
   async function loadDashboardData(date = selectedDate) {

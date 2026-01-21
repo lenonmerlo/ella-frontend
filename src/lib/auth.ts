@@ -42,23 +42,9 @@ export async function login(email: string, password: string) {
 }
 
 export async function register(payload: RegisterPayload) {
-  // O backend espera UserRequestDTO com todos os campos
-  // Usamos valores padrão para campos não fornecidos pelo formulário
-  const res = await http.post("/users", {
-    // Pessoa
-    name: `${payload.firstName} ${payload.lastName}`,
-    phone: "1199999999", // padrão
-    birthDate: "1990-01-01", // padrão
-    address: "Não informado", // padrão
-    income: "1000", // padrão
-    language: "PT_BR",
-    plan: "FREE",
-    currency: "BRL",
-    status: "ACTIVE",
-    // Usuário
-    email: payload.email,
-    password: payload.password,
-    role: "USER",
+  const name = `${payload.firstName} ${payload.lastName}`.trim();
+  const res = await http.post("/auth/register", null, {
+    params: { name, email: payload.email, password: payload.password },
   });
   return res.data;
 }

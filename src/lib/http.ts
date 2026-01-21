@@ -27,6 +27,9 @@ http.interceptors.request.use(
     const isPublicEndpoint =
       (url === "/auth/login" && method === "post") ||
       (url === "/auth/refresh" && method === "post") ||
+      (url === "/auth/register" && method === "post") ||
+      (url === "/auth/forgot-password" && method === "post") ||
+      (url === "/auth/reset-password" && method === "post") ||
       (url === "/users" && method === "post");
 
     if (token && !isPublicEndpoint) {
@@ -77,7 +80,7 @@ http.interceptors.response.use(
         .catch((e) => {
           // se não for possível renovar, redireciona
           localStorage.removeItem("ella:token");
-          if (typeof window !== "undefined") window.location.href = "/login";
+          if (typeof window !== "undefined") window.location.href = "/auth/login";
           return Promise.reject(e);
         });
     }
@@ -87,7 +90,7 @@ http.interceptors.response.use(
       try {
         localStorage.removeItem("ella:token");
         if (typeof window !== "undefined") {
-          window.location.href = "/login";
+          window.location.href = "/auth/login";
         }
       } catch (e) {
         // ignore
