@@ -2,6 +2,13 @@
 
 Frontend do ELLA (assistente financeira) feito com **Vite + React + TypeScript**, usando **React Router** e **TailwindCSS**.
 
+## Licença / Propriedade
+
+Projeto **particular e proprietário**. Reprodução/redistribuição não é permitida sem autorização.
+
+- Licença: [LICENSE.md](../LICENSE.md)
+- Aviso: [NOTICE.md](NOTICE.md)
+
 ## Requisitos
 
 - Node.js 18+ (recomendado 20+)
@@ -9,13 +16,13 @@ Frontend do ELLA (assistente financeira) feito com **Vite + React + TypeScript**
 
 ## Rodando em desenvolvimento
 
-1) Instale as dependências:
+1. Instale as dependências:
 
 npm install
 
-2) Crie um arquivo `frontend/.env.local` (veja o exemplo em `frontend/.env.example`).
+2. Crie um arquivo `frontend/.env.local` (veja o exemplo em `frontend/.env.example`).
 
-3) Suba o app:
+3. Suba o app:
 
 npm run dev
 
