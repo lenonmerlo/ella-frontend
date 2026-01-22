@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { clearToken, getToken } from "../lib/auth";
+import { onUnauthorized } from "../lib/authEvents";
 import { http } from "../lib/http";
 
 export interface UserProfile {
@@ -63,6 +64,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   useEffect(() => {
+    const unsub = onUnauthorized(() => {
+      clearToken();
+      setUser(null);
+      if (typeof window !== "undefined" && window.location.pathname !== "/auth/login") {
+        window.location.href = "/auth/login";
+      }
+    });
+
     // Tenta carregar perfil se houver token
     (async () => {
       const token = getToken();
@@ -75,6 +84,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await loadProfile();
       setLoadingProfile(false);
     })();
+
+    return () => {
+      unsub();
+    };
   }, []);
 
   return (
