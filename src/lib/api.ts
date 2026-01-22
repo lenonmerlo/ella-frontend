@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/lib/api.ts
 
-export const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api";
+import { getApiBaseUrl } from "../config/apiBase";
+
+export const API_BASE = getApiBaseUrl();
 
 // Wrapper genérico pra falar com o backend
 type ApiFetchOptions = RequestInit & {

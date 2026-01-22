@@ -34,14 +34,22 @@ O Vite só expõe variáveis com prefixo `VITE_`.
 
 Variáveis usadas no projeto:
 
-- `VITE_API_BASE_URL` (obrigatória)
-  - Base URL do backend, incluindo `/api`.
+- `VITE_API_URL` (recomendada)
+  - URL do backend **sem** `/api`.
+  - Ex.: `http://localhost:8080` (DEV) ou `https://seu-backend.onrender.com` (produção)
+- `VITE_API_BASE_URL` (legado / compatibilidade)
+  - Base URL do backend **incluindo** `/api`.
   - Ex.: `http://localhost:8080/api`
 - `VITE_PUBLIC_TESTING_NOTICE` (opcional)
   - Quando `true`, mostra a mensagem "Você está participando da etapa de testes." no rodapé também fora do modo DEV.
   - Em DEV a mensagem já aparece automaticamente.
 
-Observação importante: o cliente HTTP baseado em Axios (`src/lib/http.ts`) usa `VITE_API_BASE_URL` diretamente, então sem essa variável os requests podem falhar.
+Observação importante: o cliente HTTP (Axios/fetch) resolve a base da API por estas regras:
+
+- Se `VITE_API_URL` estiver definida: usa `${VITE_API_URL}/api`
+- Senão, se `VITE_API_BASE_URL` estiver definida: usa ela diretamente
+- Em DEV, fallback: `http://localhost:8080/api`
+- Em produção, fallback: `/api` (requer reverse-proxy/rewrites no provedor)
 
 ## Scripts
 
@@ -80,10 +88,10 @@ Preview local do build:
 
 npm run preview
 
-Em produção, garanta que `VITE_API_BASE_URL` esteja definida no ambiente de build do seu provedor (Vercel/Netlify/Docker/VM/etc.).
+Em produção, garanta que `VITE_API_URL` (recomendado) ou `VITE_API_BASE_URL` esteja definida no ambiente de build do seu provedor (Vercel/Netlify/Docker/VM/etc.).
 
 ## Troubleshooting
 
-- Erros de request / API: confirme `VITE_API_BASE_URL` e se ela inclui `/api`.
+- Erros de request / API: confirme `VITE_API_URL`/`VITE_API_BASE_URL` e se apontam para o backend publicado.
 - CORS / refresh token falhando: verifique CORS no backend e se ele aceita `credentials`.
 - Aviso de "etapa de testes": em DEV aparece sempre; em produção use `VITE_PUBLIC_TESTING_NOTICE=true`.

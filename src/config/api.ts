@@ -1,21 +1,8 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
 import { emitUnauthorized } from "../lib/authEvents";
+import { getApiBaseUrl } from "./apiBase";
 
 const TOKEN_KEY = "ella:token";
-
-function getApiBaseUrl(): string {
-  const rawApiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
-  if (rawApiUrl) {
-    return `${rawApiUrl.replace(/\/+$/, "")}/api`;
-  }
-
-  const legacyBase = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
-  if (legacyBase) {
-    return legacyBase.replace(/\/+$/, "");
-  }
-
-  return "http://localhost:8080/api";
-}
 
 export const api: AxiosInstance = axios.create({
   baseURL: getApiBaseUrl(),
