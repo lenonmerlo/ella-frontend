@@ -16,6 +16,7 @@ export async function uploadInvoice(file: File, password?: string): Promise<Dash
 
   const response = await http.post<any>("/invoices/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
+    timeout: 120_000,
   });
 
   const raw = response.data?.data ?? response.data;

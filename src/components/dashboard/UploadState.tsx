@@ -66,6 +66,11 @@ export function UploadState({ onClose, onSuccess }: Props) {
 
       const msg = error.response?.data?.message || error.message || "Erro ao fazer upload";
 
+      if (/requisi\S*\s+expirou/i.test(String(msg)) || /timeout/i.test(String(msg))) {
+        alert("Processando… pode levar até 2 min. Se demorar, atualize a lista.");
+        return;
+      }
+
       if (msg.toLowerCase().includes("senha") || msg.toLowerCase().includes("password")) {
         setIsPasswordRequired(true);
         setErrorMessage(msg);
