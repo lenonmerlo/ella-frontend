@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { clearToken, getToken } from "../lib/auth";
 import { onUnauthorized } from "../lib/authEvents";
 import { http } from "../lib/http";
@@ -32,6 +33,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState<boolean>(true);
 
@@ -58,18 +60,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     clearToken();
     setUser(null);
-    if (typeof window !== "undefined") {
-      window.location.href = "/auth/login";
-    }
+    navigate("/", { replace: true });
   }
 
   useEffect(() => {
     const unsub = onUnauthorized(() => {
       clearToken();
       setUser(null);
-      if (typeof window !== "undefined" && window.location.pathname !== "/auth/login") {
-        window.location.href = "/auth/login";
-      }
+      navigate("/", { replace: true });
     });
 
     // Tenta carregar perfil se houver token
@@ -88,7 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       unsub();
     };
-  }, []);
+  }, [navigate]);
 
   return (
     <AuthContext.Provider value={{ user, setUser, loadingProfile, loadProfile, logout }}>

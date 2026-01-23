@@ -7,8 +7,7 @@ export function Header() {
   const navigate = useNavigate();
 
   function handleLogout() {
-    logout();
-    navigate("/auth/login");
+    void logout();
   }
 
   const initials = user?.name
@@ -51,13 +50,13 @@ export function Header() {
         ) : (
           <div className="flex gap-4">
             <button
-              onClick={() => navigate("/auth/login")}
+              onClick={() => navigate("/")}
               className="text-ella-subtile hover:text-ella-navy text-sm font-medium"
             >
               Entrar
             </button>
             <button
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/auth/register")}
               className="bg-ella-navy hover:bg-ella-navy/90 rounded-full px-4 py-2 text-sm font-medium text-white"
             >
               Criar conta
