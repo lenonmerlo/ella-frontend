@@ -1,7 +1,7 @@
 import { JSX } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
-import LoginPage from "../pages/Login";
+import HomePage from "../pages/Home";
 import PrivacyPage from "../pages/PrivacyPage";
 import { AuthRoutes } from "./AuthRoutes";
 import { DashboardRoutes } from "./DashboardRoutes";
@@ -17,7 +17,7 @@ function HomeRoute() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <LoginPage />;
+  return <HomePage />;
 }
 
 function PrivateRoute({ children }: { children: JSX.Element }) {

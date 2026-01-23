@@ -50,7 +50,7 @@ export function Header() {
         ) : (
           <div className="flex gap-4">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/auth/login")}
               className="text-ella-subtile hover:text-ella-navy text-sm font-medium"
             >
               Entrar
