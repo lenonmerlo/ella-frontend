@@ -1181,13 +1181,23 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-5">
                 <button
-                  onClick={() => navigate("/privacy")}
+                  onClick={() => navigate("/privacy-policy")}
                   className="transition-colors hover:text-white"
                 >
                   Privacidade
                 </button>
-                <span className="cursor-default opacity-40">Termos</span>
-                <span className="cursor-default opacity-40">Cookies</span>
+                <button
+                  onClick={() => navigate("/terms")}
+                  className="transition-colors hover:text-white"
+                >
+                  Termos
+                </button>
+                <button
+                  onClick={() => navigate("/cookies")}
+                  className="transition-colors hover:text-white"
+                >
+                  Cookies
+                </button>
               </div>
             </div>
           </div>

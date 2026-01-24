@@ -3,6 +3,9 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import HomePage from "../pages/Home";
 import PrivacyPage from "../pages/PrivacyPage";
+import PrivacyPolicy from "../pages/PrivacyPolicy";
+import TermsOfService from "../pages/TermsOfService";
+import CookiePolicy from "../pages/CookiePolicy";
 import { AuthRoutes } from "./AuthRoutes";
 import { DashboardRoutes } from "./DashboardRoutes";
 
@@ -39,6 +42,9 @@ export function AppRoutes() {
     <AuthProvider>
       <Routes>
         <Route path="/" element={<HomeRoute />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/auth/*" element={<AuthRoutes />} />
         <Route
           path="/*"
