@@ -1,11 +1,11 @@
 import { JSX } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
+import CookiePolicy from "../pages/CookiePolicy";
 import HomePage from "../pages/Home";
 import PrivacyPage from "../pages/PrivacyPage";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
 import TermsOfService from "../pages/TermsOfService";
-import CookiePolicy from "../pages/CookiePolicy";
 import { AuthRoutes } from "./AuthRoutes";
 import { DashboardRoutes } from "./DashboardRoutes";
 
