@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import type { DashboardDataLocal } from "../../lib/dashboard";
+import {
+  uploadBankStatement,
+  type BankStatementUploadResponse,
+} from "../../services/api/bankStatementUploadService";
 import { applyTrip } from "../../services/api/tripService";
 import { uploadInvoice } from "../../services/api/uploadService";
 
@@ -28,6 +32,9 @@ export function UploadState({ onClose, onSuccess }: Props) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [resultToReturn, setResultToReturn] = useState<DashboardDataLocal | null>(null);
   const [tripIsApplying, setTripIsApplying] = useState(false);
+  const [uploadType, setUploadType] = useState<"CREDIT_CARD" | "BANK_STATEMENT" | null>(null);
+  const [bankStatementResult, setBankStatementResult] =
+    useState<BankStatementUploadResponse | null>(null);
 
   async function processUpload(file: File, pwd?: string) {
     setIsUploading(true);
@@ -35,6 +42,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
     setUploadProgress(10);
     setErrorMessage(null);
     setResultToReturn(null);
+    setBankStatementResult(null);
 
     try {
       // Simulate progress steps
@@ -45,12 +53,30 @@ export function UploadState({ onClose, onSuccess }: Props) {
         });
       }, 500);
 
-      const result = await uploadInvoice(file, pwd);
+      let result: DashboardDataLocal | undefined;
+
+      if (uploadType === "CREDIT_CARD") {
+        // Upload de cartão de crédito (existente)
+        result = await uploadInvoice(file, pwd);
+      } else if (uploadType === "BANK_STATEMENT") {
+        // Upload de extrato bancário (novo)
+        const bankResult = await uploadBankStatement(file, pwd);
+        setBankStatementResult(bankResult);
+        clearInterval(interval);
+        setUploadProgress(100);
+        setIsUploading(false);
+        return; // Mostrar tela de sucesso de extrato
+      }
 
       clearInterval(interval);
       setUploadProgress(100);
 
       setTimeout(() => {
+        if (!result) {
+          setIsUploading(false);
+          return;
+        }
+
         if (result.tripSuggestion) {
           setIsUploading(false);
           setResultToReturn(result);
@@ -107,8 +133,25 @@ export function UploadState({ onClose, onSuccess }: Props) {
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!uploadType) {
+      alert("Selecione o tipo de documento");
+      return;
+    }
+
     setFileToUpload(file);
     processUpload(file);
+  }
+
+  function handleCloseTypeSelection() {
+    setUploadType(null);
+    setFileToUpload(null);
+  }
+
+  function handleCloseBankStatementResult() {
+    setBankStatementResult(null);
+    onSuccess();
+    onClose();
   }
 
   async function handlePasswordSubmit(e: React.FormEvent) {
@@ -131,7 +174,125 @@ export function UploadState({ onClose, onSuccess }: Props) {
           <X size={24} />
         </button>
 
-        {resultToReturn?.tripSuggestion ? (
+        {/* Tela de Sucesso - Extrato Bancário */}
+        {bankStatementResult ? (
+          <div className="ella-glass p-12 text-center">
+            <div
+              className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full"
+              style={{ backgroundColor: "rgba(201, 164, 59, 0.1)" }}
+            >
+              <CheckCircle size={48} style={{ color: "#C9A43B" }} />
+            </div>
+            <h2 className="text-ella-navy mb-4 text-2xl font-semibold">
+              Extrato Processado com Sucesso!
+            </h2>
+            <p className="text-ella-subtile mx-auto mb-8 max-w-2xl text-sm">
+              {bankStatementResult.transactionCount} transações importadas de{" "}
+              {new Date(bankStatementResult.statementDate).toLocaleDateString("pt-BR")}
+            </p>
+
+            <div className="mx-auto mb-8 max-w-md space-y-3 text-left text-sm">
+              <div className="flex justify-between">
+                <span className="text-ella-subtile">Saldo Inicial:</span>
+                <span className="text-ella-navy font-semibold">
+                  R$ {bankStatementResult.openingBalance.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ella-subtile">Saldo Final:</span>
+                <span className="text-ella-navy font-semibold">
+                  R$ {bankStatementResult.closingBalance.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ella-subtile">Limite Disponível:</span>
+                <span className="text-ella-navy font-semibold">
+                  R$ {bankStatementResult.availableLimit.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ella-subtile">Total Recebido:</span>
+                <span className="font-semibold text-emerald-600">
+                  R$ {bankStatementResult.totalIncome.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ella-subtile">Total Debitado:</span>
+                <span className="font-semibold text-red-600">
+                  R$ {bankStatementResult.totalExpenses.toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={handleCloseBankStatementResult}
+              className="w-full rounded-xl px-8 py-4 text-sm font-medium shadow-lg transition-all hover:opacity-90"
+              style={{ backgroundColor: "#C9A43B", color: "#FFFFFF" }}
+            >
+              Concluído
+            </button>
+          </div>
+        ) : uploadType === null ? (
+          /* Tela de Seleção de Tipo */
+          <div className="ella-glass p-12 text-center">
+            <div
+              className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full"
+              style={{ backgroundColor: "rgba(201, 164, 59, 0.1)" }}
+            >
+              <FileText size={48} style={{ color: "#C9A43B" }} />
+            </div>
+
+            <h2 className="text-ella-navy mb-4 text-2xl font-semibold">Qual tipo de documento?</h2>
+            <p className="text-ella-subtile mx-auto mb-10 max-w-md text-sm">
+              Escolha se deseja enviar uma fatura de cartão de crédito ou um extrato bancário.
+            </p>
+
+            <div className="mx-auto flex max-w-md flex-col gap-4">
+              <button
+                onClick={() => setUploadType("CREDIT_CARD")}
+                className="rounded-xl border-2 border-gray-200 px-8 py-6 text-left transition-all hover:border-[#C9A43B] hover:bg-amber-50"
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: "rgba(201, 164, 59, 0.1)" }}
+                  >
+                    <FileText size={24} style={{ color: "#C9A43B" }} />
+                  </div>
+                  <div>
+                    <h3 className="text-ella-navy font-semibold">Cartão de Crédito</h3>
+                    <p className="text-ella-subtile text-sm">Fatura do cartão de crédito</p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setUploadType("BANK_STATEMENT")}
+                className="rounded-xl border-2 border-gray-200 px-8 py-6 text-left transition-all hover:border-[#C9A43B] hover:bg-amber-50"
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: "rgba(201, 164, 59, 0.1)" }}
+                  >
+                    <TrendingUp size={24} style={{ color: "#C9A43B" }} />
+                  </div>
+                  <div>
+                    <h3 className="text-ella-navy font-semibold">Extrato Bancário</h3>
+                    <p className="text-ella-subtile text-sm">Extrato da conta corrente</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <button
+              onClick={handleCloseTypeSelection}
+              className="text-ella-subtile hover:text-ella-navy mt-6 text-sm font-medium transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        ) : resultToReturn?.tripSuggestion ? (
           <div className="ella-glass p-12 text-center">
             <div
               className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full"
@@ -255,34 +416,54 @@ export function UploadState({ onClose, onSuccess }: Props) {
               <FileText size={48} style={{ color: "#C9A43B" }} />
             </div>
 
-            <h2 className="text-ella-navy mb-4 text-2xl font-semibold">Novo Upload</h2>
+            <h2 className="text-ella-navy mb-4 text-2xl font-semibold">
+              {uploadType === "CREDIT_CARD" ? "Enviar Fatura de Cartão" : "Enviar Extrato Bancário"}
+            </h2>
             <p className="text-ella-subtile mx-auto mb-10 max-w-md text-sm">
-              Envie uma fatura bancária em PDF ou CSV. A ELLA vai analisar automaticamente suas
-              transações e gerar insights personalizados.
+              {uploadType === "CREDIT_CARD"
+                ? "Envie uma fatura bancária em PDF ou CSV. A ELLA vai analisar automaticamente suas transações."
+                : "Envie um extrato bancário em PDF. A ELLA vai importar suas movimentações."}
             </p>
 
-            <label className="inline-block cursor-pointer">
-              <input
-                type="file"
-                accept=".pdf,.csv"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <div
-                className="inline-flex items-center gap-3 rounded-xl px-8 py-4 text-sm font-medium shadow-lg transition-all hover:opacity-90"
-                style={{ backgroundColor: "#C9A43B", color: "#FFFFFF" }}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+              <label className="inline-block cursor-pointer">
+                <input
+                  type="file"
+                  accept={uploadType === "CREDIT_CARD" ? ".pdf,.csv" : ".pdf"}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <div
+                  className="inline-flex items-center gap-3 rounded-xl px-8 py-4 text-sm font-medium shadow-lg transition-all hover:opacity-90"
+                  style={{ backgroundColor: "#C9A43B", color: "#FFFFFF" }}
+                >
+                  <Upload size={24} />
+                  <span>
+                    {uploadType === "CREDIT_CARD"
+                      ? "Enviar Fatura (PDF/CSV)"
+                      : "Enviar Extrato (PDF)"}
+                  </span>
+                </div>
+              </label>
+
+              <button
+                onClick={() => setUploadType(null)}
+                className="text-ella-subtile hover:text-ella-navy inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors hover:bg-black/5"
               >
-                <Upload size={24} />
-                <span>Enviar Fatura (PDF/CSV)</span>
-              </div>
-            </label>
+                ← Voltar
+              </button>
+            </div>
 
             <div className="mt-12 grid grid-cols-1 gap-6 text-left md:grid-cols-3">
               <div className="bg-ella-background rounded-xl p-6">
                 <Sparkles size={32} className="mb-3" style={{ color: "#C9A43B" }} />
-                <h4 className="text-ella-navy mb-2 text-sm font-semibold">Análise com IA</h4>
+                <h4 className="text-ella-navy mb-2 text-sm font-semibold">
+                  {uploadType === "CREDIT_CARD" ? "Análise com IA" : "Importação com IA"}
+                </h4>
                 <p className="text-ella-subtile text-sm">
-                  Processamento inteligente de suas faturas.
+                  {uploadType === "CREDIT_CARD"
+                    ? "Processamento inteligente de suas faturas."
+                    : "Leitura inteligente do seu extrato e importação das movimentações."}
                 </p>
               </div>
               <div className="bg-ella-background rounded-xl p-6">

@@ -8,12 +8,21 @@ import { CreditCard, PieChart, Sparkles, Target, TrendingUp, Wallet } from "luci
 import { useEffect, useMemo, useState } from "react";
 import { ScoreCard } from "./ScoreCard";
 
+type BankStatementSummary = {
+  totalIncome: number;
+  totalExpenses: number;
+  balance: number;
+  transactionCount: number;
+};
+
 interface Props {
   personId: string;
   summary: DashboardSummary;
   insights: DashboardInsight[];
   goalsCount?: number;
   invoices?: DashboardInvoice[];
+  bankStatementSummary?: BankStatementSummary | null;
+  bankStatementLoading?: boolean;
   onOpenInvestments?: () => void;
   onOpenBudget?: () => void;
   onOpenScore?: () => void;
@@ -25,6 +34,8 @@ export function SummaryCards({
   insights,
   goalsCount = 0,
   invoices,
+  bankStatementSummary,
+  bankStatementLoading = false,
   onOpenInvestments,
   onOpenBudget,
   onOpenScore,
@@ -77,7 +88,11 @@ export function SummaryCards({
     };
   }, [personId]);
 
-  const saldoTotal = summary.totalIncome - summary.totalExpenses;
+  const ccIncome = bankStatementSummary?.totalIncome ?? 0;
+  const ccExpenses = bankStatementSummary?.totalExpenses ?? 0;
+  const ccBalance = bankStatementSummary?.balance ?? ccIncome - ccExpenses;
+
+  const showCcPlaceholder = !bankStatementLoading && !bankStatementSummary;
   const faturaAtual = (invoices ?? []).reduce((sum, inv) => sum + Number(inv.amount ?? 0), 0);
   const alertasIa = insights.length;
 
@@ -116,16 +131,26 @@ export function SummaryCards({
           </div>
           <span className="text-ella-subtile text-xs font-medium uppercase">saldo</span>
         </div>
-        <p className="text-ella-subtile mb-1 text-sm">Saldo Total</p>
-        <p
-          className={`text-2xl font-bold whitespace-nowrap lg:text-3xl ${saldoTotal >= 0 ? "text-green-600" : "text-red-600"}`}
-        >
-          {"R$\u00A0"}
-          {Math.abs(saldoTotal).toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-          })}
-        </p>
-        <p className="text-ella-subtile mt-1 text-xs">Recebimentos menos despesas do mês.</p>
+        <p className="text-ella-subtile mb-1 text-sm">Saldo (Conta Corrente)</p>
+        {bankStatementLoading ? (
+          <p className="text-ella-navy text-2xl font-bold whitespace-nowrap lg:text-3xl">
+            Carregando...
+          </p>
+        ) : showCcPlaceholder ? (
+          <p className="text-ella-subtile text-2xl font-bold whitespace-nowrap lg:text-3xl">
+            Sem extrato
+          </p>
+        ) : (
+          <p
+            className={`text-2xl font-bold whitespace-nowrap lg:text-3xl ${ccBalance >= 0 ? "text-green-600" : "text-red-600"}`}
+          >
+            {"R$\u00A0"}
+            {Math.abs(ccBalance).toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+            })}
+          </p>
+        )}
+        <p className="text-ella-subtile mt-1 text-xs">Entradas menos saídas do extrato.</p>
       </div>
 
       {/* Fatura atual */}
@@ -148,8 +173,8 @@ export function SummaryCards({
         </p>
       </div>
 
-      {/* Recebimentos (standby por enquanto) */}
-      <div className="ella-glass p-6 opacity-70">
+      {/* Recebimentos (Conta Corrente) */}
+      <div className="ella-glass p-6">
         <div className="mb-4 flex items-center justify-between">
           <div className="bg-ella-background flex h-12 w-12 items-center justify-center rounded-full">
             <Wallet size={24} className="text-green-600" />
@@ -157,10 +182,23 @@ export function SummaryCards({
           <span className="text-ella-subtile text-xs font-medium uppercase">recebimentos</span>
         </div>
         <p className="text-ella-subtile mb-1 text-sm">Recebimentos do mês</p>
-        <p className="text-2xl font-bold text-green-600">Em breve</p>
-        <p className="text-ella-subtile mt-1 text-xs">
-          Em standby — será alimentado por extratos bancários.
-        </p>
+        {bankStatementLoading ? (
+          <p className="text-ella-navy text-2xl font-bold whitespace-nowrap lg:text-3xl">
+            Carregando...
+          </p>
+        ) : showCcPlaceholder ? (
+          <p className="text-ella-subtile text-2xl font-bold whitespace-nowrap lg:text-3xl">
+            Sem extrato
+          </p>
+        ) : (
+          <p className="text-2xl font-bold whitespace-nowrap text-green-600 lg:text-3xl">
+            {"R$\u00A0"}
+            {ccIncome.toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+            })}
+          </p>
+        )}
+        <p className="text-ella-subtile mt-1 text-xs">Somente entradas da conta corrente.</p>
       </div>
 
       {/* Investimentos */}

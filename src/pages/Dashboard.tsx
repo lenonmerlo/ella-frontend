@@ -25,6 +25,10 @@ import { InsightsController } from "../controllers/InsightsController";
 import { InvoicesController } from "../controllers/InvoicesController";
 import { SummaryController } from "../controllers/SummaryController";
 import { TransactionsController } from "../controllers/TransactionsController";
+import {
+  fetchBankStatementsDashboard,
+  type BankStatementDashboardResponseDTO,
+} from "../services/api/bankStatementsDashboardService";
 import { updateTransaction } from "../services/api/transactionsService";
 import BudgetPage from "./BudgetPage";
 import InvestmentPage from "./InvestmentPage";
@@ -41,6 +45,12 @@ export default function DashboardPage() {
   });
   const [showUpload, setShowUpload] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const [bankDashboard, setBankDashboard] = useState<BankStatementDashboardResponseDTO | null>(
+    null,
+  );
+  const [bankDashboardLoading, setBankDashboardLoading] = useState(false);
+  const [bankDashboardError, setBankDashboardError] = useState<string | null>(null);
 
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
@@ -76,6 +86,30 @@ export default function DashboardPage() {
   const month = selectedDate.getMonth() + 1;
 
   console.log("[Dashboard] Data selecionada:", selectedDate, { year, month });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!personId) return;
+      setBankDashboardLoading(true);
+      setBankDashboardError(null);
+      try {
+        const data = await fetchBankStatementsDashboard(personId, year, month);
+        if (!cancelled) setBankDashboard(data);
+      } catch (e: any) {
+        if (!cancelled) {
+          setBankDashboard(null);
+          setBankDashboardError(String(e?.message ?? "Erro ao carregar extrato"));
+        }
+      } finally {
+        if (!cancelled) setBankDashboardLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [personId, year, month, refreshKey]);
 
   const mapInsights = (insights: any[]): DashboardInsight[] =>
     (Array.isArray(insights) ? insights : []).map((i: any, idx: number) => {
@@ -126,6 +160,17 @@ export default function DashboardPage() {
             ? "PERSONAL"
             : undefined,
     }));
+
+  const formatLocalDatePtBr = (raw: string) => {
+    const s = String(raw ?? "").trim();
+    if (!s) return "";
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) {
+      return `${m[3]}/${m[2]}/${m[1]}`;
+    }
+    const d = new Date(s);
+    return Number.isNaN(d.getTime()) ? s : d.toLocaleDateString("pt-BR");
+  };
 
   return (
     <div className="ella-gradient-bg min-h-screen">
@@ -224,6 +269,8 @@ export default function DashboardPage() {
                                   insights={mapInsights(insightsData.insights)}
                                   goalsCount={goalsData?.goals?.length ?? 0}
                                   invoices={invoicesData?.invoices ?? []}
+                                  bankStatementSummary={bankDashboard?.summary ?? null}
+                                  bankStatementLoading={bankDashboardLoading}
                                   onOpenInvestments={() => setSelectedSection("investments")}
                                   onOpenBudget={() => setSelectedSection("budget")}
                                   onOpenScore={() => setSelectedSection("score")}
@@ -323,9 +370,60 @@ export default function DashboardPage() {
             <div className="space-y-6">
               <div className="rounded-lg bg-white p-6 shadow-sm">
                 <h2 className="text-ella-navy mb-4 text-lg font-semibold">Movimentação C/C</h2>
-                <p className="text-ella-subtile">
-                  Em breve — será alimentado por extratos bancários.
-                </p>
+                {bankDashboardLoading ? (
+                  <p className="text-ella-subtile">Carregando extrato...</p>
+                ) : bankDashboardError ? (
+                  <p className="text-ella-subtile">{bankDashboardError}</p>
+                ) : !bankDashboard?.transactions?.length ? (
+                  <p className="text-ella-subtile">Sem movimentações no período.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr className="text-ella-subtile border-b">
+                          <th className="px-3 py-2 text-left font-semibold">Data</th>
+                          <th className="px-3 py-2 text-left font-semibold">Descrição</th>
+                          <th className="px-3 py-2 text-right font-semibold">Valor</th>
+                          <th className="px-3 py-2 text-right font-semibold">Saldo</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bankDashboard.transactions.map((t) => {
+                          const amount = Number(t.amount ?? 0);
+                          const balance = t.balance != null ? Number(t.balance) : null;
+                          const isIncome = amount >= 0;
+                          const date = t.transactionDate
+                            ? formatLocalDatePtBr(t.transactionDate)
+                            : "";
+
+                          return (
+                            <tr key={t.id} className="border-b last:border-0">
+                              <td className="text-ella-subtile px-3 py-2 whitespace-nowrap">
+                                {date}
+                              </td>
+                              <td className="text-ella-navy px-3 py-2">{t.description}</td>
+                              <td
+                                className={`px-3 py-2 text-right whitespace-nowrap ${
+                                  isIncome ? "text-green-600" : "text-red-600"
+                                }`}
+                              >
+                                {"R$\u00A0"}
+                                {Math.abs(amount).toLocaleString("pt-BR", {
+                                  minimumFractionDigits: 2,
+                                })}
+                              </td>
+                              <td className="text-ella-subtile px-3 py-2 text-right whitespace-nowrap">
+                                {balance == null
+                                  ? "—"
+                                  : `R$\u00A0${Math.abs(balance).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
           )}
