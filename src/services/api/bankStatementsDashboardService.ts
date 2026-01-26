@@ -1,6 +1,8 @@
 import { http } from "../../lib/http";
 
 export interface BankStatementDashboardSummaryDTO {
+  openingBalance?: number | null;
+  closingBalance?: number | null;
   totalIncome: number;
   totalExpenses: number;
   balance: number;

@@ -9,6 +9,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ScoreCard } from "./ScoreCard";
 
 type BankStatementSummary = {
+  openingBalance?: number | null;
+  closingBalance?: number | null;
   totalIncome: number;
   totalExpenses: number;
   balance: number;
@@ -90,7 +92,8 @@ export function SummaryCards({
 
   const ccIncome = bankStatementSummary?.totalIncome ?? 0;
   const ccExpenses = bankStatementSummary?.totalExpenses ?? 0;
-  const ccBalance = bankStatementSummary?.balance ?? ccIncome - ccExpenses;
+  const ccClosingBalance = bankStatementSummary?.closingBalance;
+  const ccBalance = ccClosingBalance != null ? ccClosingBalance : bankStatementSummary?.balance ?? ccIncome - ccExpenses;
 
   const showCcPlaceholder = !bankStatementLoading && !bankStatementSummary;
   const faturaAtual = (invoices ?? []).reduce((sum, inv) => sum + Number(inv.amount ?? 0), 0);
@@ -145,12 +148,12 @@ export function SummaryCards({
             className={`text-2xl font-bold whitespace-nowrap lg:text-3xl ${ccBalance >= 0 ? "text-green-600" : "text-red-600"}`}
           >
             {"R$\u00A0"}
-            {Math.abs(ccBalance).toLocaleString("pt-BR", {
+            {ccBalance.toLocaleString("pt-BR", {
               minimumFractionDigits: 2,
             })}
           </p>
         )}
-        <p className="text-ella-subtile mt-1 text-xs">Entradas menos saídas do extrato.</p>
+        <p className="text-ella-subtile mt-1 text-xs">Saldo final do extrato.</p>
       </div>
 
       {/* Fatura atual */}

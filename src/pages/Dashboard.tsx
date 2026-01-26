@@ -415,7 +415,7 @@ export default function DashboardPage() {
                               <td className="text-ella-subtile px-3 py-2 text-right whitespace-nowrap">
                                 {balance == null
                                   ? "—"
-                                  : `R$\u00A0${Math.abs(balance).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`}
+                                  : `R$\u00A0${balance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`}
                               </td>
                             </tr>
                           );
