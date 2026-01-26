@@ -93,7 +93,10 @@ export function SummaryCards({
   const ccIncome = bankStatementSummary?.totalIncome ?? 0;
   const ccExpenses = bankStatementSummary?.totalExpenses ?? 0;
   const ccClosingBalance = bankStatementSummary?.closingBalance;
-  const ccBalance = ccClosingBalance != null ? ccClosingBalance : bankStatementSummary?.balance ?? ccIncome - ccExpenses;
+  const ccBalance =
+    ccClosingBalance != null
+      ? ccClosingBalance
+      : (bankStatementSummary?.balance ?? ccIncome - ccExpenses);
 
   const showCcPlaceholder = !bankStatementLoading && !bankStatementSummary;
   const faturaAtual = (invoices ?? []).reduce((sum, inv) => sum + Number(inv.amount ?? 0), 0);

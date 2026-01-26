@@ -35,7 +35,7 @@ describe("BudgetForm", () => {
     render(<BudgetForm personId="p1" />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/Renda Mensal/i)).toHaveValue(1000);
+      expect(screen.getByLabelText(/Renda Mensal/i)).toHaveValue("1000");
     });
   });
 
@@ -84,7 +84,7 @@ describe("BudgetForm", () => {
     render(<BudgetForm personId="p1" onSuccess={onSuccess} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/Renda Mensal/i)).toHaveValue(1000);
+      expect(screen.getByLabelText(/Renda Mensal/i)).toHaveValue("1000");
     });
 
     fireEvent.change(screen.getByLabelText(/Renda Mensal/i), { target: { value: "2000" } });

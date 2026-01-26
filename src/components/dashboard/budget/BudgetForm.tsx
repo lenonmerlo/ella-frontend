@@ -61,6 +61,7 @@ function validateBudget(input: BudgetRequest): string | null {
 
 export function BudgetForm({ personId, onSuccess }: BudgetFormProps) {
   const [formData, setFormData] = useState<BudgetRequest>(EMPTY_FORM);
+  const [rawValues, setRawValues] = useState<Partial<Record<keyof BudgetRequest, string>>>({});
   const [budgetId, setBudgetId] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
@@ -80,7 +81,7 @@ export function BudgetForm({ personId, onSuccess }: BudgetFormProps) {
         if (cancelled) return;
 
         setBudgetId(budget.id);
-        setFormData({
+        const next: BudgetRequest = {
           income: budget.income,
           essentialFixedCost: budget.essentialFixedCost,
           necessaryFixedCost: budget.necessaryFixedCost,
@@ -88,6 +89,17 @@ export function BudgetForm({ personId, onSuccess }: BudgetFormProps) {
           investment: budget.investment,
           plannedPurchase: budget.plannedPurchase,
           protection: budget.protection,
+        };
+        setFormData(next);
+        const toPtBr = (v: number) => (v === 0 ? "" : String(v).replace(".", ","));
+        setRawValues({
+          income: toPtBr(next.income),
+          essentialFixedCost: toPtBr(next.essentialFixedCost),
+          necessaryFixedCost: toPtBr(next.necessaryFixedCost),
+          variableFixedCost: toPtBr(next.variableFixedCost),
+          investment: toPtBr(next.investment),
+          plannedPurchase: toPtBr(next.plannedPurchase),
+          protection: toPtBr(next.protection),
         });
       } catch (err) {
         // Se não existir orçamento ainda, não é erro.
@@ -95,6 +107,7 @@ export function BudgetForm({ personId, onSuccess }: BudgetFormProps) {
         if (!cancelled) {
           setBudgetId(null);
           setFormData(EMPTY_FORM);
+          setRawValues({});
         }
       } finally {
         if (!cancelled) setPrefillLoading(false);
@@ -112,6 +125,20 @@ export function BudgetForm({ personId, onSuccess }: BudgetFormProps) {
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleRawChange = (field: keyof BudgetRequest, raw: string) => {
+    setRawValues((prev) => ({ ...prev, [field]: raw }));
+    const trimmed = raw.trim();
+    handleChange(field, trimmed ? parseNumberInput(trimmed) : 0);
+  };
+
+  const getDisplayValue = (field: keyof BudgetRequest) => {
+    const raw = rawValues[field];
+    if (raw != null) return raw;
+    const v = formData[field];
+    if (!Number.isFinite(v) || v === 0) return "";
+    return String(v).replace(".", ",");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -156,11 +183,11 @@ export function BudgetForm({ personId, onSuccess }: BudgetFormProps) {
             <label className="text-ella-subtile mb-1 block text-xs font-medium">{label}</label>
             {hint && <p className="mb-2 text-xs text-gray-600">{hint}</p>}
             <input
-              type="number"
-              step="0.01"
-              min={0}
-              value={Number.isFinite(formData[key]) ? formData[key] : 0}
-              onChange={(e) => handleChange(key, parseNumberInput(e.target.value))}
+              type="text"
+              inputMode="decimal"
+              pattern="[0-9]*[.,]?[0-9]*"
+              value={getDisplayValue(key)}
+              onChange={(e) => handleRawChange(key, e.target.value)}
               className="border-ella-muted focus:border-ella-gold w-full rounded-lg border p-2 text-sm outline-none"
               placeholder="0,00"
               required={key === "income"}

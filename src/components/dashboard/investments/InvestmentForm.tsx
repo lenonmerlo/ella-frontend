@@ -38,6 +38,8 @@ function validateInvestment(input: InvestmentRequest): string | null {
 
 export function InvestmentForm({ personId, investment, onSuccess, onCancel }: InvestmentFormProps) {
   const [formData, setFormData] = useState<InvestmentRequest>(EMPTY_FORM);
+  const [rawInitialValue, setRawInitialValue] = useState<string>("");
+  const [rawCurrentValue, setRawCurrentValue] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,16 +48,22 @@ export function InvestmentForm({ personId, investment, onSuccess, onCancel }: In
   useEffect(() => {
     if (!investment) {
       setFormData(EMPTY_FORM);
+      setRawInitialValue("");
+      setRawCurrentValue("");
       return;
     }
-    setFormData({
+    const next: InvestmentRequest = {
       name: investment.name,
       type: investment.type,
       initialValue: Number(investment.initialValue ?? 0),
       currentValue: Number(investment.currentValue ?? 0),
       investmentDate: investment.investmentDate,
       description: investment.description || "",
-    });
+    };
+    setFormData(next);
+    const toPtBr = (v: number) => (v === 0 ? "" : String(v).replace(".", ","));
+    setRawInitialValue(toPtBr(next.initialValue));
+    setRawCurrentValue(toPtBr(next.currentValue));
   }, [investment]);
 
   const handleChange = <K extends keyof InvestmentRequest>(
@@ -66,6 +74,13 @@ export function InvestmentForm({ personId, investment, onSuccess, onCancel }: In
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleRawNumberChange = (field: "initialValue" | "currentValue", raw: string) => {
+    const trimmed = raw.trim();
+    if (field === "initialValue") setRawInitialValue(raw);
+    else setRawCurrentValue(raw);
+    handleChange(field, trimmed ? parseNumberInput(trimmed) : 0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -146,11 +161,11 @@ export function InvestmentForm({ personId, investment, onSuccess, onCancel }: In
         <div>
           <label className="text-ella-subtile mb-1 block text-xs font-medium">Valor Inicial</label>
           <input
-            type="number"
-            step="0.01"
-            min={0}
-            value={Number.isFinite(formData.initialValue) ? formData.initialValue : 0}
-            onChange={(e) => handleChange("initialValue", parseNumberInput(e.target.value))}
+            type="text"
+            inputMode="decimal"
+            pattern="[0-9]*[.,]?[0-9]*"
+            value={rawInitialValue}
+            onChange={(e) => handleRawNumberChange("initialValue", e.target.value)}
             className="border-ella-muted focus:border-ella-gold w-full rounded-lg border p-2 text-sm outline-none"
             placeholder="0,00"
             required
@@ -161,11 +176,11 @@ export function InvestmentForm({ personId, investment, onSuccess, onCancel }: In
         <div>
           <label className="text-ella-subtile mb-1 block text-xs font-medium">Valor Atual</label>
           <input
-            type="number"
-            step="0.01"
-            min={0}
-            value={Number.isFinite(formData.currentValue) ? formData.currentValue : 0}
-            onChange={(e) => handleChange("currentValue", parseNumberInput(e.target.value))}
+            type="text"
+            inputMode="decimal"
+            pattern="[0-9]*[.,]?[0-9]*"
+            value={rawCurrentValue}
+            onChange={(e) => handleRawNumberChange("currentValue", e.target.value)}
             className="border-ella-muted focus:border-ella-gold w-full rounded-lg border p-2 text-sm outline-none"
             placeholder="0,00"
             required
