@@ -1,10 +1,7 @@
 // tailwind.config.mjs ou tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 const config = {
-  content: [
-    "./index.html",
-    "./src/**/*.{ts,tsx,js,jsx,mdx}",
-  ],
+  content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx,mdx}"],
   theme: {
     extend: {
       fontFamily: {
