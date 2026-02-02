@@ -1,5 +1,6 @@
 // src/components/dashboard/TransactionsSection.tsx
 import type { DashboardTransaction } from "@/types/dashboard";
+import { tryParseISODateLike } from "@/utils/date";
 
 interface Props {
   transactions: DashboardTransaction[];
@@ -14,7 +15,7 @@ export function TransactionsSection({ transactions }: Props) {
       <div className="space-y-3">
         {transactions.slice(0, 8).map((transaction) => {
           const dateStr = transaction.purchaseDate || transaction.date;
-          const date = dateStr ? new Date(dateStr) : null;
+          const date = tryParseISODateLike(dateStr);
           const formattedDate =
             date && !Number.isNaN(date.getTime())
               ? date.toLocaleDateString("pt-BR")

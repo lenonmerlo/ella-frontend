@@ -30,6 +30,7 @@ import {
   type BankStatementDashboardResponseDTO,
 } from "../services/api/bankStatementsDashboardService";
 import { updateTransaction } from "../services/api/transactionsService";
+import { tryParseISODateLike } from "../utils/date";
 import BudgetPage from "./BudgetPage";
 import InvestmentPage from "./InvestmentPage";
 import ScorePage from "./ScorePage";
@@ -477,10 +478,8 @@ export default function DashboardPage() {
           onSuccess={(result) => {
             const targetDateStr = result?.endDate || result?.startDate;
             if (targetDateStr) {
-              const parsed = new Date(targetDateStr);
-              if (!Number.isNaN(parsed.getTime())) {
-                handleDateChange(parsed);
-              }
+              const parsed = tryParseISODateLike(targetDateStr);
+              if (parsed) handleDateChange(parsed);
             }
             setRefreshKey((k) => k + 1);
             setShowUpload(false);

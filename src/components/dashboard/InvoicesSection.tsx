@@ -3,6 +3,7 @@ import { ChevronRight, CreditCard } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { fetchInvoiceInsights, updateInvoicePayment } from "../../services/api/invoicesService";
 import { DashboardInvoice } from "../../types/dashboard";
+import { formatDatePtBR } from "../../utils/date";
 
 interface InvoicesSectionProps {
   invoices?: DashboardInvoice[];
@@ -107,7 +108,7 @@ export function InvoicesSection({ invoices = [], onRefresh }: InvoicesSectionPro
               <div className="flex justify-between text-sm">
                 <span className="text-ella-subtile">Vencimento</span>
                 <span className="text-ella-navy font-medium">
-                  {invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString("pt-BR") : "--"}
+                  {formatDatePtBR(invoice.dueDate)}
                 </span>
               </div>
 

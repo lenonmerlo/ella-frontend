@@ -11,6 +11,7 @@ import {
 } from "../lib/dashboard";
 import { mapBackendToDashboard } from "../lib/mappers/dashboardMapper";
 import type { DashboardData, SectionId } from "../types/dashboard";
+import { parseISODateLike, tryParseISODateLike } from "../utils/date";
 
 export function useDashboard(navigate?: (path: string) => void) {
   const [hasData, setHasData] = useState(false);
@@ -135,17 +136,22 @@ export function useDashboard(navigate?: (path: string) => void) {
       const uploaded: DashboardDataLocal = await uploadInvoice(file);
       console.log("[Upload] parsed local data:", uploaded);
 
+      const navigationDateStr = uploaded.endDate || uploaded.startDate;
+      const navigationDate = tryParseISODateLike(navigationDateStr);
       const latestTxDate = uploaded.transactions
-        .map((t) => new Date(t.date))
+        .map((t) => parseISODateLike(t.date))
         .filter((d) => !Number.isNaN(d.getTime()))
         .sort((a, b) => b.getTime() - a.getTime())[0];
 
-      if (latestTxDate) {
-        const year = latestTxDate.getFullYear();
-        const month = latestTxDate.getMonth() + 1;
+      const targetDate =
+        navigationDate && !Number.isNaN(navigationDate.getTime()) ? navigationDate : latestTxDate;
+
+      if (targetDate) {
+        const year = targetDate.getFullYear();
+        const month = targetDate.getMonth() + 1;
         try {
           // Atualiza a data selecionada para a data da fatura
-          setSelectedDate(latestTxDate);
+          setSelectedDate(targetDate);
 
           const personId = getPersonIdFromToken();
           if (!personId) throw new Error("Token sem personId");
@@ -165,10 +171,10 @@ export function useDashboard(navigate?: (path: string) => void) {
             const invoices = await getInvoices();
             console.log("[Upload] invoices:", invoices);
           } else {
-            await loadDashboardData(latestTxDate);
+            await loadDashboardData(targetDate);
           }
         } catch {
-          await loadDashboardData(latestTxDate);
+          await loadDashboardData(targetDate);
         }
       } else {
         await loadDashboardData();

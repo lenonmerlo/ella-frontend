@@ -9,6 +9,7 @@ import {
   updateTransaction,
 } from "../../services/api/transactionsService";
 import type { DashboardInvoice } from "../../types/dashboard";
+import { formatDatePtBR, tryParseISODateLike } from "../../utils/date";
 
 interface Props {
   personId: string;
@@ -56,9 +57,8 @@ function formatCurrency(value: number) {
 
 function formatDate(value?: string | null) {
   if (!value) return "-";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "-";
-  return d.toLocaleDateString("pt-BR");
+  const d = tryParseISODateLike(value);
+  return d ? d.toLocaleDateString("pt-BR") : "-";
 }
 
 function signedForInvoiceTotal(type: FinancialTransactionResponseDTO["type"], amount: number) {
@@ -473,8 +473,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
                   <div>
                     <div className="text-ella-navy text-sm font-medium">{inv.cardName}</div>
                     <div className="text-ella-subtile text-xs">
-                      Venc.:{" "}
-                      {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString("pt-BR") : "--"}
+                      Venc.: {formatDatePtBR(inv.dueDate)}
                     </div>
                   </div>
                   {inv.isOverdue && !inv.isPaid && (

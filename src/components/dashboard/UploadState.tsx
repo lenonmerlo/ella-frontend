@@ -17,11 +17,12 @@ import {
 } from "../../services/api/bankStatementUploadService";
 import { applyTrip } from "../../services/api/tripService";
 import { uploadInvoice } from "../../services/api/uploadService";
+import { formatDatePtBR } from "../../utils/date";
 import { InfoModal } from "../shared/InfoModal";
 
 interface Props {
   onClose: () => void;
-  onSuccess: (result?: DashboardDataLocal) => void;
+  onSuccess: (result?: DashboardDataLocal | { startDate?: string; endDate?: string }) => void;
 }
 
 export function UploadState({ onClose, onSuccess }: Props) {
@@ -36,6 +37,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
   const [uploadType, setUploadType] = useState<"CREDIT_CARD" | "BANK_STATEMENT" | null>(null);
   const [bankStatementResult, setBankStatementResult] =
     useState<BankStatementUploadResponse | null>(null);
+  const [bankStatementBank, setBankStatementBank] = useState<"ITAU" | "C6">("ITAU");
 
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [infoModalTitle, setInfoModalTitle] = useState<string>("");
@@ -71,7 +73,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
         result = await uploadInvoice(file, pwd);
       } else if (uploadType === "BANK_STATEMENT") {
         // Upload de extrato bancário (novo)
-        const bankResult = await uploadBankStatement(file, pwd);
+        const bankResult = await uploadBankStatement(file, pwd, bankStatementBank);
         setBankStatementResult(bankResult);
         clearInterval(interval);
         setUploadProgress(100);
@@ -163,8 +165,13 @@ export function UploadState({ onClose, onSuccess }: Props) {
   }
 
   function handleCloseBankStatementResult() {
+    const statementDate = bankStatementResult?.statementDate;
     setBankStatementResult(null);
-    onSuccess();
+    if (statementDate) {
+      onSuccess({ startDate: statementDate, endDate: statementDate });
+    } else {
+      onSuccess();
+    }
     onClose();
   }
 
@@ -209,7 +216,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
             </h2>
             <p className="text-ella-subtile mx-auto mb-8 max-w-2xl text-sm">
               {bankStatementResult.transactionCount} transações importadas de{" "}
-              {new Date(bankStatementResult.statementDate).toLocaleDateString("pt-BR")}
+              {formatDatePtBR(bankStatementResult.statementDate)}
             </p>
 
             <div className="mx-auto mb-8 max-w-md space-y-3 text-left text-sm">
@@ -447,6 +454,33 @@ export function UploadState({ onClose, onSuccess }: Props) {
             </p>
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+              {uploadType === "BANK_STATEMENT" && (
+                <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm">
+                  <span className="text-ella-subtile">Banco:</span>
+                  <button
+                    type="button"
+                    onClick={() => setBankStatementBank("ITAU")}
+                    className={`rounded-lg px-3 py-1 transition-colors ${
+                      bankStatementBank === "ITAU"
+                        ? "text-ella-navy bg-amber-100"
+                        : "text-ella-subtile hover:bg-black/5"
+                    }`}
+                  >
+                    Itaú
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBankStatementBank("C6")}
+                    className={`rounded-lg px-3 py-1 transition-colors ${
+                      bankStatementBank === "C6"
+                        ? "text-ella-navy bg-amber-100"
+                        : "text-ella-subtile hover:bg-black/5"
+                    }`}
+                  >
+                    C6
+                  </button>
+                </div>
+              )}
               <label className="inline-block cursor-pointer">
                 <input
                   type="file"

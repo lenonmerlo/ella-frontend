@@ -332,7 +332,16 @@ export async function uploadInvoice(file: File, password?: string): Promise<Dash
     : [];
 
   const startDate = raw.startDate ? String(raw.startDate) : undefined;
-  const endDate = raw.endDate ? String(raw.endDate) : undefined;
+  const dueDateFromAnyTx = Array.isArray(raw.transactions)
+    ? raw.transactions
+        .map((t: any) => t?.dueDate ?? t?.invoiceDueDate)
+        .find((d: any) => d != null && String(d).trim() !== "")
+    : undefined;
+  const endDate = dueDateFromAnyTx
+    ? String(dueDateFromAnyTx)
+    : raw.endDate
+      ? String(raw.endDate)
+      : undefined;
 
   return { summary, transactions, insights, startDate, endDate };
 }
