@@ -644,7 +644,6 @@ export default function HomePage() {
                 <Pill>C6 Bank</Pill>
                 <Pill>Sicredi</Pill>
                 <Pill>Banco do Brasil</Pill>
-                <Pill>Mercado Pago</Pill>
               </div>
             </div>
           </div>

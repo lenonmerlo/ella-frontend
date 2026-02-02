@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { clearToken, getToken } from "../lib/auth";
+import { clearAuth, getToken } from "../lib/auth";
 import { onUnauthorized } from "../lib/authEvents";
 import { http } from "../lib/http";
 
@@ -58,14 +58,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       // ignore
     }
-    clearToken();
+    clearAuth();
     setUser(null);
     navigate("/", { replace: true });
   }
 
   useEffect(() => {
     const unsub = onUnauthorized(() => {
-      clearToken();
+      clearAuth();
       setUser(null);
       navigate("/", { replace: true });
     });

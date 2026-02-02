@@ -2,9 +2,11 @@
 import { http } from "./http";
 
 const TOKEN_KEY = "ella:token";
+const REFRESH_TOKEN_KEY = "ella:refreshToken";
 
 export interface LoginResponse {
   token: string;
+  refreshToken?: string;
   tokenType: string;
   expiresIn: number;
 }
@@ -20,12 +22,25 @@ export function setToken(token: string) {
   localStorage.setItem(TOKEN_KEY, token);
 }
 
+export function setRefreshToken(refreshToken: string) {
+  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+}
+
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
 
+export function getRefreshToken(): string | null {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY);
+}
+
+export function clearAuth() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
 export async function login(email: string, password: string) {
@@ -36,6 +51,10 @@ export async function login(email: string, password: string) {
 
   if (res.data.data.token) {
     setToken(res.data.data.token);
+  }
+
+  if (res.data.data.refreshToken) {
+    setRefreshToken(res.data.data.refreshToken);
   }
 
   return res.data.data;

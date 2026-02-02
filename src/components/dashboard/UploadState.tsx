@@ -17,6 +17,7 @@ import {
 } from "../../services/api/bankStatementUploadService";
 import { applyTrip } from "../../services/api/tripService";
 import { uploadInvoice } from "../../services/api/uploadService";
+import { InfoModal } from "../shared/InfoModal";
 
 interface Props {
   onClose: () => void;
@@ -35,6 +36,16 @@ export function UploadState({ onClose, onSuccess }: Props) {
   const [uploadType, setUploadType] = useState<"CREDIT_CARD" | "BANK_STATEMENT" | null>(null);
   const [bankStatementResult, setBankStatementResult] =
     useState<BankStatementUploadResponse | null>(null);
+
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const [infoModalTitle, setInfoModalTitle] = useState<string>("");
+  const [infoModalMessage, setInfoModalMessage] = useState<string>("");
+
+  function showInfoModal(title: string, message: string) {
+    setInfoModalTitle(title);
+    setInfoModalMessage(message);
+    setInfoModalOpen(true);
+  }
 
   async function processUpload(file: File, pwd?: string) {
     setIsUploading(true);
@@ -93,7 +104,10 @@ export function UploadState({ onClose, onSuccess }: Props) {
       const msg = error.response?.data?.message || error.message || "Erro ao fazer upload";
 
       if (/requisi\S*\s+expirou/i.test(String(msg)) || /timeout/i.test(String(msg))) {
-        alert("Processando… pode levar até 2 min. Se demorar, atualize a lista.");
+        showInfoModal(
+          "Processando",
+          "Processando… pode levar até 2 min. Se demorar, atualize a lista.",
+        );
         return;
       }
 
@@ -101,7 +115,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
         setIsPasswordRequired(true);
         setErrorMessage(msg);
       } else {
-        alert(msg);
+        showInfoModal("Erro no upload", String(msg));
       }
     }
   }
@@ -118,7 +132,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
       onClose();
     } catch (e: any) {
       const msg = e?.response?.data?.message || e?.message || "Erro ao aplicar sugestão de viagem";
-      alert(msg);
+      showInfoModal("Erro", String(msg));
     } finally {
       setTripIsApplying(false);
     }
@@ -135,7 +149,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
     if (!file) return;
 
     if (!uploadType) {
-      alert("Selecione o tipo de documento");
+      showInfoModal("Atenção", "Selecione o tipo de documento");
       return;
     }
 
@@ -166,6 +180,13 @@ export function UploadState({ onClose, onSuccess }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
       <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-2xl">
+        <InfoModal
+          open={infoModalOpen}
+          title={infoModalTitle}
+          message={infoModalMessage}
+          onClose={() => setInfoModalOpen(false)}
+        />
+
         <button
           onClick={onClose}
           className="absolute top-6 right-6 z-10 text-gray-400 hover:text-gray-600"
