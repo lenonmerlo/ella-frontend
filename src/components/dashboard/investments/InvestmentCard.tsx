@@ -15,18 +15,18 @@ export function InvestmentCard({ investment, onEdit, onDelete }: InvestmentCardP
   const gain = Number(investment.currentValue ?? 0) - Number(investment.initialValue ?? 0);
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md">
+    <div className="border-ella-muted bg-ella-card rounded-lg border p-4 transition-shadow hover:shadow-md">
       <div className="mb-4 flex items-start justify-between">
         <div>
           <h3 className="text-ella-navy font-semibold">{investment.name}</h3>
-          <p className="text-sm text-gray-600">{INVESTMENT_TYPE_LABELS[investment.type]}</p>
+          <p className="text-ella-subtile text-sm">{INVESTMENT_TYPE_LABELS[investment.type]}</p>
         </div>
         <div className="flex gap-2">
           {onEdit && (
             <button
               type="button"
               onClick={() => onEdit(investment)}
-              className="hover:text-ella-gold p-2 text-gray-600 transition-colors"
+              className="text-ella-subtile hover:text-ella-gold p-2 transition-colors"
               aria-label={`Editar ${investment.name}`}
             >
               <Edit2 size={18} />
@@ -36,7 +36,7 @@ export function InvestmentCard({ investment, onEdit, onDelete }: InvestmentCardP
             <button
               type="button"
               onClick={() => onDelete(investment.id)}
-              className="p-2 text-gray-600 transition-colors hover:text-red-600"
+              className="text-ella-subtile p-2 transition-colors hover:text-red-600"
               aria-label={`Excluir ${investment.name}`}
             >
               <Trash2 size={18} />
@@ -47,25 +47,25 @@ export function InvestmentCard({ investment, onEdit, onDelete }: InvestmentCardP
 
       <div className="mb-4 grid grid-cols-2 gap-4">
         <div>
-          <p className="mb-1 text-xs text-gray-600">Valor Inicial</p>
+          <p className="text-ella-subtile mb-1 text-xs">Valor Inicial</p>
           <p className="font-medium">{formatCurrency(Number(investment.initialValue ?? 0))}</p>
         </div>
         <div>
-          <p className="mb-1 text-xs text-gray-600">Valor Atual</p>
+          <p className="text-ella-subtile mb-1 text-xs">Valor Atual</p>
           <p className="font-medium">{formatCurrency(Number(investment.currentValue ?? 0))}</p>
         </div>
       </div>
 
-      <div className="mb-4 rounded-lg bg-gray-50 p-3">
+      <div className="bg-ella-background/50 mb-4 rounded-lg p-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Ganho/Perda</span>
+          <span className="text-ella-subtile text-sm">Ganho/Perda</span>
           <span className={`font-semibold ${gain >= 0 ? "text-green-600" : "text-red-600"}`}>
             {gain >= 0 ? "+" : ""}
             {formatCurrency(gain)}
           </span>
         </div>
         <div className="mt-2 flex items-center justify-between">
-          <span className="text-sm text-gray-600">Rentabilidade</span>
+          <span className="text-ella-subtile text-sm">Rentabilidade</span>
           <span className={`text-lg font-bold ${isPositive ? "text-green-600" : "text-red-600"}`}>
             {isPositive ? "+" : ""}
             {profitability.toFixed(2)}%
@@ -73,7 +73,7 @@ export function InvestmentCard({ investment, onEdit, onDelete }: InvestmentCardP
         </div>
       </div>
 
-      <p className="text-xs text-gray-500">
+      <p className="text-ella-subtile text-xs">
         Desde {new Date(investment.investmentDate).toLocaleDateString("pt-BR")}
       </p>
     </div>

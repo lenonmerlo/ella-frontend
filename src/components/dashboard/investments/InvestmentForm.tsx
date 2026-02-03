@@ -109,7 +109,7 @@ export function InvestmentForm({ personId, investment, onSuccess, onCancel }: In
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl bg-white/80 p-6 shadow-sm">
+    <form onSubmit={handleSubmit} className="bg-ella-card/80 space-y-6 rounded-2xl p-6 shadow-sm">
       {error && <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</div>}
 
       <div className="grid gap-4 md:grid-cols-2">

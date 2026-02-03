@@ -14,17 +14,17 @@ export function InvestmentSummary({ summary }: InvestmentSummaryProps) {
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
+      <div className="border-ella-muted bg-ella-card rounded-lg border p-6">
         <div className="mb-2 flex items-center justify-between">
-          <p className="text-sm text-gray-600">Total Investido</p>
+          <p className="text-ella-subtile text-sm">Total Investido</p>
           <TrendingUp size={20} className="text-blue-600" />
         </div>
         <p className="text-ella-navy text-2xl font-bold">{formatCurrency(totalInvested)}</p>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
+      <div className="border-ella-muted bg-ella-card rounded-lg border p-6">
         <div className="mb-2 flex items-center justify-between">
-          <p className="text-sm text-gray-600">Valor Atual</p>
+          <p className="text-ella-subtile text-sm">Valor Atual</p>
           <TrendingUp size={20} className="text-green-600" />
         </div>
         <p className="text-ella-navy text-2xl font-bold">{formatCurrency(totalCurrent)}</p>

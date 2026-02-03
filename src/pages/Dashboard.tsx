@@ -33,6 +33,7 @@ import { updateTransaction } from "../services/api/transactionsService";
 import { tryParseISODateLike } from "../utils/date";
 import BudgetPage from "./BudgetPage";
 import InvestmentPage from "./InvestmentPage";
+import PatrimonioPage from "./PatrimonioPage";
 import ScorePage from "./ScorePage";
 
 export default function DashboardPage() {
@@ -176,11 +177,11 @@ export default function DashboardPage() {
   return (
     <div className="ella-gradient-bg min-h-screen">
       {/* Mobile header */}
-      <div className="sticky top-0 z-40 border-b border-white/40 bg-white/70 backdrop-blur lg:hidden">
+      <div className="border-ella-muted/40 bg-ella-card/70 sticky top-0 z-40 border-b backdrop-blur lg:hidden">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 md:px-6">
           <button
             type="button"
-            className="text-ella-navy inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white/80 px-3 py-2 text-sm font-semibold"
+            className="border-ella-muted text-ella-navy bg-ella-card/80 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold"
             onClick={() => setMobileNavOpen(true)}
             aria-label="Abrir menu"
             aria-expanded={mobileNavOpen}
@@ -209,7 +210,7 @@ export default function DashboardPage() {
               <p className="text-ella-navy text-sm font-semibold">Navegação</p>
               <button
                 type="button"
-                className="text-ella-navy rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold"
+                className="border-ella-muted text-ella-navy bg-ella-card rounded-lg border px-3 py-2 text-sm font-semibold"
                 onClick={() => setMobileNavOpen(false)}
                 aria-label="Fechar"
               >
@@ -369,7 +370,7 @@ export default function DashboardPage() {
 
           {selectedSection === "bank-statements" && (
             <div className="space-y-6">
-              <div className="rounded-lg bg-white p-6 shadow-sm">
+              <div className="bg-ella-card rounded-lg p-6 shadow-sm">
                 <h2 className="text-ella-navy mb-4 text-lg font-semibold">Movimentação C/C</h2>
                 {bankDashboardLoading ? (
                   <p className="text-ella-subtile">Carregando extrato...</p>
@@ -470,6 +471,8 @@ export default function DashboardPage() {
           {selectedSection === "budget" && <BudgetPage />}
 
           {selectedSection === "investments" && <InvestmentPage />}
+
+          {selectedSection === "patrimonio" && <PatrimonioPage />}
         </div>
       </main>
       {showUpload && (

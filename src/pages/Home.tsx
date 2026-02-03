@@ -1,5 +1,7 @@
 import { Logo } from "@/components/Logo";
+import { useTheme } from "@/contexts/ThemeContext";
 import { type ReactNode, useMemo } from "react";
+import { Moon, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 function PrimaryButton({
@@ -15,7 +17,7 @@ function PrimaryButton({
     <button
       onClick={onClick}
       className={
-        "bg-ella-gold text-ella-navy inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:brightness-110 focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:outline-none " +
+        "bg-ella-gold text-ella-navy focus-visible:ring-offset-ella-background inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:brightness-110 focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 focus-visible:outline-none " +
         (className ?? "")
       }
     >
@@ -37,7 +39,7 @@ function SecondaryButton({
     <button
       onClick={onClick}
       className={
-        "border-ella-muted text-ella-subtile hover:border-ella-gold hover:text-ella-navy inline-flex items-center justify-center rounded-full border bg-white/60 px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-amber-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:outline-none " +
+        "border-ella-muted text-ella-subtile hover:border-ella-gold hover:text-ella-navy bg-ella-card/60 focus-visible:ring-offset-ella-background inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-amber-400/50 focus-visible:ring-offset-2 focus-visible:outline-none " +
         (className ?? "")
       }
     >
@@ -56,11 +58,11 @@ function FeatureCard({
   icon: ReactNode;
 }) {
   return (
-    <div className="ella-glass group border-ella-muted/70 relative overflow-hidden rounded-2xl border bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg">
+    <div className="ella-glass group border-ella-muted/70 bg-ella-card/80 relative overflow-hidden rounded-2xl border p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg">
       <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-amber-500/10 via-white/0 to-slate-900/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
       <div className="relative">
-        <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/70 ring-1 ring-black/5">
+        <div className="bg-ella-card/70 mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl ring-1 ring-black/5">
           {icon}
         </div>
         <h3 className="text-ella-navy text-sm font-semibold">{title}</h3>
@@ -167,7 +169,7 @@ function IconTag({ className }: { className?: string }) {
 
 function Pill({ children }: { children: ReactNode }) {
   return (
-    <span className="border-ella-muted/70 text-ella-subtile inline-flex items-center rounded-full border bg-white/70 px-4 py-2 text-sm font-medium shadow-sm">
+    <span className="border-ella-muted/70 text-ella-subtile bg-ella-card/70 inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium shadow-sm">
       {children}
     </span>
   );
@@ -186,13 +188,13 @@ function MetricBadge({
 }) {
   const accentClass =
     accent === "emerald"
-      ? "text-emerald-600"
+      ? "text-emerald-600 dark:text-emerald-400"
       : accent === "amber"
-        ? "text-amber-700"
-        : "text-slate-600";
+        ? "text-amber-700 dark:text-amber-400"
+        : "text-slate-600 dark:text-slate-300";
 
   return (
-    <div className="rounded-xl bg-white/65 p-3 ring-1 ring-black/5">
+    <div className="bg-ella-card/65 rounded-xl p-3 ring-1 ring-black/5 dark:ring-white/10">
       <div className="text-ella-subtile text-[10px] font-medium tracking-wide uppercase">
         {label}
       </div>
@@ -338,8 +340,8 @@ function StepCard({
   description: string;
 }) {
   return (
-    <div className="ella-glass border-ella-muted relative rounded-2xl border bg-white/90 p-6 shadow-sm">
-      <div className="bg-ella-navy absolute -top-5 left-6 flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold text-white shadow-lg">
+    <div className="ella-glass border-ella-muted bg-ella-card/90 relative rounded-2xl border p-6 shadow-sm">
+      <div className="bg-ella-brand absolute -top-5 left-6 flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold text-white shadow-lg">
         {number}
       </div>
       <h3 className="text-ella-navy mt-4 text-sm font-semibold">{title}</h3>
@@ -351,6 +353,7 @@ function StepCard({
 export default function HomePage() {
   const navigate = useNavigate();
   const year = useMemo(() => new Date().getFullYear(), []);
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="ella-gradient-bg min-h-screen">
@@ -359,7 +362,17 @@ export default function HomePage() {
         <div className="px-4 pt-10">
           <div className="mx-auto max-w-6xl">
             <div className="flex items-center justify-between gap-4">
-              <Logo variant="horizontal" size="medium" />
+              <Logo variant="horizontal" size="medium" inverted={theme === "dark"} />
+
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="border-ella-muted bg-ella-card/60 text-ella-navy hover:bg-ella-background/60 inline-flex items-center justify-center rounded-full border p-2 shadow-sm transition-colors md:hidden"
+                aria-label={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}
+                title={theme === "dark" ? "Tema claro" : "Tema escuro"}
+              >
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
 
               <div className="hidden items-center gap-6 md:flex">
                 <a
@@ -374,17 +387,29 @@ export default function HomePage() {
                 >
                   Como funciona
                 </a>
+
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="border-ella-muted bg-ella-card/60 text-ella-navy hover:bg-ella-background/60 inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold shadow-sm transition-colors"
+                  aria-label={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}
+                  title={theme === "dark" ? "Tema claro" : "Tema escuro"}
+                >
+                  {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+                  <span className="hidden lg:inline">Tema</span>
+                </button>
+
                 <SecondaryButton onClick={() => navigate("/auth/login")}>Entrar</SecondaryButton>
                 <button
                   onClick={() => navigate("/auth/register")}
-                  className="bg-ella-navy hover:bg-ella-navy/90 inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-slate-900/30 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:outline-none"
+                  className="bg-ella-brand hover:bg-ella-brand/90 focus-visible:ring-offset-ella-background inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-slate-900/30 focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   Criar conta
                 </button>
               </div>
             </div>
 
-            <div className="mt-10 grid items-center gap-6 rounded-2xl bg-white/60 p-6 shadow-sm backdrop-blur md:grid-cols-[1.1fr_0.9fr]">
+            <div className="bg-ella-card/60 mt-10 grid items-center gap-6 rounded-2xl p-6 shadow-sm backdrop-blur md:grid-cols-[1.1fr_0.9fr]">
               {/* Lado esquerdo */}
               <section className="space-y-4">
                 <p className="text-ella-subtile text-sm tracking-[0.3em] uppercase">
@@ -412,7 +437,7 @@ export default function HomePage() {
                   </PrimaryButton>
                   <a
                     href="#funcionalidades"
-                    className="border-ella-muted text-ella-navy hover:border-ella-gold inline-flex items-center justify-center rounded-xl border bg-white/70 px-5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                    className="border-ella-muted text-ella-navy hover:border-ella-gold bg-ella-card/70 inline-flex items-center justify-center rounded-xl border px-5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                   >
                     Saiba mais
                   </a>
@@ -420,7 +445,7 @@ export default function HomePage() {
               </section>
 
               {/* Lado direito (tech preview) */}
-              <section className="border-ella-muted/70 ella-glass relative overflow-hidden rounded-2xl border bg-white/85 p-6 shadow-lg">
+              <section className="border-ella-muted/70 ella-glass bg-ella-card/85 relative overflow-hidden rounded-2xl border p-6 shadow-lg">
                 <div className="pointer-events-none absolute -top-16 -right-16 h-52 w-52 rounded-full bg-amber-500/10 blur-3xl" />
                 <div className="pointer-events-none absolute -bottom-16 -left-16 h-52 w-52 rounded-full bg-slate-900/10 blur-3xl" />
 
@@ -438,14 +463,14 @@ export default function HomePage() {
                     <MetricBadge label="Metas" value="3" sub="em dia" accent="slate" />
                   </div>
 
-                  <div className="mt-4 rounded-xl bg-white/65 p-4 ring-1 ring-black/5">
+                  <div className="bg-ella-card/65 mt-4 rounded-xl p-4 ring-1 ring-black/5 dark:ring-white/10">
                     <div className="flex items-center justify-between">
                       <div className="text-ella-subtile text-[10px] font-medium tracking-wide uppercase">
                         Fluxo mensal
                       </div>
                       <div className="text-ella-gold text-[10px] font-semibold">IA</div>
                     </div>
-                    <div className="relative mt-3 h-24 overflow-hidden rounded-lg bg-linear-to-br from-amber-500/12 via-slate-900/5 to-white/0">
+                    <div className="to-ella-card/0 relative mt-3 h-24 overflow-hidden rounded-lg bg-linear-to-br from-amber-500/12 via-slate-900/5">
                       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(201,164,59,0.18),transparent_55%)]" />
                       <div className="absolute inset-x-0 bottom-0 flex h-full items-end gap-2 p-2">
                         {[34, 48, 28, 62, 54, 72, 46, 80, 58, 66, 44, 76].map((h, idx) => (
@@ -465,7 +490,7 @@ export default function HomePage() {
                       (tag) => (
                         <span
                           key={tag}
-                          className="border-ella-muted/60 text-ella-subtile rounded-full border bg-white/55 px-3 py-1 text-[11px]"
+                          className="border-ella-muted/60 text-ella-subtile bg-ella-card/55 rounded-full border px-3 py-1 text-[11px]"
                         >
                           {tag}
                         </span>
@@ -479,7 +504,7 @@ export default function HomePage() {
         </div>
 
         {/* APRESENTAÇÃO */}
-        <section className="bg-white/70 py-14">
+        <section className="bg-ella-card/70 py-14">
           <div className="mx-auto max-w-6xl px-6">
             <p className="text-ella-gold text-center text-xs font-semibold tracking-[0.3em] uppercase">
               Apresentação
@@ -508,7 +533,7 @@ export default function HomePage() {
                 },
               ].map((item) => (
                 <div key={item.title} className="flex items-start gap-3">
-                  <div className="bg-ella-navy mt-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold text-white">
+                  <div className="bg-ella-brand mt-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold text-white">
                     ✓
                   </div>
                   <div>
@@ -570,7 +595,7 @@ export default function HomePage() {
         </section>
 
         {/* COMO FUNCIONA (ref print 2) */}
-        <section id="como-funciona" className="bg-white/70 py-12">
+        <section id="como-funciona" className="bg-ella-card/70 py-12">
           <div className="mx-auto max-w-6xl px-6">
             <p className="text-ella-gold text-xs font-semibold tracking-[0.3em] uppercase">
               Faturas
@@ -608,9 +633,9 @@ export default function HomePage() {
               ].map((s) => (
                 <div
                   key={s.title}
-                  className="ella-glass border-ella-muted/70 rounded-2xl border bg-white/85 p-7 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                  className="ella-glass border-ella-muted/70 bg-ella-card/85 rounded-2xl border p-7 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
                 >
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white/75 ring-1 ring-black/5">
+                  <div className="bg-ella-card/75 mx-auto flex h-14 w-14 items-center justify-center rounded-full ring-1 ring-black/5 dark:ring-white/10">
                     {s.icon}
                   </div>
                   <div className="text-ella-navy mt-6 text-lg font-semibold">
@@ -623,7 +648,7 @@ export default function HomePage() {
               ))}
             </div>
 
-            <div className="mt-10 rounded-2xl border border-dashed border-slate-200 bg-white/60 p-6">
+            <div className="border-ella-muted/70 bg-ella-card/60 mt-10 rounded-2xl border border-dashed p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-ella-navy inline-flex items-center gap-2 text-sm font-semibold">
                   <span className="bg-ella-navy/10 inline-flex h-8 w-8 items-center justify-center rounded-full">
@@ -631,7 +656,7 @@ export default function HomePage() {
                   </span>
                   Bancos Suportados
                 </div>
-                <span className="text-ella-subtile rounded-md bg-slate-100 px-3 py-1 text-xs">
+                <span className="text-ella-subtile bg-ella-background/60 rounded-md px-3 py-1 text-xs">
                   Atualizado Jan/{String(year).slice(-2)}
                 </span>
               </div>
@@ -661,7 +686,7 @@ export default function HomePage() {
             </p>
 
             <div className="mt-10 grid gap-8 md:grid-cols-2">
-              <div className="ella-glass border-ella-muted/70 rounded-2xl border bg-white/80 p-6 shadow-sm">
+              <div className="ella-glass border-ella-muted/70 bg-ella-card/80 rounded-2xl border p-6 shadow-sm">
                 <div className="text-ella-subtile text-xs font-semibold tracking-wide">
                   Score ELLA
                 </div>
@@ -672,19 +697,19 @@ export default function HomePage() {
                 </div>
 
                 <div className="mt-6 grid grid-cols-2 gap-4">
-                  <div className="rounded-xl bg-white/70 p-4 ring-1 ring-black/5">
+                  <div className="bg-ella-card/70 rounded-xl p-4 ring-1 ring-black/5 dark:ring-white/10">
                     <div className="text-ella-subtile text-xs">Utilização</div>
                     <div className="text-ella-navy mt-1 text-sm font-semibold">100</div>
                   </div>
-                  <div className="rounded-xl bg-white/70 p-4 ring-1 ring-black/5">
+                  <div className="bg-ella-card/70 rounded-xl p-4 ring-1 ring-black/5 dark:ring-white/10">
                     <div className="text-ella-subtile text-xs">Pagamento</div>
                     <div className="text-ella-navy mt-1 text-sm font-semibold">100</div>
                   </div>
-                  <div className="rounded-xl bg-white/70 p-4 ring-1 ring-black/5">
+                  <div className="bg-ella-card/70 rounded-xl p-4 ring-1 ring-black/5 dark:ring-white/10">
                     <div className="text-ella-subtile text-xs">Diversidade</div>
                     <div className="text-ella-navy mt-1 text-sm font-semibold">20</div>
                   </div>
-                  <div className="rounded-xl bg-white/70 p-4 ring-1 ring-black/5">
+                  <div className="bg-ella-card/70 rounded-xl p-4 ring-1 ring-black/5 dark:ring-white/10">
                     <div className="text-ella-subtile text-xs">Consistência</div>
                     <div className="text-ella-navy mt-1 text-sm font-semibold">100</div>
                   </div>
@@ -717,7 +742,7 @@ export default function HomePage() {
                       title: "Consistência",
                       sub: "Regularidade nos gastos",
                       pct: "15%",
-                      color: "bg-amber-500/10 text-amber-700",
+                      color: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
                     },
                     {
                       title: "Histórico de Crédito",
@@ -728,7 +753,7 @@ export default function HomePage() {
                   ].map((item) => (
                     <div
                       key={item.title}
-                      className="ella-glass border-ella-muted/70 flex items-center justify-between gap-4 rounded-2xl border bg-white/85 p-4 shadow-sm"
+                      className="ella-glass border-ella-muted/70 bg-ella-card/85 flex items-center justify-between gap-4 rounded-2xl border p-4 shadow-sm"
                     >
                       <div className="flex items-center gap-3">
                         <div
@@ -743,7 +768,7 @@ export default function HomePage() {
                           <div className="text-ella-subtile text-xs">{item.sub}</div>
                         </div>
                       </div>
-                      <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                      <div className="text-ella-navy bg-ella-background/60 rounded-full px-3 py-1 text-xs font-semibold">
                         {item.pct}
                       </div>
                     </div>
@@ -755,7 +780,7 @@ export default function HomePage() {
         </section>
 
         {/* PLANEJAMENTO (ref print 4) */}
-        <section id="planejamento" className="bg-white/70 py-12">
+        <section id="planejamento" className="bg-ella-card/70 py-12">
           <div className="mx-auto max-w-6xl px-6">
             <p className="text-ella-gold text-xs font-semibold tracking-[0.3em] uppercase">
               Planejamento
@@ -800,7 +825,7 @@ export default function HomePage() {
                         {block.rows.map((r) => (
                           <div
                             key={r.name}
-                            className="rounded-xl bg-white/80 p-4 ring-1 ring-black/5"
+                            className="bg-ella-card/80 rounded-xl p-4 ring-1 ring-black/5 dark:ring-white/10"
                           >
                             <div className="flex items-center justify-between">
                               <div className="text-ella-navy text-sm font-medium">{r.name}</div>
@@ -892,7 +917,7 @@ export default function HomePage() {
                 <div
                   key={c.title}
                   className={
-                    "ella-glass border-ella-muted/70 rounded-2xl border bg-white/85 p-8 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                    "ella-glass border-ella-muted/70 bg-ella-card/85 rounded-2xl border p-8 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
                   }
                 >
                   <div className={"h-1 w-full rounded-full " + c.color} />
@@ -923,7 +948,7 @@ export default function HomePage() {
         </section>
 
         {/* INTELIGÊNCIA ARTIFICIAL (ref prints 6) */}
-        <section id="insights" className="bg-white/70 py-12">
+        <section id="insights" className="bg-ella-card/70 py-12">
           <div className="mx-auto max-w-6xl px-6">
             <p className="text-ella-gold text-xs font-semibold tracking-[0.3em] uppercase">
               Inteligência Artificial
@@ -964,7 +989,7 @@ export default function HomePage() {
                   <div
                     key={card.title}
                     className={
-                      "ella-glass border-ella-muted/70 relative overflow-hidden rounded-2xl border bg-white/85 p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                      "ella-glass border-ella-muted/70 bg-ella-card/85 relative overflow-hidden rounded-2xl border p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
                     }
                   >
                     <div className={"absolute top-0 left-0 h-full w-1 " + card.accent} />
@@ -979,7 +1004,7 @@ export default function HomePage() {
                         </div>
                       </div>
                     </div>
-                    <div className="mt-5 border-t border-slate-100 pt-3 text-xs text-slate-400">
+                    <div className="border-ella-muted/50 text-ella-subtile mt-5 border-t pt-3 text-xs">
                       {card.foot}
                     </div>
                   </div>
@@ -1029,7 +1054,7 @@ export default function HomePage() {
               ].map((g) => (
                 <div
                   key={g.title}
-                  className="ella-glass border-ella-muted/70 rounded-2xl border bg-white/85 p-5 shadow-sm"
+                  className="ella-glass border-ella-muted/70 bg-ella-card/85 rounded-2xl border p-5 shadow-sm"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -1044,7 +1069,7 @@ export default function HomePage() {
                     <div className={"text-sm font-semibold " + g.badge}>{g.pct}%</div>
                   </div>
 
-                  <div className="mt-4 h-3 w-full rounded-full bg-slate-100">
+                  <div className="bg-ella-background/60 mt-4 h-3 w-full rounded-full">
                     <div className={"h-3 rounded-full " + g.color} style={{ width: `${g.pct}%` }} />
                   </div>
 
@@ -1075,7 +1100,7 @@ export default function HomePage() {
         </section>
 
         {/* CTA */}
-        <section className="bg-ella-navy py-16">
+        <section className="bg-ella-brand py-16">
           <div className="mx-auto max-w-6xl px-6 text-center">
             <h2 className="text-3xl font-semibold text-white md:text-4xl">
               Pronto para transformar suas finanças?
@@ -1100,7 +1125,7 @@ export default function HomePage() {
         </section>
 
         {/* FOOTER marketing */}
-        <footer className="bg-ella-navy/95 relative overflow-hidden py-12">
+        <footer className="bg-ella-brand/95 relative overflow-hidden py-12">
           <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-white/5 blur-3xl" />
 
