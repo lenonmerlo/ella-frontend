@@ -6,8 +6,6 @@ interface Props {
   transactions: DashboardTransaction[];
 }
 
-const HIGH_VALUE_THRESHOLD = 5000;
-
 export function TransactionsSection({ transactions }: Props) {
   return (
     <section className="ella-glass p-6">
@@ -27,7 +25,6 @@ export function TransactionsSection({ transactions }: Props) {
             : "bg-emerald-100 text-emerald-700";
           const isIncome = transaction.type === "INCOME";
           const amountAbs = Math.abs(transaction.amount ?? 0);
-          const isHighValue = !isIncome && amountAbs >= HIGH_VALUE_THRESHOLD;
 
           return (
             <div
@@ -40,12 +37,6 @@ export function TransactionsSection({ transactions }: Props) {
                   <span className="text-ella-subtile bg-ella-card/70 rounded px-2 py-1 text-xs">
                     {transaction.category}
                   </span>
-                  {isHighValue && (
-                    <span className="rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
-                      Alto valor&nbsp;
-                      <span className="text-ella-navy font-semibold">≥ R$ 5.000</span>
-                    </span>
-                  )}
                   <span className={`${scopeClass} rounded px-2 py-1 text-xs font-semibold`}>
                     {scopeLabel}
                   </span>
