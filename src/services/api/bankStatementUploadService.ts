@@ -30,7 +30,7 @@ export interface BankStatementUploadResponse {
 export async function uploadBankStatement(
   file: File,
   password?: string,
-  bank: "ITAU" | "C6" = "ITAU",
+  bank: "ITAU" | "C6" | "NUBANK" = "ITAU",
 ): Promise<BankStatementUploadResponse> {
   const formData = new FormData();
   formData.append("file", file);
