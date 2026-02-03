@@ -11,18 +11,18 @@ export function BudgetSummary({ budget }: BudgetSummaryProps) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <p className="mb-1 text-sm text-gray-600">Renda</p>
+        <div className="border-ella-muted bg-ella-card rounded-lg border p-4">
+          <p className="text-ella-subtile mb-1 text-sm">Renda</p>
           <p className="text-ella-navy text-2xl font-bold">{formatCurrency(budget.income)}</p>
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <p className="mb-1 text-sm text-gray-600">Total de Custos</p>
+        <div className="border-ella-muted bg-ella-card rounded-lg border p-4">
+          <p className="text-ella-subtile mb-1 text-sm">Total de Custos</p>
           <p className="text-ella-navy text-2xl font-bold">{formatCurrency(budget.total)}</p>
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <p className="mb-1 text-sm text-gray-600">Saldo</p>
+        <div className="border-ella-muted bg-ella-card rounded-lg border p-4">
+          <p className="text-ella-subtile mb-1 text-sm">Saldo</p>
           <p
             className={`text-2xl font-bold ${budget.balance >= 0 ? "text-green-600" : "text-red-600"}`}
           >
@@ -30,8 +30,8 @@ export function BudgetSummary({ budget }: BudgetSummaryProps) {
           </p>
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <p className="mb-1 text-sm text-gray-600">Saldo Anual</p>
+        <div className="border-ella-muted bg-ella-card rounded-lg border p-4">
+          <p className="text-ella-subtile mb-1 text-sm">Saldo Anual</p>
           <p
             className={`text-2xl font-bold ${annualBalance >= 0 ? "text-green-600" : "text-red-600"}`}
           >
@@ -40,31 +40,31 @@ export function BudgetSummary({ budget }: BudgetSummaryProps) {
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-4">
+      <div className="border-ella-muted bg-ella-card rounded-lg border p-4">
         <h3 className="text-ella-navy mb-4 text-lg font-semibold">Detalhamento de Custos</h3>
         <div className="space-y-3 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-700">Custo Fixo Essencial</span>
+            <span className="text-ella-subtile">Custo Fixo Essencial</span>
             <span className="font-medium">{formatCurrency(budget.essentialFixedCost)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-700">Custo Fixo Necessário</span>
+            <span className="text-ella-subtile">Custo Fixo Necessário</span>
             <span className="font-medium">{formatCurrency(budget.necessaryFixedCost)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-700">Custo Fixo Variável</span>
+            <span className="text-ella-subtile">Custo Fixo Variável</span>
             <span className="font-medium">{formatCurrency(budget.variableFixedCost)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-700">Investimento</span>
+            <span className="text-ella-subtile">Investimento</span>
             <span className="font-medium">{formatCurrency(budget.investment)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-700">Compra Planejada</span>
+            <span className="text-ella-subtile">Compra Planejada</span>
             <span className="font-medium">{formatCurrency(budget.plannedPurchase)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-700">Proteção</span>
+            <span className="text-ella-subtile">Proteção</span>
             <span className="font-medium">{formatCurrency(budget.protection)}</span>
           </div>
           <div className="flex justify-between border-t pt-3 font-bold">

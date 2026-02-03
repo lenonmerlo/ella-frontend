@@ -52,7 +52,7 @@ export default function RegisterPage() {
     <div className="ella-gradient-bg min-h-screen">
       <div className="flex min-h-screen flex-col">
         <div className="px-4 py-10">
-          <div className="mx-auto grid max-w-5xl items-center gap-6 rounded-2xl bg-white/60 p-6 shadow-sm backdrop-blur md:grid-cols-[1.1fr,0.9fr]">
+          <div className="bg-ella-card/60 mx-auto grid max-w-5xl items-center gap-6 rounded-2xl p-6 shadow-sm backdrop-blur md:grid-cols-[1.1fr,0.9fr]">
             <section className="space-y-4">
               <p className="text-ella-subtile text-sm tracking-[0.3em] uppercase">
                 comece com a ella
@@ -68,7 +68,7 @@ export default function RegisterPage() {
             </section>
 
             {/* Card */}
-            <section className="border-ella-muted ella-glass rounded-2xl border bg-white/90 p-6 shadow-lg">
+            <section className="border-ella-muted ella-glass bg-ella-card/90 rounded-2xl border p-6 shadow-lg">
               <h2 className="text-ella-navy mb-1 text-lg font-medium">Criar sua conta ELLA</h2>
 
               <form className="space-y-4" onSubmit={handleSubmit}>
@@ -86,7 +86,7 @@ export default function RegisterPage() {
                       placeholder="Mariana"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
+                      className="border-ella-muted bg-ella-card text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
                       required
                     />
                   </div>
@@ -103,7 +103,7 @@ export default function RegisterPage() {
                       placeholder="Silva"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
+                      className="border-ella-muted bg-ella-card text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
                       required
                     />
                   </div>
@@ -122,7 +122,7 @@ export default function RegisterPage() {
                     placeholder="voce@exemplo.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
+                    className="border-ella-muted bg-ella-card text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
                     required
                     autoComplete="email"
                   />
@@ -141,7 +141,7 @@ export default function RegisterPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
+                    className="border-ella-muted bg-ella-card text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
                     required
                     autoComplete="new-password"
                   />
@@ -160,7 +160,7 @@ export default function RegisterPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="border-ella-muted focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
+                    className="border-ella-muted bg-ella-card text-ella-text focus:border-ella-gold focus:ring-ella-gold w-full rounded-lg border px-3 py-2 text-sm focus:ring-1"
                     required
                     autoComplete="new-password"
                   />

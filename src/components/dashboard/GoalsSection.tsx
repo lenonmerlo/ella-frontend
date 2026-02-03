@@ -126,7 +126,7 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
 
   return (
     <section className="space-y-6">
-      <div className="flex items-center justify-between rounded-2xl bg-white/80 p-6 shadow-sm backdrop-blur-sm">
+      <div className="bg-ella-card/80 flex items-center justify-between rounded-2xl p-6 shadow-sm backdrop-blur-sm">
         <div>
           <h2 className="text-ella-navy text-lg font-semibold">Metas financeiras</h2>
           <p className="text-ella-subtile mt-1 text-sm">
@@ -135,7 +135,7 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-ella-navy hover:bg-ella-navy/90 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
+          className="bg-ella-brand hover:bg-ella-brand/90 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
         >
           <Plus size={18} />
           Nova Meta
@@ -143,7 +143,7 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
       </div>
 
       {showForm && (
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="bg-ella-card rounded-2xl p-6 shadow-sm">
           <h3 className="text-ella-navy mb-4 font-medium">Nova Meta</h3>
           <form onSubmit={handleCreate} className="grid gap-4 md:grid-cols-2">
             <div className="col-span-2">
@@ -233,7 +233,7 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
           return (
             <div
               key={goalId}
-              className="group relative rounded-2xl bg-white/80 p-5 shadow-sm backdrop-blur-sm transition-all hover:shadow-md"
+              className="group bg-ella-card/80 relative rounded-2xl p-5 shadow-sm backdrop-blur-sm transition-all hover:shadow-md"
             >
               <div className="mb-3 flex items-start justify-between">
                 <div className="flex items-center gap-3">
@@ -270,7 +270,7 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
               {editingGoalId === String(goalId) && (
                 <form
                   onSubmit={handleEditSave}
-                  className="mt-3 space-y-4 rounded-xl border border-gray-100 bg-white p-4"
+                  className="border-ella-muted bg-ella-card mt-3 space-y-4 rounded-xl border p-4"
                 >
                   <div>
                     <label className="text-ella-subtile mb-1 block text-xs font-medium">

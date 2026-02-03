@@ -54,7 +54,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="flex min-h-screen flex-col">
         <div className="flex flex-1 items-center justify-center px-4">
-          <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="border-ella-muted bg-ella-card w-full max-w-md rounded-2xl border p-6 shadow-sm">
             <h1 className="text-2xl font-semibold text-gray-900">Redefinir senha</h1>
             <p className="mt-2 text-sm text-gray-600">
               Digite sua nova senha para concluir a redefinição.

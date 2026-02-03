@@ -12,6 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export interface CategoryDatum {
   name: string;
@@ -59,9 +60,39 @@ export function SmartCategoryChart({
   title = "Despesas por Categoria",
   currency = "R$",
 }: Props) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   const categoryCount = data.length;
   const [selectedType, setSelectedType] = useState<ChartType>(() =>
     defaultChartType(categoryCount),
+  );
+
+  const axisTickStyle = useMemo(() => ({
+    fill: "var(--color-ella-subtile)",
+    fontSize: 12,
+  }), []);
+
+  const tooltipContentStyle = useMemo(() => ({
+    backgroundColor: isDark ? "rgba(15, 23, 42, 0.96)" : "rgba(255, 255, 255, 0.96)",
+    border: "1px solid var(--color-ella-muted)",
+    borderRadius: "8px",
+    padding: "8px 12px",
+    color: "var(--color-ella-text)",
+  }), [isDark]);
+
+  const tooltipLabelStyle = useMemo(() => ({
+    color: "var(--color-ella-text)",
+    fontWeight: 600,
+  }), []);
+
+  const tooltipItemStyle = useMemo(() => ({
+    color: "var(--color-ella-text)",
+  }), []);
+
+  const legendFormatter = useMemo(
+    () => (value: string) => <span style={{ color: "var(--color-ella-text)" }}>{value}</span>,
+    [],
   );
 
   const chartData = useMemo(() => {
@@ -122,14 +153,14 @@ export function SmartCategoryChart({
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <h3 className="text-ella-navy text-sm font-semibold">{title}</h3>
-          <div className="mt-1 text-xs text-gray-500">
+          <div className="text-ella-subtile mt-1 text-xs">
             Categorias: {categoryCount} · Total: {formatMoney(chartData.total, currency)} ·
             Visualização: {chartTypeName(type)}
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-gray-500">Alterar:</span>
+          <span className="text-ella-subtile text-xs font-medium">Alterar:</span>
           {availableTypes.map((opt) => (
             <button
               key={opt}
@@ -137,8 +168,8 @@ export function SmartCategoryChart({
               onClick={() => setSelectedType(opt)}
               className={
                 opt === type
-                  ? "bg-ella-navy rounded-md px-3 py-1 text-xs font-medium text-white"
-                  : "rounded-md border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700"
+                  ? "bg-ella-brand rounded-md px-3 py-1 text-xs font-medium text-white"
+                  : "border-ella-muted bg-ella-card text-ella-subtile rounded-md border px-3 py-1 text-xs font-medium"
               }
             >
               {chartTypeName(opt)}
@@ -177,12 +208,9 @@ export function SmartCategoryChart({
                   formatMoney(Number(value), currency),
                   name,
                 ]}
-                contentStyle={{
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  border: "1px solid #E1E1E6",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
-                }}
+                contentStyle={tooltipContentStyle}
+                labelStyle={tooltipLabelStyle}
+                itemStyle={tooltipItemStyle}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -208,18 +236,19 @@ export function SmartCategoryChart({
                   />
                 ))}
               </Pie>
-              <Legend iconType="circle" wrapperStyle={{ paddingTop: "12px" }} />
+              <Legend
+                iconType="circle"
+                wrapperStyle={{ paddingTop: "12px" }}
+                formatter={legendFormatter}
+              />
               <Tooltip
                 formatter={(value: number, name: string) => [
                   formatMoney(Number(value), currency),
                   name,
                 ]}
-                contentStyle={{
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  border: "1px solid #E1E1E6",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
-                }}
+                contentStyle={tooltipContentStyle}
+                labelStyle={tooltipLabelStyle}
+                itemStyle={tooltipItemStyle}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -236,7 +265,7 @@ export function SmartCategoryChart({
                 type="number"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fill: "#6B7280", fontSize: 12 }}
+                tick={axisTickStyle}
                 tickFormatter={(v) => `${currency} ${Number(v).toLocaleString("pt-BR")}`}
               />
               <YAxis
@@ -245,19 +274,16 @@ export function SmartCategoryChart({
                 axisLine={false}
                 tickLine={false}
                 width={140}
-                tick={{ fill: "#6B7280", fontSize: 12 }}
+                tick={axisTickStyle}
               />
               <Tooltip
                 formatter={(value: number, name: string) => [
                   formatMoney(Number(value), currency),
                   name,
                 ]}
-                contentStyle={{
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  border: "1px solid #E1E1E6",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
-                }}
+                contentStyle={tooltipContentStyle}
+                labelStyle={tooltipLabelStyle}
+                itemStyle={tooltipItemStyle}
               />
               <Bar dataKey="value" radius={[6, 6, 6, 6]}>
                 {chartData.items.map((_, index) => (
@@ -286,8 +312,8 @@ export function SmartCategoryChart({
         {type === "table" && (
           <div className="h-full overflow-auto">
             <table className="w-full border-collapse text-sm">
-              <thead className="sticky top-0 bg-white">
-                <tr className="text-left text-xs text-gray-500">
+              <thead className="bg-ella-card sticky top-0">
+                <tr className="text-ella-subtile text-left text-xs">
                   <th className="py-2 pr-3">Categoria</th>
                   <th className="py-2 pr-3">Valor</th>
                   <th className="py-2">%</th>
@@ -295,10 +321,10 @@ export function SmartCategoryChart({
               </thead>
               <tbody>
                 {chartData.items.map((item, idx) => (
-                  <tr key={`${item.name}-${idx}`} className="border-t border-gray-100">
-                    <td className="py-2 pr-3 text-gray-800">{item.name}</td>
-                    <td className="py-2 pr-3 text-gray-800">{formatMoney(item.value, currency)}</td>
-                    <td className="py-2 text-gray-500">{item.percentage.toFixed(1)}%</td>
+                  <tr key={`${item.name}-${idx}`} className="border-ella-muted/60 border-t">
+                    <td className="text-ella-navy py-2 pr-3">{item.name}</td>
+                    <td className="text-ella-navy py-2 pr-3">{formatMoney(item.value, currency)}</td>
+                    <td className="text-ella-subtile py-2">{item.percentage.toFixed(1)}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -310,8 +336,8 @@ export function SmartCategoryChart({
       {type !== "table" && (
         <div className="mt-4 overflow-auto">
           <table className="w-full border-collapse text-sm">
-            <thead className="bg-white">
-              <tr className="text-left text-xs text-gray-500">
+            <thead className="bg-ella-card">
+              <tr className="text-ella-subtile text-left text-xs">
                 <th className="py-2 pr-3">Categoria</th>
                 <th className="py-2 pr-3">Valor</th>
                 <th className="py-2">%</th>
@@ -319,10 +345,10 @@ export function SmartCategoryChart({
             </thead>
             <tbody>
               {chartData.items.map((item, idx) => (
-                <tr key={`${item.name}-${idx}`} className="border-t border-gray-100">
-                  <td className="py-2 pr-3 text-gray-800">{item.name}</td>
-                  <td className="py-2 pr-3 text-gray-800">{formatMoney(item.value, currency)}</td>
-                  <td className="py-2 text-gray-500">{item.percentage.toFixed(1)}%</td>
+                <tr key={`${item.name}-${idx}`} className="border-ella-muted/60 border-t">
+                  <td className="text-ella-navy py-2 pr-3">{item.name}</td>
+                  <td className="text-ella-navy py-2 pr-3">{formatMoney(item.value, currency)}</td>
+                  <td className="text-ella-subtile py-2">{item.percentage.toFixed(1)}%</td>
                 </tr>
               ))}
             </tbody>

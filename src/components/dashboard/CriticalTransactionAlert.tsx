@@ -172,7 +172,7 @@ export function CriticalTransactionAlert({
 
         <button
           type="button"
-          className="rounded-md p-2 text-gray-500 hover:bg-white/60"
+          className="text-ella-subtile hover:bg-ella-background/60 hover:text-ella-navy rounded-md p-2"
           onClick={() => setDismissed(true)}
           aria-label="Dispensar"
         >
@@ -181,14 +181,14 @@ export function CriticalTransactionAlert({
       </div>
 
       <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-semibold text-gray-600">
+        <div className="text-ella-subtile flex items-center gap-2 text-xs font-semibold">
           <DollarSign size={14} />
           <span>Alto valor</span>
         </div>
 
         <button
           type="button"
-          className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700"
+          className="border-ella-muted bg-ella-card text-ella-navy flex items-center gap-2 rounded-md border px-3 py-1 text-xs font-semibold"
           onClick={() => {
             const first = view.list[0];
             if (first) openReview(first);
@@ -203,7 +203,7 @@ export function CriticalTransactionAlert({
         {view.list.slice(0, 5).map((t) => (
           <div
             key={t.id}
-            className="flex items-center justify-between gap-4 rounded-lg bg-white/70 p-4"
+            className="bg-ella-card/70 flex items-center justify-between gap-4 rounded-lg p-4"
           >
             <div className="min-w-0">
               <div className="text-ella-navy truncate text-sm font-medium">{t.description}</div>
@@ -211,7 +211,7 @@ export function CriticalTransactionAlert({
                 <span className="rounded bg-amber-100 px-2 py-0.5 text-amber-800">
                   {backendOk ? "Crítica" : "Alto valor"}
                 </span>
-                <span className="rounded bg-white px-2 py-0.5">{t.category}</span>
+                <span className="bg-ella-card/70 rounded px-2 py-0.5">{t.category}</span>
               </div>
             </div>
 
@@ -222,7 +222,7 @@ export function CriticalTransactionAlert({
               </div>
               <button
                 type="button"
-                className="bg-ella-navy rounded-md px-3 py-1 text-xs font-semibold text-white"
+                className="bg-ella-brand rounded-md px-3 py-1 text-xs font-semibold text-white"
                 onClick={() => openReview(t)}
               >
                 Categorizar

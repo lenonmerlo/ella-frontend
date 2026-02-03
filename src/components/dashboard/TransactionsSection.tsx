@@ -37,7 +37,7 @@ export function TransactionsSection({ transactions }: Props) {
               <div className="flex-1">
                 <p className="text-ella-navy font-medium">{transaction.description}</p>
                 <div className="mt-1 flex flex-wrap items-center gap-3">
-                  <span className="text-ella-subtile rounded bg-white px-2 py-1 text-xs">
+                  <span className="text-ella-subtile bg-ella-card/70 rounded px-2 py-1 text-xs">
                     {transaction.category}
                   </span>
                   {isHighValue && (

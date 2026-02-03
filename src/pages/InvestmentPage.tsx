@@ -63,7 +63,7 @@ export default function InvestmentPage() {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-2xl bg-white/80 p-6 shadow-sm backdrop-blur-sm">
+      <div className="bg-ella-card/80 rounded-2xl p-6 shadow-sm backdrop-blur-sm">
         <h2 className="text-ella-navy text-lg font-semibold">Investimentos</h2>
         <p className="text-ella-subtile mt-1 text-sm">
           Acompanhe todos os seus investimentos e a rentabilidade ao longo do tempo.
@@ -73,7 +73,7 @@ export default function InvestmentPage() {
       {error && <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</div>}
 
       {loading ? (
-        <div className="rounded-2xl bg-white/80 p-6 shadow-sm">Carregando investimentos...</div>
+        <div className="bg-ella-card/80 rounded-2xl p-6 shadow-sm">Carregando investimentos...</div>
       ) : (
         <div className="space-y-8">
           {summary && <InvestmentSummary summary={summary} />}

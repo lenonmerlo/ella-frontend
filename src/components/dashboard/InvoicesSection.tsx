@@ -74,7 +74,7 @@ export function InvoicesSection({ invoices = [], onRefresh }: InvoicesSectionPro
         {invoices.map((invoice) => (
           <div
             key={invoice.id}
-            className="group border-ella-muted/50 hover:border-ella-gold/50 relative cursor-pointer overflow-hidden rounded-xl border bg-white/70 p-5 transition-all hover:shadow-md"
+            className="group border-ella-muted/50 hover:border-ella-gold/50 bg-ella-card/70 relative cursor-pointer overflow-hidden rounded-xl border p-5 transition-all hover:shadow-md"
             onClick={() => setSelectedInvoice((prev) => (prev === invoice.id ? null : invoice.id))}
           >
             <div className="flex items-start justify-between">
@@ -179,7 +179,7 @@ export function InvoicesSection({ invoices = [], onRefresh }: InvoicesSectionPro
       </div>
 
       {selectedInvoice && (
-        <div className="border-ella-muted/30 mt-6 rounded-xl border bg-white/70 p-5">
+        <div className="border-ella-muted/30 bg-ella-card/70 mt-6 rounded-xl border p-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 className="text-ella-navy text-base font-semibold">Insights da fatura</h3>

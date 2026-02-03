@@ -186,7 +186,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-2xl">
+      <div className="bg-ella-card relative w-full max-w-4xl overflow-hidden rounded-3xl shadow-2xl">
         <InfoModal
           open={infoModalOpen}
           title={infoModalTitle}
@@ -455,7 +455,7 @@ export function UploadState({ onClose, onSuccess }: Props) {
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
               {uploadType === "BANK_STATEMENT" && (
-                <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm">
+                <div className="border-ella-muted bg-ella-card flex items-center gap-2 rounded-xl border px-3 py-2 text-sm">
                   <span className="text-ella-subtile">Banco:</span>
                   <button
                     type="button"

@@ -57,7 +57,7 @@ export default function BudgetPage() {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-2xl bg-white/80 p-6 shadow-sm backdrop-blur-sm">
+      <div className="bg-ella-card/80 rounded-2xl p-6 shadow-sm backdrop-blur-sm">
         <h2 className="text-ella-navy text-lg font-semibold">Orçamento</h2>
         <p className="text-ella-subtile mt-1 text-sm">
           Planeje seu mês com mais clareza: defina seu orçamento e acompanhe a regra 50/30/20 (50%
@@ -68,7 +68,7 @@ export default function BudgetPage() {
       {error && <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</div>}
 
       {loading ? (
-        <div className="rounded-2xl bg-white/80 p-6 shadow-sm">Carregando orçamento...</div>
+        <div className="bg-ella-card/80 rounded-2xl p-6 shadow-sm">Carregando orçamento...</div>
       ) : budget ? (
         <div className="space-y-8">
           <BudgetSummary budget={budget} />
@@ -96,7 +96,7 @@ export default function BudgetPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="rounded-2xl bg-white/80 p-6 shadow-sm">
+          <div className="bg-ella-card/80 rounded-2xl p-6 shadow-sm">
             <p className="text-ella-subtile text-sm">
               Você ainda não tem um orçamento. Crie um agora!
             </p>

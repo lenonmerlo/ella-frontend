@@ -77,8 +77,8 @@ export const ManualCategoryModal = ({
       <div className="ella-glass w-full max-w-xl overflow-hidden rounded-lg shadow-2xl">
         {/* ===== HEADER ===== */}
         <div className="flex items-start justify-between gap-4 border-b border-white/40 p-6">
-          <div className="flex items-center gap-3 flex-1">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
+          <div className="flex flex-1 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
               <AlertTriangle size={20} />
             </div>
             <div>
@@ -93,7 +93,7 @@ export const ManualCategoryModal = ({
                 <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
                   Alto valor
                 </span>
-                <span className="font-semibold text-ella-navy">≥ R$ 5.000</span>
+                <span className="text-ella-navy font-semibold">≥ R$ 5.000</span>
                 <span className="mx-1">·</span>
                 Revisão manual obrigatória
               </p>
@@ -101,7 +101,7 @@ export const ManualCategoryModal = ({
           </div>
           <button
             type="button"
-            className="flex-shrink-0 rounded-md p-2 text-gray-500 transition-colors hover:bg-white/60 hover:text-gray-700"
+            className="text-ella-subtile hover:bg-ella-background/60 hover:text-ella-navy shrink-0 rounded-md p-2 transition-colors"
             onClick={onClose}
             aria-label="Fechar modal"
             disabled={saving}
@@ -113,20 +113,16 @@ export const ManualCategoryModal = ({
         {/* ===== BODY ===== */}
         <div className="max-h-[70vh] overflow-y-auto p-6">
           {/* Transaction Details Card */}
-          <div className="mb-6 rounded-lg bg-white/70 p-4">
+          <div className="bg-ella-card/70 mb-6 rounded-lg p-4">
             <div className="flex items-start justify-between gap-4">
               {/* Left: Description and Date */}
               <div className="flex-1">
-                <div className="text-ella-navy text-sm font-medium">
-                  {transaction.description}
-                </div>
-                <div className="text-ella-subtile mt-1 text-xs">
-                  {formattedDate}
-                </div>
+                <div className="text-ella-navy text-sm font-medium">{transaction.description}</div>
+                <div className="text-ella-subtile mt-1 text-xs">{formattedDate}</div>
               </div>
 
               {/* Right: Amount and Current Category */}
-              <div className="flex-shrink-0 text-right">
+              <div className="shrink-0 text-right">
                 <div className="text-sm font-bold text-red-600">
                   -R${" "}
                   {Math.abs(transaction.amount ?? 0).toLocaleString("pt-BR", {
@@ -143,7 +139,7 @@ export const ManualCategoryModal = ({
 
           {/* Category Selection Section */}
           <div>
-            <label className="mb-3 block text-sm font-semibold text-gray-700">
+            <label className="text-ella-navy mb-3 block text-sm font-semibold">
               Selecione a nova categoria
             </label>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -156,11 +152,11 @@ export const ManualCategoryModal = ({
                     onClick={() => setSelectedCategory(category)}
                     className={`flex items-center justify-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition-all ${
                       isActive
-                        ? "bg-ella-navy text-white shadow-md"
-                        : "border border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                        ? "bg-ella-brand text-white shadow-md"
+                        : "border-ella-muted bg-ella-card text-ella-navy hover:bg-ella-background/60 border"
                     }`}
                   >
-                    {isActive && <Check size={14} className="flex-shrink-0" />}
+                    {isActive && <Check size={14} className="shrink-0" />}
                     <span>{category}</span>
                   </button>
                 );
@@ -171,17 +167,17 @@ export const ManualCategoryModal = ({
           {/* Error Message */}
           {error && (
             <div className="mt-4 flex items-start gap-2 rounded-md bg-red-50 p-3">
-              <AlertTriangle size={14} className="mt-0.5 flex-shrink-0 text-red-600" />
+              <AlertTriangle size={14} className="mt-0.5 shrink-0 text-red-600" />
               <p className="text-xs text-red-700">{error}</p>
             </div>
           )}
         </div>
 
         {/* ===== FOOTER ===== */}
-        <div className="flex gap-3 border-t border-white/40 bg-white/30 p-6">
+        <div className="border-ella-muted/40 bg-ella-card/30 flex gap-3 border-t p-6">
           <button
             type="button"
-            className="flex-1 rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+            className="border-ella-muted bg-ella-card text-ella-navy hover:bg-ella-background/60 flex-1 rounded-md border px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50"
             onClick={onClose}
             disabled={saving}
           >
@@ -189,7 +185,7 @@ export const ManualCategoryModal = ({
           </button>
           <button
             type="button"
-            className="bg-ella-navy flex-1 rounded-md px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-60"
+            className="bg-ella-brand flex-1 rounded-md px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-60"
             onClick={handleConfirm}
             disabled={saving || !selectedCategory}
           >

@@ -2,7 +2,7 @@ export default function CookiePolicy() {
   const updatedAt = new Date().toLocaleDateString("pt-BR");
 
   return (
-    <div className="mx-auto max-w-4xl bg-white px-6 py-12 text-gray-800">
+    <div className="bg-ella-card text-ella-text mx-auto max-w-4xl px-6 py-12">
       <h1 className="mb-8 text-4xl font-bold">Política de Cookies</h1>
 
       <p className="mb-6 leading-relaxed">

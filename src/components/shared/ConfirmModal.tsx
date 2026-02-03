@@ -30,7 +30,7 @@ export function ConfirmModal({
 
   const confirmClassName =
     confirmVariant === "primary"
-      ? "bg-ella-navy hover:bg-ella-navy/90"
+      ? "bg-ella-brand hover:bg-ella-brand/90"
       : "bg-red-600 hover:bg-red-700";
 
   return (
@@ -39,7 +39,7 @@ export function ConfirmModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+        className="bg-ella-card w-full max-w-md rounded-2xl p-6 shadow-xl"
       >
         <div className="mb-3 flex items-start gap-3">
           <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
@@ -57,7 +57,7 @@ export function ConfirmModal({
           <button
             type="button"
             disabled={loading}
-            className="text-ella-subtile rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium disabled:opacity-60"
+            className="text-ella-subtile border-ella-muted rounded-lg border px-4 py-2 text-sm font-medium disabled:opacity-60"
             onClick={onCancel}
           >
             {cancelText}

@@ -18,7 +18,7 @@ export function BudgetRule5030202({ budget }: BudgetRule5030202Props) {
     <div className="space-y-6">
       <h3 className="text-ella-navy text-lg font-semibold">Regra 50/30/20</h3>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
+      <div className="border-ella-muted bg-ella-card rounded-lg border p-6">
         <div style={{ height: 300 }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -43,40 +43,40 @@ export function BudgetRule5030202({ budget }: BudgetRule5030202Props) {
       </div>
 
       <div className="space-y-3">
-        <div className="rounded-lg bg-blue-50 p-4">
+        <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-500/10">
           <div className="mb-2 flex justify-between">
-            <span className="font-medium text-blue-900">Necessidades</span>
+            <span className="font-medium text-blue-900 dark:text-blue-200">Necessidades</span>
             <span
               className={`font-bold ${budget.necessitiesPercentage <= 50 ? "text-green-600" : "text-red-600"}`}
             >
               {budget.necessitiesPercentage.toFixed(1)}%
             </span>
           </div>
-          <p className="text-sm text-blue-700">Recomendado: 50%</p>
+          <p className="text-sm text-blue-700 dark:text-blue-200/80">Recomendado: 50%</p>
         </div>
 
-        <div className="rounded-lg bg-amber-50 p-4">
+        <div className="rounded-lg bg-amber-50 p-4 dark:bg-amber-500/10">
           <div className="mb-2 flex justify-between">
-            <span className="font-medium text-amber-900">Desejos</span>
+            <span className="font-medium text-amber-900 dark:text-amber-200">Desejos</span>
             <span
               className={`font-bold ${budget.desiresPercentage <= 30 ? "text-green-600" : "text-red-600"}`}
             >
               {budget.desiresPercentage.toFixed(1)}%
             </span>
           </div>
-          <p className="text-sm text-amber-700">Recomendado: 30%</p>
+          <p className="text-sm text-amber-700 dark:text-amber-200/80">Recomendado: 30%</p>
         </div>
 
-        <div className="rounded-lg bg-green-50 p-4">
+        <div className="rounded-lg bg-green-50 p-4 dark:bg-green-500/10">
           <div className="mb-2 flex justify-between">
-            <span className="font-medium text-green-900">Investimentos</span>
+            <span className="font-medium text-green-900 dark:text-green-200">Investimentos</span>
             <span
               className={`font-bold ${budget.investmentsPercentage >= 20 ? "text-green-600" : "text-red-600"}`}
             >
               {budget.investmentsPercentage.toFixed(1)}%
             </span>
           </div>
-          <p className="text-sm text-green-700">Recomendado: 20%</p>
+          <p className="text-sm text-green-700 dark:text-green-200/80">Recomendado: 20%</p>
         </div>
       </div>
     </div>

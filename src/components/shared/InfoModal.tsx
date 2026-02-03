@@ -26,7 +26,7 @@ export function InfoModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+        className="bg-ella-card w-full max-w-md rounded-2xl p-6 shadow-xl"
       >
         <div className="mb-3 flex items-start gap-3">
           <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
@@ -43,7 +43,7 @@ export function InfoModal({
         <div className="mt-5 flex items-center justify-end gap-2">
           <button
             type="button"
-            className="bg-ella-navy hover:bg-ella-navy/90 rounded-lg px-4 py-2 text-sm font-medium text-white"
+            className="bg-ella-brand hover:bg-ella-brand/90 rounded-lg px-4 py-2 text-sm font-medium text-white"
             onClick={onClose}
           >
             {closeText}

@@ -361,7 +361,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
         <div className="flex items-center gap-2">
           <button
             onClick={openCreate}
-            className="bg-ella-navy hover:bg-ella-navy/90 rounded-lg px-4 py-2 text-sm font-medium text-white"
+            className="bg-ella-brand hover:bg-ella-brand/90 rounded-lg px-4 py-2 text-sm font-medium text-white"
           >
             Nova transação
           </button>
@@ -450,7 +450,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
         <div className="flex items-end gap-2 md:col-span-2 lg:col-span-4">
           <button
             onClick={() => setPage(0)}
-            className="bg-ella-navy hover:bg-ella-navy/90 rounded-lg px-4 py-2 text-sm font-medium text-white"
+            className="bg-ella-brand hover:bg-ella-brand/90 rounded-lg px-4 py-2 text-sm font-medium text-white"
           >
             Aplicar filtros
           </button>
@@ -468,7 +468,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
           <h4 className="text-ella-navy mb-3 text-sm font-semibold">Pagamento das faturas</h4>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {invoices.map((inv) => (
-              <div key={inv.id} className="rounded-lg bg-white/70 p-3">
+              <div key={inv.id} className="bg-ella-card/70 rounded-lg p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="text-ella-navy text-sm font-medium">{inv.cardName}</div>
@@ -568,7 +568,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
 
       <div className="overflow-x-auto">
         {groupedByCard.shouldGroup && (
-          <div className="mb-3 flex items-center justify-between rounded-xl border border-gray-200 bg-white/70 px-4 py-3">
+          <div className="border-ella-muted bg-ella-card/70 mb-3 flex items-center justify-between rounded-xl border px-4 py-3">
             <div className="text-ella-navy text-sm font-semibold">Total geral (fatura)</div>
             <div className="text-ella-navy text-sm font-bold">
               {formatCurrency(Math.abs(groupedByCard.grandTotal))}
@@ -599,7 +599,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
                       {formatDate(tx.purchaseDate ?? tx.transactionDate)}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-ella-subtile rounded bg-white px-2 py-1 text-xs">
+                      <span className="text-ella-subtile bg-ella-card/70 rounded px-2 py-1 text-xs">
                         {tx.category}
                       </span>
                     </td>
@@ -675,7 +675,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
                               {formatDate(tx.purchaseDate ?? tx.transactionDate)}
                             </td>
                             <td className="px-4 py-3">
-                              <span className="text-ella-subtile rounded bg-white px-2 py-1 text-xs">
+                              <span className="text-ella-subtile bg-ella-card/70 rounded px-2 py-1 text-xs">
                                 {tx.category}
                               </span>
                             </td>
@@ -771,7 +771,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
+          <div className="bg-ella-card w-full max-w-2xl rounded-2xl p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h4 className="text-ella-navy text-lg font-semibold">
@@ -895,7 +895,7 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
                 </button>
                 <button
                   type="submit"
-                  className="bg-ella-navy hover:bg-ella-navy/90 rounded-lg px-4 py-2 text-sm font-medium text-white"
+                  className="bg-ella-brand hover:bg-ella-brand/90 rounded-lg px-4 py-2 text-sm font-medium text-white"
                 >
                   {editing ? "Salvar alterações" : "Criar transação"}
                 </button>
@@ -907,14 +907,14 @@ export function TransactionsBoard({ personId, referenceDate, onRefresh }: Props)
 
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div className="bg-ella-card w-full max-w-md rounded-2xl p-6 shadow-xl">
             <h4 className="text-ella-navy mb-2 text-lg font-semibold">Confirmar exclusão</h4>
             <p className="text-ella-subtile mb-4 text-sm">
               Tem certeza que deseja excluir "{deleteTarget.description}"?
             </p>
             <div className="flex items-center justify-end gap-2">
               <button
-                className="text-ella-subtile rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium"
+                className="border-ella-muted text-ella-subtile rounded-lg border px-4 py-2 text-sm font-medium"
                 onClick={() => setDeleteTarget(null)}
               >
                 Cancelar
