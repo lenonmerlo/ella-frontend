@@ -32,6 +32,7 @@ import { tryParseISODateLike } from "../utils/date";
 import BudgetPage from "./BudgetPage";
 import InvestmentPage from "./InvestmentPage";
 import PatrimonioPage from "./PatrimonioPage";
+import ReportsPage from "./ReportsPage";
 import ScorePage from "./ScorePage";
 
 export default function DashboardPage() {
@@ -448,6 +449,10 @@ export default function DashboardPage() {
           {selectedSection === "investments" && <InvestmentPage />}
 
           {selectedSection === "patrimonio" && <PatrimonioPage />}
+
+          {selectedSection === "reports" && personId && (
+            <ReportsPage personId={personId} referenceDate={selectedDate} />
+          )}
         </div>
       </main>
       {showUpload && (

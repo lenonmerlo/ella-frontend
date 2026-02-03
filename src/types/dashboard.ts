@@ -57,6 +57,11 @@ export interface DashboardData {
 
 export type SectionId =
   | "overview"
+  | "score"
+  | "budget"
+  | "investments"
+  | "patrimonio"
+  | "reports"
   | "invoices"
   | "transactions"
   | "bank-statements"
