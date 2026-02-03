@@ -58,7 +58,7 @@ export function PrivacyView({ loading, error, history, onAccept }: Props) {
       <button
         onClick={onAccept}
         disabled={loading}
-        className="bg-ella-navy hover:bg-ella-navy/90 disabled:bg-ella-navy/50 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed"
+        className="bg-ella-brand hover:bg-ella-brand/90 disabled:bg-ella-brand/50 w-full rounded-xl px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed"
       >
         {loading ? "Carregando..." : "Concordo e continuar"}
       </button>

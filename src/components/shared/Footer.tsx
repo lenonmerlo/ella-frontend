@@ -4,7 +4,7 @@ export function Footer() {
     String(import.meta.env.VITE_PUBLIC_TESTING_NOTICE || "").toLowerCase() === "true";
 
   return (
-    <footer className="border-ella-muted text-ella-subtile border-t bg-white/70">
+    <footer className="border-ella-muted text-ella-subtile bg-ella-card/70 border-t">
       <div className="mx-auto max-w-5xl px-6 py-6 text-center text-xs leading-relaxed">
         <div>Desenvolvido por Lenon Merlo.</div>
         <div>

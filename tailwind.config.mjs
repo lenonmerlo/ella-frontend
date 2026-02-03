@@ -1,6 +1,7 @@
 // tailwind.config.mjs ou tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 const config = {
+  darkMode: ["class"],
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx,mdx}"],
   theme: {
     extend: {
@@ -8,6 +9,7 @@ const config = {
         poppins: ["Poppins", "system-ui", "sans-serif"],
       },
       colors: {
+        "ella-brand": "var(--color-ella-brand)",
         "ella-navy": "var(--color-ella-navy)",
         "ella-gold": "var(--color-ella-gold)",
         "ella-background": "var(--color-ella-background)",

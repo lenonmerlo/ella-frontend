@@ -5,6 +5,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CreditCard,
+  Landmark,
   ListTree,
   Sparkles,
   Target,
@@ -27,6 +28,7 @@ const ITEMS = [
   { id: "score", label: "Score ELLA", icon: Activity },
   { id: "budget", label: "Orçamento", icon: Wallet },
   { id: "investments", label: "Investimentos", icon: TrendingUp },
+  { id: "patrimonio", label: "Patrimônio", icon: Landmark },
   { id: "invoices", label: "Faturas de cartão", icon: CreditCard },
   { id: "transactions", label: "Lançamentos Cartão", icon: ListTree },
   { id: "bank-statements", label: "Movimentação C/C", icon: ListTree },
@@ -60,8 +62,8 @@ export function DashboardSidebar({
 
   const asideClassName =
     mode === "drawer"
-      ? "flex w-72 shrink-0 flex-col gap-2 rounded-2xl bg-white/95 p-4 shadow-sm"
-      : "hidden w-56 shrink-0 flex-col gap-2 rounded-2xl bg-white/90 p-4 shadow-sm lg:flex";
+      ? "flex w-72 shrink-0 flex-col gap-2 rounded-2xl bg-ella-card/95 p-4 shadow-sm"
+      : "hidden w-56 shrink-0 flex-col gap-2 rounded-2xl bg-ella-card/90 p-4 shadow-sm lg:flex";
 
   return (
     <aside className={asideClassName}>
@@ -69,7 +71,7 @@ export function DashboardSidebar({
         <div className="bg-ella-background/50 mb-4 flex items-center justify-between rounded-xl p-2">
           <button
             onClick={handlePrevMonth}
-            className="rounded-lg p-1 transition-colors hover:bg-white"
+            className="hover:bg-ella-background/60 rounded-lg p-1 transition-colors"
             title="Mês anterior"
           >
             <ChevronLeft size={16} className="text-ella-navy" />
@@ -77,7 +79,7 @@ export function DashboardSidebar({
           <span className="text-ella-navy text-sm font-medium capitalize">{monthLabel}</span>
           <button
             onClick={handleNextMonth}
-            className="rounded-lg p-1 transition-colors hover:bg-white"
+            className="hover:bg-ella-background/60 rounded-lg p-1 transition-colors"
             title="Próximo mês"
           >
             <ChevronRight size={16} className="text-ella-navy" />
@@ -100,7 +102,9 @@ export function DashboardSidebar({
               type="button"
               onClick={() => onSelect?.(item.id)}
               className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
-                isActive ? "bg-ella-navy text-white" : "text-ella-subtile hover:bg-ella-background"
+                isActive
+                  ? "bg-ella-brand text-white"
+                  : "text-ella-subtile hover:bg-ella-background/60"
               }`}
             >
               <Icon size={18} className={isActive ? "text-ella-gold" : "text-ella-subtile"} />

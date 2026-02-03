@@ -1,6 +1,7 @@
 // src/components/dashboard/DashboardHeader.tsx
 import { LogOut, Sparkles, Upload } from "lucide-react";
 import { Logo } from "../Logo";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface Props {
   userName: string;
@@ -18,18 +19,19 @@ export function DashboardHeader({
   onFileUpload,
 }: Props) {
   const firstLetter = userName?.charAt(0).toUpperCase() || "U";
+  const { theme } = useTheme();
 
   return (
-    <header className="border-ella-muted border-b bg-white shadow-sm">
+    <header className="border-ella-muted bg-ella-card border-b shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
           <div
             className="flex h-10 w-10 items-center justify-center rounded-full"
-            style={{ backgroundColor: "#0E1A2B" }}
+            style={{ backgroundColor: "var(--color-ella-brand)" }}
           >
             <Sparkles size={24} style={{ color: "#C9A43B" }} />
           </div>
-          <Logo variant="horizontal" size="small" />
+          <Logo variant="horizontal" size="small" inverted={theme === "dark"} />
         </div>
 
         <div className="flex items-center gap-4">

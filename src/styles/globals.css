@@ -7,8 +7,13 @@ body {
   padding: 0;
 }
 
+body {
+  @apply bg-ella-background text-ella-text;
+}
+
 /* 🎨 Paleta da ELLA usando Tailwind v4 (@theme) */
 @theme {
+  --color-ella-brand: #0e1a2b;
   --color-ella-navy: #0e1a2b;
   --color-ella-gold: #c9a43b;
   --color-ella-background: #f5f5f7;
@@ -16,6 +21,15 @@ body {
   --color-ella-muted: #e1e1e6;
   --color-ella-text: #111827;
   --color-ella-subtile: #4b5563;
+}
+
+.dark {
+  --color-ella-navy: #e5e7eb;
+  --color-ella-background: #0b1220;
+  --color-ella-card: #0f172a;
+  --color-ella-muted: #1f2937;
+  --color-ella-text: #e5e7eb;
+  --color-ella-subtile: #94a3b8;
 }
 
 .ella-gradient-bg {
@@ -26,6 +40,14 @@ body {
   background-color: #f5f5f7;
 }
 
+.dark .ella-gradient-bg {
+  background:
+    linear-gradient(135deg, #0b1220 0%, #0f172a 40%, #0b1220 100%),
+    radial-gradient(circle at top left, #c9a43b22, transparent 55%),
+    radial-gradient(circle at bottom right, #0e1a2b55, transparent 55%);
+  background-color: #0b1220;
+}
+
 /* glass */
 .ella-glass {
   background-color: rgba(255, 255, 255, 0.85);
@@ -33,4 +55,10 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(18px);
+}
+
+.dark .ella-glass {
+  background-color: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
 }
