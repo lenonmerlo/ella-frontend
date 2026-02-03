@@ -68,27 +68,39 @@ export function SmartCategoryChart({
     defaultChartType(categoryCount),
   );
 
-  const axisTickStyle = useMemo(() => ({
-    fill: "var(--color-ella-subtile)",
-    fontSize: 12,
-  }), []);
+  const axisTickStyle = useMemo(
+    () => ({
+      fill: "var(--color-ella-subtile)",
+      fontSize: 12,
+    }),
+    [],
+  );
 
-  const tooltipContentStyle = useMemo(() => ({
-    backgroundColor: isDark ? "rgba(15, 23, 42, 0.96)" : "rgba(255, 255, 255, 0.96)",
-    border: "1px solid var(--color-ella-muted)",
-    borderRadius: "8px",
-    padding: "8px 12px",
-    color: "var(--color-ella-text)",
-  }), [isDark]);
+  const tooltipContentStyle = useMemo(
+    () => ({
+      backgroundColor: isDark ? "rgba(15, 23, 42, 0.96)" : "rgba(255, 255, 255, 0.96)",
+      border: "1px solid var(--color-ella-muted)",
+      borderRadius: "8px",
+      padding: "8px 12px",
+      color: "var(--color-ella-text)",
+    }),
+    [isDark],
+  );
 
-  const tooltipLabelStyle = useMemo(() => ({
-    color: "var(--color-ella-text)",
-    fontWeight: 600,
-  }), []);
+  const tooltipLabelStyle = useMemo(
+    () => ({
+      color: "var(--color-ella-text)",
+      fontWeight: 600,
+    }),
+    [],
+  );
 
-  const tooltipItemStyle = useMemo(() => ({
-    color: "var(--color-ella-text)",
-  }), []);
+  const tooltipItemStyle = useMemo(
+    () => ({
+      color: "var(--color-ella-text)",
+    }),
+    [],
+  );
 
   const legendFormatter = useMemo(
     () => (value: string) => <span style={{ color: "var(--color-ella-text)" }}>{value}</span>,
@@ -323,7 +335,9 @@ export function SmartCategoryChart({
                 {chartData.items.map((item, idx) => (
                   <tr key={`${item.name}-${idx}`} className="border-ella-muted/60 border-t">
                     <td className="text-ella-navy py-2 pr-3">{item.name}</td>
-                    <td className="text-ella-navy py-2 pr-3">{formatMoney(item.value, currency)}</td>
+                    <td className="text-ella-navy py-2 pr-3">
+                      {formatMoney(item.value, currency)}
+                    </td>
                     <td className="text-ella-subtile py-2">{item.percentage.toFixed(1)}%</td>
                   </tr>
                 ))}

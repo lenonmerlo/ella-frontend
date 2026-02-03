@@ -1,7 +1,7 @@
 import { Logo } from "@/components/Logo";
 import { useTheme } from "@/contexts/ThemeContext";
-import { type ReactNode, useMemo } from "react";
 import { Moon, Sun } from "lucide-react";
+import { type ReactNode, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 function PrimaryButton({

@@ -28,7 +28,6 @@ import {
   fetchBankStatementsDashboard,
   type BankStatementDashboardResponseDTO,
 } from "../services/api/bankStatementsDashboardService";
-import { updateTransaction } from "../services/api/transactionsService";
 import { tryParseISODateLike } from "../utils/date";
 import BudgetPage from "./BudgetPage";
 import InvestmentPage from "./InvestmentPage";

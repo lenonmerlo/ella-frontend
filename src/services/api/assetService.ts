@@ -1,9 +1,5 @@
 import { http } from "../../lib/http";
-import type {
-  AssetRequest,
-  AssetResponse,
-  AssetTotalValueResponse,
-} from "../../types/asset";
+import type { AssetRequest, AssetResponse, AssetTotalValueResponse } from "../../types/asset";
 
 function unwrap<T>(data: any): T {
   return (data?.data ?? data) as T;

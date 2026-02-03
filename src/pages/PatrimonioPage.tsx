@@ -134,7 +134,9 @@ export default function PatrimonioPage() {
             </div>
           ) : (
             <div className="bg-ella-card/60 rounded-2xl p-8 text-center shadow-sm">
-              <p className="text-ella-subtile mb-4 text-sm">Você ainda não tem ativos cadastrados.</p>
+              <p className="text-ella-subtile mb-4 text-sm">
+                Você ainda não tem ativos cadastrados.
+              </p>
               <button
                 type="button"
                 onClick={() => setShowForm(true)}

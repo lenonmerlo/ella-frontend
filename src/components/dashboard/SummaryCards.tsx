@@ -118,7 +118,7 @@ export function SummaryCards({
       ? budget.isHealthy
         ? "Saudável"
         : "Atenção"
-      : "Não configurado";
+      : "Crie seu orçamento";
   const budgetStatusColor = budget?.isHealthy
     ? "text-green-600"
     : budget
@@ -252,13 +252,15 @@ export function SummaryCards({
           <span className="text-ella-subtile text-xs font-medium uppercase">orçamento</span>
         </div>
         <p className="text-ella-subtile mb-1 text-sm">Regra 50/30/20</p>
-        <p className={`text-2xl font-bold whitespace-nowrap lg:text-3xl ${budgetStatusColor}`}>
+        <p
+          className={`text-2xl leading-tight font-bold wrap-break-word whitespace-normal lg:text-3xl ${budgetStatusColor}`}
+        >
           {budgetStatusText}
         </p>
         <p className="text-ella-subtile mt-1 line-clamp-2 text-xs">
           {budget?.recommendation
             ? budget.recommendation
-            : "Defina seu orçamento e acompanhe seus percentuais."}
+            : "Defina limites para cada categoria e acompanhe seus gastos."}
         </p>
         {onOpenBudget && (
           <button

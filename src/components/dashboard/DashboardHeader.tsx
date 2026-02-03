@@ -1,7 +1,7 @@
 // src/components/dashboard/DashboardHeader.tsx
 import { LogOut, Sparkles, Upload } from "lucide-react";
-import { Logo } from "../Logo";
 import { useTheme } from "../../contexts/ThemeContext";
+import { Logo } from "../Logo";
 
 interface Props {
   userName: string;

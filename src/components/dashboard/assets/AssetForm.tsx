@@ -159,7 +159,9 @@ export function AssetForm({ personId, asset, onSuccess, onCancel }: AssetFormPro
         </div>
 
         <div>
-          <label className="text-ella-subtile mb-1 block text-xs font-medium">Valor de compra</label>
+          <label className="text-ella-subtile mb-1 block text-xs font-medium">
+            Valor de compra
+          </label>
           <input
             type="text"
             inputMode="decimal"
