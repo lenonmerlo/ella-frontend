@@ -26,6 +26,10 @@ export interface MonthlyPointDTO {
   monthLabel: string;
   income: number;
   expenses: number;
+
+  incomeChecking?: number;
+  expensesChecking?: number;
+  expensesCard?: number;
 }
 
 export interface MonthlyEvolutionDTO {

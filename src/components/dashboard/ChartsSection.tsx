@@ -22,11 +22,19 @@ export function ChartsSection({ data }: Props) {
     value: item.total,
   }));
 
-  const monthlyData = data.monthlyEvolution.points.map((m) => ({
-    month: m.monthLabel,
-    receitas: m.income,
-    despesas: m.expenses,
-  }));
+  const monthlyData = data.monthlyEvolution.points.map((m) => {
+    const despesasConta = m.expensesChecking ?? m.expenses;
+    const despesasCartao = m.expensesCard ?? 0;
+    const despesasTotal = m.expenses;
+
+    return {
+      month: m.monthLabel,
+      receitas: m.income,
+      despesasConta,
+      despesasCartao,
+      despesas: despesasTotal,
+    };
+  });
 
   const formatMonth = (label: string) => {
     // Espera "YYYY-MM"; se falhar, devolve original
@@ -76,11 +84,20 @@ export function ChartsSection({ data }: Props) {
                 barSize={20}
               />
               <Bar
-                dataKey="despesas"
-                name="Despesas"
+                dataKey="despesasConta"
+                name="Despesas (C/C)"
                 fill="#EF4444"
                 radius={[4, 4, 0, 0]}
                 barSize={20}
+                stackId="despesas"
+              />
+              <Bar
+                dataKey="despesasCartao"
+                name="Despesas (Cartão)"
+                fill="#F97316"
+                radius={[4, 4, 0, 0]}
+                barSize={20}
+                stackId="despesas"
               />
             </BarChart>
           </ResponsiveContainer>
