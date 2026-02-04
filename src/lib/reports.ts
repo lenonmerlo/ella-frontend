@@ -1,5 +1,5 @@
-import { http } from "./http";
 import type { ApiResponse, ReportListItem, ReportResponse, ReportType } from "../types/reports";
+import { http } from "./http";
 
 export async function generateReport(personId: string, type: ReportType, date: Date) {
   const year = date.getFullYear();

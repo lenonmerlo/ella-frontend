@@ -26,17 +26,17 @@ interface Props {
 
 const ITEMS = [
   { id: "overview", label: "Saúde financeira", icon: Activity },
-  { id: "score", label: "Score ELLA", icon: Activity },
-  { id: "budget", label: "Orçamento", icon: Wallet },
+  { id: "invoices", label: "Faturas de cartão", icon: CreditCard },
+  { id: "transactions", label: "Lançamentos cartão", icon: ListTree },
+  { id: "bank-statements", label: "Movimentação conta", icon: ListTree },
+  { id: "charts", label: "Gráficos", icon: BarChart3 },
+  { id: "insights", label: "Insights da Ella", icon: Sparkles },
+  { id: "goals", label: "Metas", icon: Target },
+  { id: "score", label: "Score Ella", icon: Activity },
   { id: "investments", label: "Investimentos", icon: TrendingUp },
+  { id: "budget", label: "Orçamento", icon: Wallet },
   { id: "patrimonio", label: "Patrimônio", icon: Landmark },
   { id: "reports", label: "Relatórios", icon: FileText },
-  { id: "invoices", label: "Faturas de cartão", icon: CreditCard },
-  { id: "transactions", label: "Lançamentos Cartão", icon: ListTree },
-  { id: "bank-statements", label: "Movimentação C/C", icon: ListTree },
-  { id: "charts", label: "Gráficos", icon: BarChart3 },
-  { id: "goals", label: "Metas", icon: Target },
-  { id: "insights", label: "Insights da Ella", icon: Sparkles },
 ];
 
 export function DashboardSidebar({

@@ -1,7 +1,12 @@
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useEffect, useMemo, useState } from "react";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { downloadReportPdf, generateReport, getReport, listReports } from "../lib/reports";
-import type { BankStatementTransaction, ReportListItem, ReportResponse, ReportType } from "../types/reports";
+import type {
+  BankStatementTransaction,
+  ReportListItem,
+  ReportResponse,
+  ReportType,
+} from "../types/reports";
 
 function formatMoneyBRL(value: number | null | undefined) {
   const v = Number(value ?? 0);
@@ -146,7 +151,7 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
               type="button"
               onClick={onGenerate}
               disabled={isGenerating}
-              className="bg-ella-brand text-white hover:bg-ella-brand/90 rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-60"
+              className="bg-ella-brand hover:bg-ella-brand/90 rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
             >
               {isGenerating ? "Gerando..." : "Gerar"}
             </button>
@@ -163,7 +168,7 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
           </div>
         </div>
 
-        {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
+        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -194,10 +199,12 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
           )}
         </div>
 
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {!selected ? (
             <div className="bg-ella-card rounded-2xl p-6 shadow-sm">
-              <p className="text-ella-subtile text-sm">Selecione ou gere um relatório para ver detalhes.</p>
+              <p className="text-ella-subtile text-sm">
+                Selecione ou gere um relatório para ver detalhes.
+              </p>
             </div>
           ) : (
             <>
@@ -206,7 +213,8 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
                   <div>
                     <h3 className="text-ella-navy text-lg font-semibold">{selected.title}</h3>
                     <p className="text-ella-subtile text-sm">
-                      Período: {formatDateBR(selected.periodStart)} – {formatDateBR(selected.periodEnd)}
+                      Período: {formatDateBR(selected.periodStart)} –{" "}
+                      {formatDateBR(selected.periodEnd)}
                     </p>
                   </div>
                   <button
@@ -222,13 +230,17 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
 
                 <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <div className="bg-ella-background/50 rounded-2xl p-4">
-                    <p className="text-ella-subtile text-xs font-semibold tracking-wide">RECEITAS</p>
+                    <p className="text-ella-subtile text-xs font-semibold tracking-wide">
+                      RECEITAS
+                    </p>
                     <p className="text-ella-navy mt-1 text-lg font-bold">
                       {formatMoneyBRL(selected.summary?.totalIncome)}
                     </p>
                   </div>
                   <div className="bg-ella-background/50 rounded-2xl p-4">
-                    <p className="text-ella-subtile text-xs font-semibold tracking-wide">DESPESAS</p>
+                    <p className="text-ella-subtile text-xs font-semibold tracking-wide">
+                      DESPESAS
+                    </p>
                     <p className="text-ella-navy mt-1 text-lg font-bold">
                       {formatMoneyBRL(selected.summary?.totalExpenses)}
                     </p>
@@ -261,7 +273,9 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
               </div>
 
               <div className="bg-ella-card rounded-2xl p-6 shadow-sm">
-                <h4 className="text-ella-navy mb-4 text-sm font-semibold">Receitas por categoria</h4>
+                <h4 className="text-ella-navy mb-4 text-sm font-semibold">
+                  Receitas por categoria
+                </h4>
                 {!incomeChartData.length ? (
                   <p className="text-ella-subtile text-sm">Sem receitas no período.</p>
                 ) : (
@@ -286,19 +300,25 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
                   <>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                       <div className="bg-ella-background/50 rounded-2xl p-4">
-                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">RENDA (PLANEJADA)</p>
+                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">
+                          RENDA (PLANEJADA)
+                        </p>
                         <p className="text-ella-navy mt-1 text-lg font-bold">
                           {formatMoneyBRL(budget?.income)}
                         </p>
                       </div>
                       <div className="bg-ella-background/50 rounded-2xl p-4">
-                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">TOTAL (PLANEJADO)</p>
+                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">
+                          TOTAL (PLANEJADO)
+                        </p>
                         <p className="text-ella-navy mt-1 text-lg font-bold">
                           {formatMoneyBRL(budget?.total)}
                         </p>
                       </div>
                       <div className="bg-ella-background/50 rounded-2xl p-4">
-                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">SALDO (PLANEJADO)</p>
+                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">
+                          SALDO (PLANEJADO)
+                        </p>
                         <p className="text-ella-navy mt-1 text-lg font-bold">
                           {formatMoneyBRL(budget?.balance)}
                         </p>
@@ -314,33 +334,37 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
                             <th className="py-2 text-right font-semibold">%</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-ella-muted/40">
+                        <tbody className="divide-ella-muted/40 divide-y">
                           <tr>
-                            <td className="py-2 text-ella-navy font-medium">Necessidades</td>
-                            <td className="py-2 text-right text-ella-navy">
+                            <td className="text-ella-navy py-2 font-medium">Necessidades</td>
+                            <td className="text-ella-navy py-2 text-right">
                               {formatMoneyBRL(budgetNeedsTotal)}
                             </td>
-                            <td className="py-2 text-right text-ella-subtile">
+                            <td className="text-ella-subtile py-2 text-right">
                               {formatPercent(budget?.necessitiesPercentage)}
                             </td>
                           </tr>
                           <tr>
-                            <td className="py-2 text-ella-navy font-medium">Desejos</td>
-                            <td className="py-2 text-right text-ella-navy">
+                            <td className="text-ella-navy py-2 font-medium">Desejos</td>
+                            <td className="text-ella-navy py-2 text-right">
                               {formatMoneyBRL(budget?.variableFixedCost)}
                             </td>
-                            <td className="py-2 text-right text-ella-subtile">
+                            <td className="text-ella-subtile py-2 text-right">
                               {formatPercent(budget?.desiresPercentage)}
                             </td>
                           </tr>
                           <tr>
-                            <td className="py-2 text-ella-navy font-medium">Investimentos</td>
-                            <td className="py-2 text-right text-ella-navy">
+                            <td className="text-ella-navy py-2 font-medium">Investimentos</td>
+                            <td className="text-ella-navy py-2 text-right">
                               {formatMoneyBRL(
-                                sumNumbers(budget?.investment, budget?.plannedPurchase, budget?.protection)
+                                sumNumbers(
+                                  budget?.investment,
+                                  budget?.plannedPurchase,
+                                  budget?.protection,
+                                ),
                               )}
                             </td>
-                            <td className="py-2 text-right text-ella-subtile">
+                            <td className="text-ella-subtile py-2 text-right">
                               {formatPercent(budget?.investmentsPercentage)}
                             </td>
                           </tr>
@@ -349,33 +373,45 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
                     </div>
 
                     {!!budget?.updatedAt && (
-                      <p className="text-ella-subtile mt-3 text-xs">Atualizado em {formatDateBR(budget.updatedAt)}</p>
+                      <p className="text-ella-subtile mt-3 text-xs">
+                        Atualizado em {formatDateBR(budget.updatedAt)}
+                      </p>
                     )}
                   </>
                 )}
               </div>
 
               <div className="bg-ella-card rounded-2xl p-6 shadow-sm">
-                <h4 className="text-ella-navy mb-4 text-sm font-semibold">Movimentação de conta corrente</h4>
+                <h4 className="text-ella-navy mb-4 text-sm font-semibold">
+                  Movimentação de conta corrente
+                </h4>
                 {!bankStatements || !bankSummary ? (
-                  <p className="text-ella-subtile text-sm">Sem dados de conta corrente no período.</p>
+                  <p className="text-ella-subtile text-sm">
+                    Sem dados de conta corrente no período.
+                  </p>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                       <div className="bg-ella-background/50 rounded-2xl p-4">
-                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">ENTRADAS</p>
+                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">
+                          ENTRADAS
+                        </p>
                         <p className="text-ella-navy mt-1 text-lg font-bold">
                           {formatMoneyBRL(bankSummary.totalIncome)}
                         </p>
                       </div>
                       <div className="bg-ella-background/50 rounded-2xl p-4">
-                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">SAÍDAS</p>
+                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">
+                          SAÍDAS
+                        </p>
                         <p className="text-ella-navy mt-1 text-lg font-bold">
                           {formatMoneyBRL(bankSummary.totalExpenses)}
                         </p>
                       </div>
                       <div className="bg-ella-background/50 rounded-2xl p-4">
-                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">SALDO DO PERÍODO</p>
+                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">
+                          SALDO DO PERÍODO
+                        </p>
                         <p className="text-ella-navy mt-1 text-lg font-bold">
                           {formatMoneyBRL(bankSummary.balance)}
                         </p>
@@ -384,13 +420,17 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
 
                     <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div className="bg-ella-background/40 rounded-2xl p-4">
-                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">SALDO INICIAL</p>
+                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">
+                          SALDO INICIAL
+                        </p>
                         <p className="text-ella-navy mt-1 text-base font-bold">
                           {formatMoneyBRL(bankSummary.openingBalance as any)}
                         </p>
                       </div>
                       <div className="bg-ella-background/40 rounded-2xl p-4">
-                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">SALDO FINAL</p>
+                        <p className="text-ella-subtile text-xs font-semibold tracking-wide">
+                          SALDO FINAL
+                        </p>
                         <p className="text-ella-navy mt-1 text-base font-bold">
                           {formatMoneyBRL(bankSummary.closingBalance as any)}
                         </p>
@@ -398,7 +438,8 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
                     </div>
 
                     <p className="text-ella-subtile mt-3 text-xs">
-                      Transações: {Number(bankSummary.transactionCount ?? bankTransactions.length)} (mostrando até 40)
+                      Transações: {Number(bankSummary.transactionCount ?? bankTransactions.length)}{" "}
+                      (mostrando até 40)
                     </p>
 
                     <div className="mt-3 overflow-x-auto">
@@ -411,27 +452,29 @@ export default function ReportsPage({ personId, referenceDate }: Props) {
                             <th className="py-2 text-right font-semibold">Saldo</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-ella-muted/40">
+                        <tbody className="divide-ella-muted/40 divide-y">
                           {!bankTransactions.length ? (
                             <tr>
-                              <td className="py-2 text-ella-subtile" colSpan={4}>
+                              <td className="text-ella-subtile py-2" colSpan={4}>
                                 Sem transações no período.
                               </td>
                             </tr>
                           ) : (
                             bankTransactions.slice(0, 40).map((t) => (
-                              <tr key={t.id ?? `${t.transactionDate}-${t.description}`}
-                                  className="align-top">
-                                <td className="py-2 text-ella-navy whitespace-nowrap">
+                              <tr
+                                key={t.id ?? `${t.transactionDate}-${t.description}`}
+                                className="align-top"
+                              >
+                                <td className="text-ella-navy py-2 whitespace-nowrap">
                                   {formatDateBR(t.transactionDate)}
                                 </td>
-                                <td className="py-2 text-ella-navy min-w-[260px]">
+                                <td className="text-ella-navy min-w-[260px] py-2">
                                   {t.description ?? ""}
                                 </td>
-                                <td className="py-2 text-right text-ella-navy whitespace-nowrap">
+                                <td className="text-ella-navy py-2 text-right whitespace-nowrap">
                                   {formatMoneyBRL(t.amount)}
                                 </td>
-                                <td className="py-2 text-right text-ella-subtile whitespace-nowrap">
+                                <td className="text-ella-subtile py-2 text-right whitespace-nowrap">
                                   {formatMoneyBRL(t.balance)}
                                 </td>
                               </tr>
