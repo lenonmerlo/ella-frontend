@@ -1,8 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { ThemeProvider } from "../../contexts/ThemeContext";
 import { SmartCategoryChart } from "./SmartCategoryChart";
 
 describe("SmartCategoryChart", () => {
+  function renderChart(data: Array<{ name: string; value: number }>) {
+    return render(
+      <ThemeProvider>
+        <SmartCategoryChart data={data} />
+      </ThemeProvider>,
+    );
+  }
+
   it("renders pie chart info for 3 categories", () => {
     const data = [
       { name: "Alimentação", value: 1000 },
@@ -10,7 +19,7 @@ describe("SmartCategoryChart", () => {
       { name: "Saúde", value: 300 },
     ];
 
-    render(<SmartCategoryChart data={data} />);
+    renderChart(data);
 
     expect(screen.getByText(/Categorias:\s*3/i)).toBeInTheDocument();
     expect(screen.getByText(/Visualização:\s*Pizza/i)).toBeInTheDocument();
@@ -22,7 +31,7 @@ describe("SmartCategoryChart", () => {
       value: 1000 - i * 10,
     }));
 
-    render(<SmartCategoryChart data={data} />);
+    renderChart(data);
 
     expect(screen.getByText(/Categorias:\s*10/i)).toBeInTheDocument();
     expect(screen.getByText(/Visualização:\s*Barras Horizontais/i)).toBeInTheDocument();
@@ -34,7 +43,7 @@ describe("SmartCategoryChart", () => {
       value: 1000 - i * 10,
     }));
 
-    render(<SmartCategoryChart data={data} />);
+    renderChart(data);
 
     expect(screen.getByText(/Categorias:\s*20/i)).toBeInTheDocument();
     expect(screen.getByText(/Visualização:\s*Treemap/i)).toBeInTheDocument();
