@@ -1,5 +1,5 @@
-import { AppRoutes } from "./routes";
 import { DialogProvider } from "./contexts/DialogContext";
+import { AppRoutes } from "./routes";
 import "./styles/globals.css";
 
 function App() {

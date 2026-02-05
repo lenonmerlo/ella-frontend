@@ -6,6 +6,7 @@ import HomePage from "../pages/Home";
 import PrivacyPage from "../pages/PrivacyPage";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
 import TermsOfService from "../pages/TermsOfService";
+import { AdminRoutes } from "./AdminRoutes";
 import { AuthRoutes } from "./AuthRoutes";
 import { DashboardRoutes } from "./DashboardRoutes";
 
@@ -37,6 +38,21 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
   return children;
 }
 
+function AdminRoute({ children }: { children: JSX.Element }) {
+  const { user, loadingProfile: loading } = useAuth();
+
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
+  const isAdmin = String(user?.role ?? "").toUpperCase() === "ADMIN";
+  if (!user || !isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
+
 export function AppRoutes() {
   return (
     <AuthProvider>
@@ -46,6 +62,16 @@ export function AppRoutes() {
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/auth/*" element={<AuthRoutes />} />
+        <Route
+          path="/admin/*"
+          element={
+            <PrivateRoute>
+              <AdminRoute>
+                <AdminRoutes />
+              </AdminRoute>
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/*"
           element={

@@ -9,6 +9,8 @@ export function Header() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
+  const isAdmin = String(user?.role ?? "").toUpperCase() === "ADMIN";
+
   function handleLogout() {
     void logout();
   }
@@ -53,6 +55,14 @@ export function Header() {
             >
               Config
             </button>
+            {isAdmin ? (
+              <button
+                onClick={() => navigate("/admin")}
+                className="border-ella-muted text-ella-subtile hover:bg-ella-background hover:text-ella-navy rounded-full border px-3 py-1 text-xs transition"
+              >
+                Admin
+              </button>
+            ) : null}
             <button
               onClick={handleLogout}
               className="border-ella-muted text-ella-subtile hover:bg-ella-background hover:text-ella-navy rounded-full border px-3 py-1 text-xs transition"
