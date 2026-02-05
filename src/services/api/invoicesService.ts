@@ -20,6 +20,11 @@ export async function updateInvoicePayment(invoiceId: string, paid: boolean, pai
   return res.data.data;
 }
 
+export async function deleteInvoice(invoiceId: string) {
+  const res = await http.delete<{ data: any }>(`/invoices/${invoiceId}`);
+  return res.data.data;
+}
+
 export interface InvoiceInsightsDTO {
   spendingByCategory: Record<string, number>;
   /** ex.: 0.18 para +18% vs mês anterior */

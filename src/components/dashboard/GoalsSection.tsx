@@ -2,6 +2,7 @@
 import { Pencil, Plus, Target, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { useDialog } from "../../contexts/DialogContext";
 import { GoalProgressDTO } from "../../lib/dashboard";
 import { createGoal, deleteGoal, updateGoal } from "../../services/api/goalsService";
 
@@ -12,6 +13,7 @@ interface GoalsSectionProps {
 
 export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
   const { user } = useAuth();
+  const dialog = useDialog();
   const [showForm, setShowForm] = useState(false);
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState({
@@ -76,7 +78,10 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
       onRefresh();
     } catch (error) {
       console.error("Erro ao criar meta:", error);
-      alert("Erro ao criar meta");
+      void dialog.alert({
+        title: "Não foi possível criar a meta",
+        message: "Tente novamente em instantes.",
+      });
     }
   }
 
@@ -110,12 +115,22 @@ export function GoalsSection({ goals, onRefresh }: GoalsSectionProps) {
       onRefresh();
     } catch (error) {
       console.error("Erro ao atualizar meta:", error);
-      alert("Erro ao atualizar meta");
+      void dialog.alert({
+        title: "Não foi possível atualizar a meta",
+        message: "Tente novamente em instantes.",
+      });
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Tem certeza que deseja excluir esta meta?")) return;
+    const ok = await dialog.confirm({
+      title: "Excluir meta",
+      message: "Tem certeza que deseja excluir esta meta?",
+      confirmText: "Excluir",
+      cancelText: "Cancelar",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       await deleteGoal(id);
       onRefresh();

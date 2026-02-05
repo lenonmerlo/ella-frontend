@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useDialog } from "../contexts/DialogContext";
 import { http } from "../lib/http";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
   const { user, logout, loadProfile } = useAuth();
+  const dialog = useDialog();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -98,9 +100,14 @@ export default function SettingsPage() {
   }
 
   async function handleDeleteAccount() {
-    if (!window.confirm("Tem certeza que deseja deletar sua conta? Esta ação é irreversível.")) {
-      return;
-    }
+    const ok = await dialog.confirm({
+      title: "Deletar conta",
+      message: "Tem certeza que deseja deletar sua conta? Esta ação é irreversível.",
+      confirmText: "Deletar",
+      cancelText: "Cancelar",
+      variant: "danger",
+    });
+    if (!ok) return;
 
     setLoading(true);
     setError(null);

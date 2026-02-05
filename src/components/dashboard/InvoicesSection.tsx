@@ -1,7 +1,12 @@
 // src/components/dashboard/InvoicesSection.tsx
 import { ChevronRight, CreditCard } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { fetchInvoiceInsights, updateInvoicePayment } from "../../services/api/invoicesService";
+import { useDialog } from "../../contexts/DialogContext";
+import {
+  deleteInvoice,
+  fetchInvoiceInsights,
+  updateInvoicePayment,
+} from "../../services/api/invoicesService";
 import { DashboardInvoice } from "../../types/dashboard";
 import { formatDatePtBR } from "../../utils/date";
 
@@ -11,8 +16,10 @@ interface InvoicesSectionProps {
 }
 
 export function InvoicesSection({ invoices = [], onRefresh }: InvoicesSectionProps) {
+  const dialog = useDialog();
   const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
   const [insightsError, setInsightsError] = useState<string | null>(null);
   const [insights, setInsights] = useState<Awaited<ReturnType<typeof fetchInvoiceInsights>> | null>(
@@ -199,6 +206,47 @@ export function InvoicesSection({ invoices = [], onRefresh }: InvoicesSectionPro
               Fechar
             </button>
           </div>
+
+          {selectedInvoiceObj?.invoiceId && (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-ella-subtile text-xs">
+                Excluir esta fatura remove também todos os lançamentos vinculados.
+              </p>
+              <button
+                type="button"
+                disabled={deleting === selectedInvoiceObj.id}
+                onClick={async () => {
+                  const invoiceId = selectedInvoiceObj.invoiceId;
+                  if (!invoiceId) return;
+
+                  const ok = await dialog.confirm({
+                    title: "Excluir fatura",
+                    message:
+                      "Excluir esta fatura? Isso também excluirá todos os lançamentos dessa fatura.",
+                    confirmText: "Excluir",
+                    cancelText: "Cancelar",
+                    variant: "danger",
+                  });
+                  if (!ok) return;
+
+                  try {
+                    setDeleting(selectedInvoiceObj.id);
+                    await deleteInvoice(invoiceId);
+                    setSelectedInvoice(null);
+                    onRefresh?.();
+                  } catch (e) {
+                    console.error(e);
+                    setInsightsError("Erro ao excluir fatura");
+                  } finally {
+                    setDeleting(null);
+                  }
+                }}
+                className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-60"
+              >
+                {deleting === selectedInvoiceObj.id ? "Excluindo..." : "Excluir fatura"}
+              </button>
+            </div>
+          )}
 
           {!selectedInvoiceObj?.invoiceId && (
             <div className="mt-4 rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
