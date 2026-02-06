@@ -52,7 +52,7 @@ export function BudgetSummary({ budget }: BudgetSummaryProps) {
             <span className="font-medium">{formatCurrency(budget.necessaryFixedCost)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-ella-subtile">Custo Fixo Variável</span>
+            <span className="text-ella-subtile">Custo Variável</span>
             <span className="font-medium">{formatCurrency(budget.variableFixedCost)}</span>
           </div>
           <div className="flex justify-between">

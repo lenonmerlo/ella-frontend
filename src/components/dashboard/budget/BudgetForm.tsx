@@ -36,7 +36,7 @@ const FIELDS: Field[] = [
     label: "Custo Fixo Necessário",
     hint: "Saúde, internet, seguro de carro",
   },
-  { key: "variableFixedCost", label: "Custo Fixo Variável", hint: "Lazer, entretenimento" },
+  { key: "variableFixedCost", label: "Custo Variável", hint: "Lazer, entretenimento" },
   {
     key: "investment",
     label: "Investimento",
