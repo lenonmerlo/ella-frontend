@@ -173,7 +173,9 @@ export default function AdminAlertsPage() {
                   <tr key={row.userId} className="hover:bg-ella-background/30">
                     <td className="px-4 py-3">
                       <div className="flex flex-col">
-                        <span className="text-ella-navy font-medium">{row.name || "(sem nome)"}</span>
+                        <span className="text-ella-navy font-medium">
+                          {row.name || "(sem nome)"}
+                        </span>
                         <span className="text-ella-subtile text-xs">{row.email}</span>
                       </div>
                     </td>
@@ -205,7 +207,9 @@ export default function AdminAlertsPage() {
                           ))}
                         </div>
                         <div className="text-ella-subtile text-xs">
-                          {row.lastPaidAt ? `Último pagamento: ${row.lastPaidAt}` : "Sem pagamento registrado"}
+                          {row.lastPaidAt
+                            ? `Último pagamento: ${row.lastPaidAt}`
+                            : "Sem pagamento registrado"}
                         </div>
                       </div>
                     </td>

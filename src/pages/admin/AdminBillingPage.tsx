@@ -177,7 +177,9 @@ export default function AdminBillingPage() {
         const next = { ...prev };
         for (const r of rows) {
           if (next[r.userId] != null) continue;
-          const currentPlan = String(r.subscriptionPlan || r.userPlan || "FREE").toUpperCase() as Plan;
+          const currentPlan = String(
+            r.subscriptionPlan || r.userPlan || "FREE",
+          ).toUpperCase() as Plan;
           next[r.userId] = {
             plan: PLAN_OPTIONS.includes(currentPlan) ? currentPlan : "",
             amount: "",
@@ -526,7 +528,11 @@ export default function AdminBillingPage() {
                             ))}
                           </select>
                           <select
-                            value={paymentDraftByUserId[row.userId]?.plan ?? (planByUserId[row.userId] ?? "")}
+                            value={
+                              paymentDraftByUserId[row.userId]?.plan ??
+                              planByUserId[row.userId] ??
+                              ""
+                            }
                             onChange={(e) => {
                               const v = e.target.value as Plan;
                               setPaymentDraftByUserId((prev) => ({
