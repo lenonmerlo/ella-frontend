@@ -10,6 +10,7 @@ import {
   type DashboardResponseDTO,
 } from "../lib/dashboard";
 import { mapBackendToDashboard } from "../lib/mappers/dashboardMapper";
+import { fetchTransactions } from "../services/api/transactionsService";
 import type { DashboardData, SectionId } from "../types/dashboard";
 import { parseISODateLike, tryParseISODateLike } from "../utils/date";
 
@@ -71,6 +72,30 @@ export function useDashboard(navigate?: (path: string) => void) {
       } catch (e) {
         console.error("[Dashboard] Erro ao mapear dados do backend:", e);
       }
+
+      // Prefer fetching transactions via paginated endpoint.
+      // This avoids depending on /dashboard payload size and stays aligned with the backend optimization.
+      try {
+        const pid = getPersonIdFromToken();
+        if (pid) {
+          const txPage = await fetchTransactions(pid, { year, month, page: 0, size: 50 });
+          if (mapped) {
+            mapped.transactions = (txPage?.transactions ?? []).map((t: any, idx: number) => ({
+              id: String(t?.id ?? idx + 1),
+              description: String(t?.description ?? ""),
+              amount: Number(t?.amount ?? 0),
+              category: String(t?.category ?? ""),
+              date: String(t?.purchaseDate ?? t?.transactionDate ?? t?.date ?? ""),
+              purchaseDate: t?.purchaseDate ? String(t.purchaseDate) : undefined,
+              type: String(t?.type ?? "EXPENSE").toUpperCase() === "INCOME" ? "INCOME" : "EXPENSE",
+              scope: t?.scope ?? "PERSONAL",
+            }));
+          }
+        }
+      } catch (e) {
+        console.warn("[Dashboard] Falha ao buscar transações paginadas:", e);
+      }
+
       console.log("[Dashboard] mapped:", mapped);
       setDashboardData(mapped);
       setHasData(true);

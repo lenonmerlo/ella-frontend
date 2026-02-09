@@ -10,8 +10,9 @@ export function AdminRoutes() {
   return (
     <div className="bg-ella-background flex min-h-screen flex-col">
       <Header />
-      <div className="mx-auto w-full max-w-6xl px-6 pt-4">
-        <div className="border-ella-muted bg-ella-card inline-flex gap-1 rounded-full border p-1">
+      <div className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
+        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+          <div className="border-ella-muted bg-ella-card flex min-w-max gap-1 rounded-full border p-1">
           <NavLink
             to="/admin/users"
             className={({ isActive }) =>
@@ -53,6 +54,7 @@ export function AdminRoutes() {
           >
             Alertas
           </NavLink>
+          </div>
         </div>
       </div>
       <div className="flex-1">
