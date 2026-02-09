@@ -37,7 +37,9 @@ export function UploadState({ onClose, onSuccess }: Props) {
   const [uploadType, setUploadType] = useState<"CREDIT_CARD" | "BANK_STATEMENT" | null>(null);
   const [bankStatementResult, setBankStatementResult] =
     useState<BankStatementUploadResponse | null>(null);
-  const [bankStatementBank, setBankStatementBank] = useState<"ITAU" | "C6" | "NUBANK">("ITAU");
+  const [bankStatementBank, setBankStatementBank] = useState<"ITAU" | "C6" | "NUBANK" | "BRADESCO">(
+    "ITAU",
+  );
 
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [infoModalTitle, setInfoModalTitle] = useState<string>("");
@@ -489,6 +491,17 @@ export function UploadState({ onClose, onSuccess }: Props) {
                     }`}
                   >
                     Nubank
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBankStatementBank("BRADESCO")}
+                    className={`rounded-lg px-3 py-1 transition-colors ${
+                      bankStatementBank === "BRADESCO"
+                        ? "text-ella-navy bg-amber-100"
+                        : "text-ella-subtile hover:bg-black/5"
+                    }`}
+                  >
+                    Bradesco
                   </button>
                 </div>
               )}

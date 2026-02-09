@@ -13,47 +13,47 @@ export function AdminRoutes() {
       <div className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
         <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
           <div className="border-ella-muted bg-ella-card flex min-w-max gap-1 rounded-full border p-1">
-          <NavLink
-            to="/admin/users"
-            className={({ isActive }) =>
-              isActive
-                ? "bg-ella-background text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
-                : "text-ella-subtile hover:text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
-            }
-          >
-            Usuários
-          </NavLink>
-          <NavLink
-            to="/admin/audit"
-            className={({ isActive }) =>
-              isActive
-                ? "bg-ella-background text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
-                : "text-ella-subtile hover:text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
-            }
-          >
-            Auditoria
-          </NavLink>
-          <NavLink
-            to="/admin/billing"
-            className={({ isActive }) =>
-              isActive
-                ? "bg-ella-background text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
-                : "text-ella-subtile hover:text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
-            }
-          >
-            Pagamentos
-          </NavLink>
+            <NavLink
+              to="/admin/users"
+              className={({ isActive }) =>
+                isActive
+                  ? "bg-ella-background text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
+                  : "text-ella-subtile hover:text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
+              }
+            >
+              Usuários
+            </NavLink>
+            <NavLink
+              to="/admin/audit"
+              className={({ isActive }) =>
+                isActive
+                  ? "bg-ella-background text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
+                  : "text-ella-subtile hover:text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
+              }
+            >
+              Auditoria
+            </NavLink>
+            <NavLink
+              to="/admin/billing"
+              className={({ isActive }) =>
+                isActive
+                  ? "bg-ella-background text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
+                  : "text-ella-subtile hover:text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
+              }
+            >
+              Pagamentos
+            </NavLink>
 
-          <NavLink
-            to="/admin/alerts"
-            className={({ isActive }) =>
-              isActive
-                ? "bg-ella-background text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
-                : "text-ella-subtile hover:text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
-            }
-          >
-            Alertas
-          </NavLink>
+            <NavLink
+              to="/admin/alerts"
+              className={({ isActive }) =>
+                isActive
+                  ? "bg-ella-background text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
+                  : "text-ella-subtile hover:text-ella-navy rounded-full px-4 py-2 text-sm font-medium"
+              }
+            >
+              Alertas
+            </NavLink>
           </div>
         </div>
       </div>

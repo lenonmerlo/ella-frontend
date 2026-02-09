@@ -120,7 +120,7 @@ export function Header() {
                   aria-label="Fechar menu"
                   onClick={() => setMobileOpen(false)}
                 />
-                <div className="bg-ella-card border-ella-muted absolute right-0 top-0 h-full w-full max-w-xs border-l p-4">
+                <div className="bg-ella-card border-ella-muted absolute top-0 right-0 h-full w-full max-w-xs border-l p-4">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="bg-ella-gold flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium text-white">
