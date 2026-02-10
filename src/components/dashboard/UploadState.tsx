@@ -37,8 +37,10 @@ export function UploadState({ onClose, onSuccess }: Props) {
   const [uploadType, setUploadType] = useState<"CREDIT_CARD" | "BANK_STATEMENT" | null>(null);
   const [bankStatementResult, setBankStatementResult] =
     useState<BankStatementUploadResponse | null>(null);
-  const [bankStatementBank, setBankStatementBank] = useState<"ITAU" | "C6" | "NUBANK" | "BRADESCO">(
-    "ITAU",
+  const [bankStatementBank, setBankStatementBank] = useState<
+    "ITAU_PERSONNALITE" | "ITAU" | "C6" | "NUBANK" | "BRADESCO"
+  >(
+    "ITAU_PERSONNALITE",
   );
 
   const [infoModalOpen, setInfoModalOpen] = useState(false);
@@ -459,6 +461,17 @@ export function UploadState({ onClose, onSuccess }: Props) {
               {uploadType === "BANK_STATEMENT" && (
                 <div className="border-ella-muted bg-ella-card flex items-center gap-2 rounded-xl border px-3 py-2 text-sm">
                   <span className="text-ella-subtile">Banco:</span>
+                  <button
+                    type="button"
+                    onClick={() => setBankStatementBank("ITAU_PERSONNALITE")}
+                    className={`rounded-lg px-3 py-1 transition-colors ${
+                      bankStatementBank === "ITAU_PERSONNALITE"
+                        ? "text-ella-navy bg-amber-100"
+                        : "text-ella-subtile hover:bg-black/5"
+                    }`}
+                  >
+                    Itaú Personnalité
+                  </button>
                   <button
                     type="button"
                     onClick={() => setBankStatementBank("ITAU")}
