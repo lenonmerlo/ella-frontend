@@ -39,8 +39,9 @@ export default function ResetPasswordPage() {
     setSuccess(null);
 
     try {
-      await http.post("/auth/reset-password", null, {
-        params: { token, newPassword },
+      await http.post("/auth/reset-password", {
+        token,
+        newPassword,
       });
       setSuccess("Senha redefinida com sucesso. Você já pode fazer login.");
     } catch (err) {

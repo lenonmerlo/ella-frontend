@@ -65,8 +65,9 @@ describe("ResetPasswordPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /redefinir senha/i }));
 
     await waitFor(() => {
-      expect(httpModule.http.post).toHaveBeenCalledWith("/auth/reset-password", null, {
-        params: { token: "abc", newPassword: "password123" },
+      expect(httpModule.http.post).toHaveBeenCalledWith("/auth/reset-password", {
+        token: "abc",
+        newPassword: "password123",
       });
     });
 

@@ -5,6 +5,7 @@ import CookiePolicy from "../pages/CookiePolicy";
 import HomePage from "../pages/Home";
 import PrivacyPage from "../pages/PrivacyPage";
 import PrivacyPolicy from "../pages/PrivacyPolicy";
+import ResetPasswordPage from "../pages/ResetPasswordPage";
 import TermsOfService from "../pages/TermsOfService";
 import { AdminRoutes } from "./AdminRoutes";
 import { AuthRoutes } from "./AuthRoutes";
@@ -61,6 +62,7 @@ export function AppRoutes() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/cookies" element={<CookiePolicy />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth/*" element={<AuthRoutes />} />
         <Route
           path="/admin/*"
